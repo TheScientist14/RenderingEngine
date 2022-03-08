@@ -1,9 +1,9 @@
-#include "tom/AppTom.h"
+#include "elvyn/AppElvyn.h"
 
 int main(int argc, char* argv[])
 {
-    AppTom* app = new AppTom();
-    app->run();
+    AppElvyn* app = new AppElvyn();
+    app->Run();
 
     return 0;
 }

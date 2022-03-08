@@ -74,26 +74,28 @@ void AppElvyn::Run() {
 
 
         for (int i = 0; i < row; ++i) {
-            for (int j = 0; j < col; j+=3) {
-
-                glColor4f(cube_vertices[i][j], cube_vertices[i][j+1], cube_vertices[i][j+2], 1.0f);
-                glVertex3f(cube_vertices[i][j],cube_vertices[i][j+1],cube_vertices[i][j+2]);
-
-
-            }
+            glColor4f(cube_vertices[i][0], cube_vertices[i][1], cube_vertices[i][2], 1.0f);
+            glVertex3f(cube_vertices[i][0],cube_vertices[i][1],cube_vertices[i][2]);
         }
 
 
-                  // Bottom Right Of The Quad (Right)
+        // Bottom Right Of The Quad (Right)
         glEnd();                        // Done Drawing The Quad
         glBegin(GL_LINES);
+        glColor4f(0.0f, 0.0f, 0.0f,0.0f);
 
-        for (int i = 0; i < row; ++i) {
-            for (int j = 0; j < col; j+=3) {
-
-                glColor4f(0.0f, 0.0f, 0.0f,0.0f);
-                glVertex3f(cube_vertices[i][j],cube_vertices[i][j+1],cube_vertices[i][j+2]);
-            }
+        for (int i = 0; i < row; i++) {
+            glVertex3f(cube_vertices[i][0],cube_vertices[i][1],cube_vertices[i][2]);
+            glVertex3f(cube_vertices[i+1][0],cube_vertices[i+1][1],cube_vertices[i+1][2]);
+            i++;
+            glVertex3f(cube_vertices[i][0],cube_vertices[i][1],cube_vertices[i][2]);
+            glVertex3f(cube_vertices[i+1][0],cube_vertices[i+1][1],cube_vertices[i+1][2]);
+            i++;
+            glVertex3f(cube_vertices[i][0],cube_vertices[i][1],cube_vertices[i][2]);
+            glVertex3f(cube_vertices[i+1][0],cube_vertices[i+1][1],cube_vertices[i+1][2]);
+            i++;
+            glVertex3f(cube_vertices[i][0],cube_vertices[i][1],cube_vertices[i][2]);
+            glVertex3f(cube_vertices[i-3][0],cube_vertices[i-3][1],cube_vertices[i-3][2]);
         }
         glEnd();
 
