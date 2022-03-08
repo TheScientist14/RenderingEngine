@@ -13,6 +13,23 @@
 
 #include <type_traits>
 
+#include <glm/vec3.hpp> // glm::vec3
+#include <glm/vec4.hpp> // glm::vec4
+#include <glm/mat4x4.hpp> // glm::mat4
+#include <glm/ext/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale
+#include <glm/ext/matrix_clip_space.hpp> // glm::perspective
+#include <glm/ext/scalar_constants.hpp> // glm::pi
+
+glm::mat4 camera(float Translate, glm::vec2 const& Rotate)
+{
+    glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
+    glm::mat4 View = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Translate));
+    View = glm::rotate(View, Rotate.y, glm::vec3(-1.0f, 0.0f, 0.0f));
+    View = glm::rotate(View, Rotate.x, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
+    return Projection * View * Model;
+}
+
 void AppTom::run() {
     SDL_Init(SDL_INIT_VIDEO);
 
@@ -29,6 +46,9 @@ void AppTom::run() {
     SDL_GLContext context = SDL_GL_CreateContext(win);
     SDL_GL_MakeCurrent(win, context);
 
+    SDL_ShowCursor(0);
+    //SDL_SetWindowGrab(win, SDL_TRUE);
+
     float cube_vertices[] = {
             1, 1, 1, 1, -1, 1, -1, -1, 1, -1, 1, 1,
             1, 1, 1, 1, -1, 1, 1, -1, -1, 1, 1, -1,
@@ -41,6 +61,15 @@ void AppTom::run() {
     appRunning = true;
     cameraRotationX = 0;
     cameraRotationY = 0;
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glFrustum(0, 1, 0, 1, 1, 5);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    float radius = 2;
+
     while (appRunning) {
         handle_events();
         glViewport(0, 0, 1024, 768);
@@ -53,8 +82,13 @@ void AppTom::run() {
 
         glLoadIdentity();
         glScalef(0.5f, 0.5f, 0.5f);
-        glRotatef(cameraRotationX, 0, 1, 0);
-        glRotatef(cameraRotationY, 1, 0, 0);
+//        glRotatef(cameraRotationX, 0, 1, 0);
+//        glRotatef(cameraRotationY, 1, 0, 0);
+        glm::vec3 cameraPos = glm::vec3(1, 1, 1);
+        glm::vec3 cameraTarget = glm::vec3(0.0, 0.0, 0.0);
+        glm::mat4 camMatrix = glm::lookAt(cameraPos, cameraTarget, glm::vec3(0, 1, 0));
+        glMatrixMode(GL_MODELVIEW);
+        glLoadMatrixf(&camMatrix[0][0]);
 
         for (int i = 0; i < std::extent<decltype(cube_vertices)>::value; i += 4 * 3) {
             glBegin(GL_QUADS);
@@ -86,9 +120,17 @@ void AppTom::handle_events() {
                 appRunning = false;
                 return;
                 break;
+            case SDL_MOUSEBUTTONDOWN:
+                isDragging = true;
+                break;
+            case SDL_MOUSEBUTTONUP:
+                isDragging = false;
+                break;
             case SDL_MOUSEMOTION:
-                cameraRotationX -= curEvent.motion.xrel * 0.5f;
-                cameraRotationY -= curEvent.motion.yrel * 0.5f;
+                if(isDragging){
+                    cameraRotationX -= curEvent.motion.xrel * 0.5f;
+                    cameraRotationY -= curEvent.motion.yrel * 0.5f;
+                }
         }
     }
 }
