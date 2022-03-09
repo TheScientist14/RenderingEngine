@@ -1,12 +1,14 @@
 #pragma once
 
+#include <glm/vec3.hpp>
+
 class AppTom
 {
 private:
     bool appRunning;
 
-    float cameraRotationX;
-    float cameraRotationY;
+    glm::vec3 cameraPos;
+    glm::vec3 cameraRot;
 
     bool isDragging;
 

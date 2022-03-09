@@ -12,22 +12,86 @@
 #include <SDL.h>
 
 #include <type_traits>
+#include <chrono>
 
-#include <glm/vec3.hpp> // glm::vec3
-#include <glm/vec4.hpp> // glm::vec4
-#include <glm/mat4x4.hpp> // glm::mat4
-#include <glm/ext/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale
-#include <glm/ext/matrix_clip_space.hpp> // glm::perspective
-#include <glm/ext/scalar_constants.hpp> // glm::pi
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
 
-glm::mat4 camera(float Translate, glm::vec2 const& Rotate)
-{
-    glm::mat4 Projection = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.f);
-    glm::mat4 View = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -Translate));
-    View = glm::rotate(View, Rotate.y, glm::vec3(-1.0f, 0.0f, 0.0f));
-    View = glm::rotate(View, Rotate.x, glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::mat4 Model = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
-    return Projection * View * Model;
+float cube_vertices[] = {
+        1, 1, 1, 1, -1, 1, -1, -1, 1, -1, 1, 1,
+        1, 1, 1, 1, -1, 1, 1, -1, -1, 1, 1, -1,
+        1, 1, 1, 1, 1, -1, -1, 1, -1, -1, 1, 1,
+        1, 1, -1, 1, -1, -1, -1, -1, -1, -1, 1, -1,
+        -1, 1, 1, -1, -1, 1, -1, -1, -1, -1, 1, -1,
+        1, -1, 1, 1, -1, -1, -1, -1, -1, -1, -1, 1
+};
+
+glm::vec3 vertices[]{
+        {0,1,1}, {1,1,1}, {1,1,0}, {0,1,0}, // top
+        {0,0,1}, {1,0,1}, {1,0,0}, {0,0,0}  // down
+};
+int triangles[][3]{
+        {0, 1, 2}, {0, 2, 3}, // top
+        {0, 1, 4}, {1, 4, 5}, // front
+        {0, 3, 4}, {3, 4, 7}, // left
+        {4, 5, 6}, {4, 6, 7}, // down
+        {2, 3, 6}, {3, 6, 7}, // back
+        {1, 2, 5}, {2, 5, 6}  // right
+};
+int edges[][2]{
+        {0, 1}, {1, 2}, {2, 3}, {3, 0}, // top edges
+        {0, 4}, {1, 5}, {2, 6}, {3, 7}, // vertical edges
+        {4, 5}, {5, 6}, {6, 7}, {7, 4}  // down edges
+};
+
+void drawCube(){
+    for (int i = 0; i < std::extent<decltype(cube_vertices)>::value; i += 4 * 3) {
+        glBegin(GL_QUADS);
+        glColor4f((cube_vertices[i] + cube_vertices[i+3] + cube_vertices[i + 6] + cube_vertices[i + 9] + 4) / 8, (cube_vertices[i+1] + cube_vertices[i+4] + cube_vertices[i + 7] + cube_vertices[i + 10] + 4) / 8, (cube_vertices[i+2] + cube_vertices[i+5] + cube_vertices[i + 8] + cube_vertices[i + 11] + 4) / 8, 1.0);
+
+        for (int j = 0; j < 4 * 3; j += 3) {
+            glVertex3f(cube_vertices[i + j], cube_vertices[i + j + 1], cube_vertices[i + j + 2]);
+        }
+        glEnd();
+    }
+}
+
+void drawGeometry(glm::vec3 vertices[], int nV, int triangles[][3], int nT, int edges[][2], int nE, bool drawnLines){
+    glm::vec3 minCoord = {0,0,0};
+    glm::vec3 maxCoord = {0,0,0};
+    for(int i = 0; i < nV; i++){
+        for(int j = 0; j < 3; j++){
+            if(vertices[i][j] < minCoord[j]){
+                minCoord[j] = vertices[i][j];
+            }
+            if(vertices[i][j] > maxCoord[j]){
+                maxCoord[j] = vertices[i][j];
+            }
+        }
+    } // getting rect bounds
+
+    glBegin(GL_TRIANGLES);
+    for(int i = 0; i < nT; i++){
+        glColor3f(
+                (vertices[triangles[i][0]][0] + vertices[triangles[i][1]][0] + vertices[triangles[i][2]][0] - 3 * minCoord[0]) / (3 * (maxCoord[0] - minCoord[0])),
+                (vertices[triangles[i][0]][1] + vertices[triangles[i][1]][1] + vertices[triangles[i][2]][1] - 3 * minCoord[1]) / (3 * (maxCoord[1] - minCoord[1])),
+                (vertices[triangles[i][0]][2] + vertices[triangles[i][1]][2] + vertices[triangles[i][2]][2] - 3 * minCoord[2]) / (3 * (maxCoord[2] - minCoord[2]))
+                );
+        for(int j = 0; j < 3; j++){
+            glVertex3fv(&(vertices[triangles[i][j]][0]));
+        }
+    }
+    glEnd(); // TRIANGLES
+    if(drawnLines){
+        glBegin(GL_LINES);
+        for(int i = 0; i < nE; i++){
+            glColor3f(0, 0, 0);
+            for(int j = 0; j < 2; j++){
+                glVertex3fv(&(vertices[edges[i][j]][0]));
+            }
+        }
+        glEnd(); // LINES
+    }
 }
 
 void AppTom::run() {
@@ -49,26 +113,10 @@ void AppTom::run() {
     SDL_ShowCursor(0);
     //SDL_SetWindowGrab(win, SDL_TRUE);
 
-    float cube_vertices[] = {
-            1, 1, 1, 1, -1, 1, -1, -1, 1, -1, 1, 1,
-            1, 1, 1, 1, -1, 1, 1, -1, -1, 1, 1, -1,
-            1, 1, 1, 1, 1, -1, -1, 1, -1, -1, 1, 1,
-            1, 1, -1, 1, -1, -1, -1, -1, -1, -1, 1, -1,
-            -1, 1, 1, -1, -1, 1, -1, -1, -1, -1, 1, -1,
-            1, -1, 1, 1, -1, -1, -1, -1, -1, -1, -1, 1
-    };
-
     appRunning = true;
-    cameraRotationX = 0;
-    cameraRotationY = 0;
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glFrustum(0, 1, 0, 1, 1, 5);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    float radius = 2;
+    cameraPos = {0,0,10};
+    cameraRot = {0,0,0};
+    std::chrono::time_point<std::chrono::steady_clock> prevTime = std::chrono::steady_clock::now();
 
     while (appRunning) {
         handle_events();
@@ -80,33 +128,52 @@ void AppTom::run() {
         glDepthMask(GL_TRUE);
         glDepthFunc(GL_LEQUAL);
 
-        glLoadIdentity();
-        glScalef(0.5f, 0.5f, 0.5f);
-//        glRotatef(cameraRotationX, 0, 1, 0);
-//        glRotatef(cameraRotationY, 1, 0, 0);
-        glm::vec3 cameraPos = glm::vec3(1, 1, 1);
-        glm::vec3 cameraTarget = glm::vec3(0.0, 0.0, 0.0);
-        glm::mat4 camMatrix = glm::lookAt(cameraPos, cameraTarget, glm::vec3(0, 1, 0));
+        glMatrixMode(GL_PROJECTION);
+//        glFrustum(-1,1,-1,1,1,100);
+        glm::mat4 projMat = glm::frustum(-1,1,-1,1,1,100);
+        glLoadMatrixf(glm::value_ptr(projMat));
+
         glMatrixMode(GL_MODELVIEW);
-        glLoadMatrixf(&camMatrix[0][0]);
+        const float radius = 2;
 
-        for (int i = 0; i < std::extent<decltype(cube_vertices)>::value; i += 4 * 3) {
-            glBegin(GL_QUADS);
-            glColor4f((cube_vertices[i] + cube_vertices[i+3] + cube_vertices[i + 6] + cube_vertices[i + 9] + 4) / 8, (cube_vertices[i+1] + cube_vertices[i+4] + cube_vertices[i + 7] + cube_vertices[i + 10] + 4) / 8, (cube_vertices[i+2] + cube_vertices[i+5] + cube_vertices[i + 8] + cube_vertices[i + 11] + 4) / 8, 1.0);
+        //camera
+        std::chrono::time_point<std::chrono::steady_clock> curTime = std::chrono::steady_clock::now();
+        std::chrono::duration<float> fTime = curTime - prevTime;
+        float camX = glm::sin(fTime.count()/5) * radius;
+        float camZ = glm::cos(fTime.count()/5) * radius;
 
-            for (int j = 0; j < 4 * 3; j += 3) {
-                glVertex3f(cube_vertices[i + j], cube_vertices[i + j + 1], cube_vertices[i + j + 2]);
-            }
-            glEnd();
-        }
+        glm::vec3 cameraPos = glm::vec3(camX, 1.0, camZ);
+        glm::vec3 cameraTarget = glm::vec3(0.0, 0.0, 0.0);
 
-//        glBegin(GL_QUADS);
-//        glColor4f( 1.0f, 1.0f,-1.0f, 1.0f);
-//        glVertex3f( 1.0f, 1.0f,-1.0f);          // Top Right Of The Quad (Top)
-//        glVertex3f(-1.0f, 1.0f,-1.0f);          // Top Left Of The Quad (Top)
-//        glVertex3f(-1.0f, 1.0f, 1.0f);          // Bottom Left Of The Quad (Top)
-//        glVertex3f( 1.0f, 1.0f, 1.0f);
-//        glEnd();
+        // Creation de la camera
+        glm::mat4 view;
+        view = glm::lookAt(    cameraPos, //Position de la camera
+                               cameraTarget, //Cible à regarder
+                               glm::vec3(0.0, 1.0, 0.0)); //position vertical
+
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        glLoadMatrixf(&view[0][0]);
+
+        glBegin(GL_LINES);
+
+        glColor4f(1.0,0.0,0.0,1.0);
+        glVertex3f(0.0,0.0,0.0);
+        glVertex3f(10.0,0.0,0.0);
+
+        glColor4f(0.0,1.0,0.0,1.0);
+        glVertex3f(0.0,0.0,0.0);
+        glVertex3f(0.0,10.0,0.0);
+
+        glColor4f(0.0,0.0,1.0,1.0);
+        glVertex3f(0.0,0.0,0.0);
+        glVertex3f(0.0,0.0,10.0);
+
+        glEnd();
+
+        glTranslatef(-0.5f, -0.5f, -0.5f);
+        drawGeometry(vertices, 8, triangles, 12, edges, 12, true);
+        //drawCube();
 
         SDL_GL_SwapWindow(win);
     }
@@ -128,8 +195,30 @@ void AppTom::handle_events() {
                 break;
             case SDL_MOUSEMOTION:
                 if(isDragging){
-                    cameraRotationX -= curEvent.motion.xrel * 0.5f;
-                    cameraRotationY -= curEvent.motion.yrel * 0.5f;
+                    cameraRot[0] -= curEvent.motion.xrel * 0.5f;
+                    cameraRot[1] -= curEvent.motion.yrel * 0.5f;
+                }
+            case SDL_KEYDOWN:
+                float cameraSpeed = 0.01f;
+                if(curEvent.key.keysym.sym == SDLK_LEFT || curEvent.key.keysym.sym == SDLK_q){
+                    cameraPos[0] -= cameraSpeed;
+                }
+                if(curEvent.key.keysym.sym == SDLK_RIGHT || curEvent.key.keysym.sym == SDLK_d){
+                    cameraPos[0] += cameraSpeed;
+                }
+                if(curEvent.key.keysym.sym == SDLK_UP || curEvent.key.keysym.sym == SDLK_z){
+                    cameraPos[2] -= cameraSpeed;
+                }
+                if(curEvent.key.keysym.sym == SDLK_DOWN || curEvent.key.keysym.sym == SDLK_s){
+                    cameraPos[2] += cameraSpeed;
+                }
+                if(curEvent.key.keysym.sym == SDLK_SPACE){
+                    if(curEvent.key.keysym.mod == KMOD_SHIFT || curEvent.key.keysym.mod == KMOD_CTRL){
+                        cameraPos[1] -= cameraSpeed;
+                    }
+                    else{
+                        cameraPos[1] += cameraSpeed;
+                    }
                 }
         }
     }

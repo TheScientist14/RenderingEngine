@@ -73,8 +73,11 @@ void AppElvyn::Run() {
         glDepthMask(GL_TRUE);
         glDepthFunc(GL_LEQUAL);
 
+        glMatrixMode(GL_PROJECTION);
+        glm::mat4 projMat = glm::frustum(-1,1,-1,1,1,100);
+        glLoadMatrixf(glm::value_ptr(projMat));
 
-        const float radius = 0.5;
+        const float radius = 5;
 
         //camera
         auto curTime = std::chrono::steady_clock::now();
@@ -94,29 +97,9 @@ void AppElvyn::Run() {
         glMatrixMode(GL_MODELVIEW);
         glLoadMatrixf(&view[0][0]);
 
-        glMatrixMode(GL_PROJECTION);
-        glm::mat4 projMat = glm::frustum(-1,1,-1,1,1,100);
-        glLoadMatrixf(glm::value_ptr(projMat));
 
 
-
-        // generate axis
-        glBegin(GL_LINES);
-
-        glColor4f(1.0,0.0,0.0,1.0);
-        glVertex3f(0.0,0.0,0.0);
-        glVertex3f(10.0,0.0,0.0);
-
-        glColor4f(0.0,1.0,0.0,1.0);
-        glVertex3f(0.0,0.0,0.0);
-        glVertex3f(0.0,10.0,0.0);
-
-        glColor4f(0.0,0.0,1.0,1.0);
-        glVertex3f(0.0,0.0,0.0);
-        glVertex3f(0.0,0.0,10.0);
-
-        glEnd();
-
+        glPushMatrix();
         glTranslatef(0.0f,0.0f,-2.0f);
         glScalef(0.5f,0.5f,0.5f);
 
@@ -156,6 +139,25 @@ void AppElvyn::Run() {
 
         glEnd();
 
+        glPopMatrix();
+
+        // generate axis
+        glBegin(GL_LINES);
+
+        glColor4f(1.0,0.0,0.0,1.0);
+        glVertex3f(0.0,0.0,0.0);
+        glVertex3f(10.0,0.0,0.0);
+
+        glColor4f(0.0,1.0,0.0,1.0);
+        glVertex3f(0.0,0.0,0.0);
+        glVertex3f(0.0,10.0,0.0);
+
+        glColor4f(0.0,0.0,1.0,1.0);
+        glVertex3f(0.0,0.0,0.0);
+        glVertex3f(0.0,0.0,10.0);
+
+        glEnd();
+
         SDL_GL_SwapWindow(win);
 
     }
@@ -176,6 +178,4 @@ void AppElvyn::HandleEvent() {
                 cameraRotationY -= curEvent.motion.yrel * 0.5f;
         }
     }
-
-
 }
