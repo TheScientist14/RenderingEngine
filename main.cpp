@@ -4,7 +4,7 @@
 int main(int argc, char* argv[])
 {
     AppElvyn* app = new AppElvyn();
-    app->Run2();
+    app->Run();
 
     return 0;
 }
