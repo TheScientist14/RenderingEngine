@@ -5,7 +5,7 @@ add_subdirectory(dep/SDL dep/SDL)
 set(SDL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dep/SDL/include)
 set(GLM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dep/glm)
 
-add_executable(moteur main.cpp tom/AppTom.h tom/AppTom.cpp elvyn/AppElvyn.cpp elvyn/AppElvyn.h antoine/AppAntoine.cpp antoine/AppAntoine.h)
+add_executable(moteur main.cpp tom/AppTom.h tom/AppTom.cpp elvyn/AppElvyn.cpp elvyn/AppElvyn.h antoine/AppAntoine.cpp antoine/AppAntoine.h elvyn/TestingZone.cpp elvyn/TestingZone.h)
 target_include_directories(moteur PRIVATE
 	${SDL_INCLUDE_DIR}
 	${GLM_INCLUDE_DIR}

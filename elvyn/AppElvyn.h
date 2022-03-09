@@ -16,6 +16,7 @@ public:
     float cameraRotationY;
 
     void Run();
+    void Run2();
     void HandleEvent();
 
 };
