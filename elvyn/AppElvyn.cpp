@@ -90,7 +90,7 @@ void AppElvyn::Run() {
         glDepthFunc(GL_LEQUAL);
 
         glMatrixMode(GL_PROJECTION);
-        glm::mat4 projMat = glm::frustum(-((float)(windowWidth)/1000),(float)(windowWidth)/1000,-((float)(windowHeight)/1000),(float)(windowHeight)/1000,1.0f,100.0f);
+        glm::mat4 projMat = glm::frustum(-((float)(windowWidth)/2000),(float)(windowWidth)/2000,-((float)(windowHeight)/2000),(float)(windowHeight)/2000,1.0f,100.0f);
         glLoadMatrixf(glm::value_ptr(projMat));
 
         const float radius = 5;
@@ -129,7 +129,6 @@ void AppElvyn::Run() {
 
 
         glColor3f(0.0,0.0,0.0);
-        glVertexPointer(3,GL_FLOAT,sizeof(glm::vec3),vertices);
         glDrawElements(GL_LINES,12*2,GL_UNSIGNED_INT,edges);
 
 
