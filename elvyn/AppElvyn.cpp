@@ -52,11 +52,13 @@ void AppElvyn::Run() {
     //array of points
     int triangles[][3]{
             {0, 1, 2}, {0, 2, 3}, // top
-            {0, 1, 4}, {1, 4, 5}, // front
-            {0, 3, 4}, {3, 4, 7}, // left
             {4, 5, 6}, {4, 6, 7}, // down
-            {2, 3, 6}, {3, 6, 7}, // back
-            {1, 2, 5}, {2, 5, 6}  // right
+
+            {9, 10, 13}, {10, 13, 14}, // right
+            {8, 11, 12}, {11, 12, 15}, // left
+
+            {18, 19, 22}, {19, 22, 23}, // back
+            {16, 17, 20}, {17, 20, 21}  // front
     };
 
     int edges[][2]{
@@ -68,7 +70,19 @@ void AppElvyn::Run() {
     //Pointers
     glm::vec3 vertices[]{
             {-1,1,1}, {1,1,1}, {1,1,-1}, {-1,1,-1}, // top
-            {-1,-1,1}, {1,-1,1}, {1,-1,-1}, {-1,-1,-1}  // down
+            {-1,-1,1}, {1,-1,1}, {1,-1,-1}, {-1,-1,-1},  // down
+            {-1,1,1}, {1,1,1}, {1,1,-1}, {-1,1,-1}, // left right right left
+            {-1,-1,1}, {1,-1,1}, {1,-1,-1}, {-1,-1,-1},  // left right right left
+            {-1,1,1}, {1,1,1}, {1,1,-1}, {-1,1,-1}, // front back
+            {-1,-1,1}, {1,-1,1}, {1,-1,-1}, {-1,-1,-1}  // front back
+    };
+    glm::vec3 verticesNormal[]{
+            {0,1,0}, {0,1,0}, {0,1,0}, {0,1,0}, // top
+            {0,-1,0}, {0,-1,0}, {0,-1,0}, {0,-1,0},  // down
+            {-1,0,0}, {1,0,0}, {1,0,0}, {-1,0,0},// left right right left
+            {-1,0,0}, {1,0,0}, {1,0,0}, {-1,0,0},// left right right left
+            {0,0,1}, {0,0,1}, {0,0,-1}, {0,0,-1}, // front back
+            {0,0,1}, {0,0,1}, {0,0,-1}, {0,0,-1} // front back
     };
 
     while (appRunning) {
@@ -113,19 +127,25 @@ void AppElvyn::Run() {
         glMatrixMode(GL_MODELVIEW);
         glLoadMatrixf(&view[0][0]);
 
-//        glEnable(GL_LIGHTING);
-//        glEnable(GL_LIGHT0);
-//        glLightfv(GL_LIGHT0,GL_LINEAR_ATTENUATION,)
 
+        glEnableClientState(GL_NORMAL_ARRAY);
         glEnableClientState(GL_COLOR_ARRAY);
         glEnableClientState(GL_VERTEX_ARRAY);
 
 
+
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+
+
+
         glVertexPointer(3,GL_FLOAT,sizeof(glm::vec3),vertices);
         glColorPointer(3,GL_FLOAT, sizeof(glm::vec3), vertices);
+        glNormalPointer(GL_FLOAT, sizeof(glm::vec3), verticesNormal);
         glDrawElements(GL_TRIANGLES,12*3,GL_UNSIGNED_INT,triangles);
 
         glDisableClientState(GL_COLOR_ARRAY);
+        glDisableClientState(GL_NORMAL_ARRAY);
 
 
         glColor3f(0.0,0.0,0.0);
