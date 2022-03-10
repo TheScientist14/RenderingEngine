@@ -30,6 +30,8 @@ glm::vec3 vertices[]{
         {0,1,1}, {1,1,1}, {1,1,0}, {0,1,0}, // top
         {0,0,1}, {1,0,1}, {1,0,0}, {0,0,0}  // down
 };
+glm::vec3 colors[8];
+
 int triangles[][3]{
         {0, 1, 2}, {0, 2, 3}, // top
         {0, 1, 4}, {1, 4, 5}, // front
@@ -56,7 +58,7 @@ void drawCube(){
     }
 }
 
-void drawGeometry(glm::vec3 vertices[], int nV, int triangles[][3], int nT, int edges[][2], int nE, bool drawnLines){
+void computeColor(glm::vec3 vertices[], glm::vec3 colors[], int nV) {
     glm::vec3 minCoord = {0,0,0};
     glm::vec3 maxCoord = {0,0,0};
     for(int i = 0; i < nV; i++){
@@ -69,42 +71,49 @@ void drawGeometry(glm::vec3 vertices[], int nV, int triangles[][3], int nT, int 
             }
         }
     } // getting rect bounds
+    //for (int i = 0; i < nT; i++) {
+    /*(vertices[triangles[i][0]][0] + vertices[triangles[i][1]][0] + vertices[triangles[i][2]][0] - 3 * minCoord[0]) / (3 * (maxCoord[0] - minCoord[0])),
+        (vertices[triangles[i][0]][1] + vertices[triangles[i][1]][1] + vertices[triangles[i][2]][1] - 3 * minCoord[1]) / (3 * (maxCoord[1] - minCoord[1])),
+        (vertices[triangles[i][0]][2] + vertices[triangles[i][1]][2] + vertices[triangles[i][2]][2] - 3 * minCoord[2]) / (3 * (maxCoord[2] - minCoord[2]))*/
+}
 
-    glBegin(GL_TRIANGLES);
-    for(int i = 0; i < nT; i++){
-        glColor3f(
-                (vertices[triangles[i][0]][0] + vertices[triangles[i][1]][0] + vertices[triangles[i][2]][0] - 3 * minCoord[0]) / (3 * (maxCoord[0] - minCoord[0])),
-                (vertices[triangles[i][0]][1] + vertices[triangles[i][1]][1] + vertices[triangles[i][2]][1] - 3 * minCoord[1]) / (3 * (maxCoord[1] - minCoord[1])),
-                (vertices[triangles[i][0]][2] + vertices[triangles[i][1]][2] + vertices[triangles[i][2]][2] - 3 * minCoord[2]) / (3 * (maxCoord[2] - minCoord[2]))
-                );
-        for(int j = 0; j < 3; j++){
-            glVertex3fv(&(vertices[triangles[i][j]][0]));
-        }
-    }
-    glEnd(); // TRIANGLES
+void drawGeometry(glm::vec3 vertices[], glm::vec3 colors[], int nV, int triangles[][3], int nT, int edges[][2], int nE, bool drawnLines) {
+    glVertexPointer(3, GL_FLOAT, 0, vertices);
+    glColorPointer(3, GL_FLOAT, 0, colors);
+
+    glDrawElements(GL_TRIANGLES, nT * 3, GL_UNSIGNED_INT, triangles);
+
     if(drawnLines){
-        glBegin(GL_LINES);
-        for(int i = 0; i < nE; i++){
-            glColor3f(0, 0, 0);
-            for(int j = 0; j < 2; j++){
-                glVertex3fv(&(vertices[edges[i][j]][0]));
-            }
-        }
-        glEnd(); // LINES
+        glDisableClientState(GL_COLOR_ARRAY);
+        glColor3f(0, 0, 0);
+        glDrawElements(GL_LINES, nE*2, GL_UNSIGNED_INT, edges);
+        glEnableClientState(GL_COLOR_ARRAY);
     }
 }
 
-void AppTom::run() {
+// nV = nSlices * nSlices / 2 + 2
+void computeSphereVertices(glm::vec3 vertices[], glm::vec3 triangles[], int nSlices) {
+    vertices[0] = glm::vec3(0, 1, 0);
+    for (float i = 1; i < nSlices / 2; i++) {
+        float radius = glm::cos(glm::pi<float>() * i / nSlices);
+        for (float j = 0; j < nSlices; j++) {
+            vertices[(int)(i-1) * nSlices + (int)j + 1] = glm::vec3(radius * glm::cos(j), glm::sin(glm::pi<float>() * i / nSlices), radius * glm::sin(j));
+        }
+    }
+    vertices[nSlices * (nSlices-1) / 2 + 1] = glm::vec3(0, -1, 0);
+}
+
+glm::vec3 sphereVertices[16*15+2];
+
+SDL_Window* init_window() {
     SDL_Init(SDL_INIT_VIDEO);
 
-    uint32_t windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+    uint32_t windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN;
 
-    // SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_
-
-    SDL_Window *win = SDL_CreateWindow("Moteur",
-                                       SDL_WINDOWPOS_UNDEFINED,
-                                       SDL_WINDOWPOS_UNDEFINED,
-                                       1024, 768, windowFlags
+    SDL_Window* win = SDL_CreateWindow("Moteur",
+        SDL_WINDOWPOS_UNDEFINED,
+        SDL_WINDOWPOS_UNDEFINED,
+        1024, 768, windowFlags
     );
 
     SDL_GLContext context = SDL_GL_CreateContext(win);
@@ -113,10 +122,22 @@ void AppTom::run() {
     SDL_ShowCursor(0);
     //SDL_SetWindowGrab(win, SDL_TRUE);
 
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+
+    return win;
+}
+
+void AppTom::run() {
+
+    SDL_Window *win = init_window();
+
     appRunning = true;
     cameraPos = {0,0,10};
     cameraRot = {0,0,0};
     std::chrono::time_point<std::chrono::steady_clock> prevTime = std::chrono::steady_clock::now();
+
+    computeSphereVertices(sphereVertices, nullptr, 16);
 
     while (appRunning) {
         handle_events();
@@ -130,7 +151,7 @@ void AppTom::run() {
 
         glMatrixMode(GL_PROJECTION);
 //        glFrustum(-1,1,-1,1,1,100);
-        glm::mat4 projMat = glm::frustum(-1,1,-1,1,1,100);
+        glm::mat4 projMat = glm::frustum(-1.024f,1.024f,-0.768f,0.768f,1.0f,100.0f);
         glLoadMatrixf(glm::value_ptr(projMat));
 
         glMatrixMode(GL_MODELVIEW);
@@ -172,7 +193,12 @@ void AppTom::run() {
         glEnd();
 
         glTranslatef(-0.5f, -0.5f, -0.5f);
-        drawGeometry(vertices, 8, triangles, 12, edges, 12, true);
+        drawGeometry(vertices, vertices, 8, triangles, 12, edges, 12, true);
+        glTranslatef(1, 1, 1);
+        glVertexPointer(3, GL_FLOAT, 0, sphereVertices);
+        glColorPointer(3, GL_FLOAT, 0, sphereVertices);
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 16 * 15 + 2);
         //drawCube();
 
         SDL_GL_SwapWindow(win);
