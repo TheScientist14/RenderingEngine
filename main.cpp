@@ -15,7 +15,6 @@ int main(int argc, char *argv[]) {
     AppElvyn *appElvyn = new AppElvyn();
     switch (x) {
         case 1:
-
             appTom->run();
             break;
         case 2:
