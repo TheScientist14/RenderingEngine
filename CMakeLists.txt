@@ -18,7 +18,7 @@ add_executable(moteur
 		Shaders/loadShader.cpp Shaders/loadShader.h
 		helper/find_exe_path.cpp
 		helper/find_exe_path.h
-		ScriptablePipeline/AppCube.cpp ScriptablePipeline/AppCube.h)
+		ScriptablePipeline/AppCube.cpp ScriptablePipeline/AppCube.h helper/stb_image.h)
 target_include_directories(moteur PRIVATE
 	${SDL_INCLUDE_DIR}
 	${GLM_INCLUDE_DIR}

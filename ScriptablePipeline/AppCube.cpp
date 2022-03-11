@@ -14,14 +14,13 @@
 #include "../Shaders/loadShader.h"
 
 using namespace std;
+using namespace glm;
 
 void AppCube::gl_init(){
 
-    glGenVertexArrays(1, &VertexArrayID);
-    glBindVertexArray(VertexArrayID);
-
     // Our vertices. Three consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
     // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
+#pragma region cube_vertex
     static const GLfloat g_vertex_buffer_data[] = {
             -1.0f,-1.0f,-1.0f, // triangle 1 : begin
             -1.0f,-1.0f, 1.0f,
@@ -60,7 +59,35 @@ void AppCube::gl_init(){
             -1.0f, 1.0f, 1.0f,
             1.0f,-1.0f, 1.0f
     };
+#pragma endregion cube_vertex
+
+#pragma region tetrahedron_vertex
+
+    static const GLfloat g_tetrahedron_vertex_buffer_data[] = {
+            -1.0f,-1.0f,-1.0f, // triangle 1 : base
+            -1.0f,-1.0f, 1.0f,
+            1.0f, -1.0f, 1.0f, // triangle 1 : end
+            -1.0f,-1.0f,-1.0f,// triangle 2 : base
+            1.0f, -1.0f, 1.0f,
+            1.0f, -1.0f, -1.0f,
+            0.0, 1.0, 0.0, // triangle 3 : 1st face
+            -1.0f,-1.0f,-1.0f,
+            -1.0f,-1.0f, 1.0f,
+            0.0, 1.0, 0.0, // triangle 4 : 2nd face
+            -1.0f,-1.0f, 1.0f,
+            1.0f, -1.0f, 1.0f,
+            0.0, 1.0, 0.0, // triangle 5 : 3rd face
+            1.0f, -1.0f, 1.0f,
+            1.0f, -1.0f, -1.0f,
+            0.0, 1.0, 0.0, // triangle 6 : 4th face
+            1.0f, -1.0f, -1.0f,
+            -1.0f,-1.0f,-1.0f,
+    };
+
+#pragma endregion tetrahedron_vertex
+
     // One color for each vertex. They were generated randomly.
+#pragma region color_buffer
     static const GLfloat g_color_buffer_data[] = {
             0.583f,  0.771f,  0.014f,
             0.609f,  0.115f,  0.436f,
@@ -99,31 +126,71 @@ void AppCube::gl_init(){
             0.820f,  0.883f,  0.371f,
             0.982f,  0.099f,  0.879f
     };
-
+#pragma endregion color_buffer
+    glGenVertexArrays(1, &cube_arrayid);
+    glBindVertexArray(cube_arrayid);
     // This will identify our vertex buffer
 
-// Generate 1 buffer, put the resulting identifier in vertexbuffer
-    glGenBuffers(1, &vertexbuffer);
-// The following commands will talk about our 'vertexbuffer' buffer
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-// Give our vertices to OpenGL.
+    // Generate 1 buffer, put the resulting identifier in cube_vertexbuffer
+    glGenBuffers(1, &cube_vertexbuffer);
+
+    // The following commands will talk about our 'cube_vertexbuffer' buffer
+    glBindBuffer(GL_ARRAY_BUFFER, cube_vertexbuffer);
+    // Give our vertices to OpenGL.
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+    //color
+    glGenBuffers(1, &cube_colorbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, cube_colorbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+
+    glGenVertexArrays(1, &tetra_arrayid);
+    glBindVertexArray(tetra_arrayid);
+    //vertex
+    glGenBuffers(1, &tetra_vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, tetra_vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_tetrahedron_vertex_buffer_data), g_tetrahedron_vertex_buffer_data, GL_STATIC_DRAW);
+    //color
+    glGenBuffers(1, &tetra_colorbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, tetra_colorbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
 
     // Create and compile our GLSL program from the shaders
-    programID = loadShader::LoadShaders( "/Shaders/TransformTriangle.vertexshader" , "/Shaders/SimpleFragmentShader.fragmentshader" );
-    //programID = loadShader::LoadShaders( "D:\\Users\\tsaury\\RenderingEngine\\Shaders\\SimpleVertexShader.vertexshader" , "D:\\Users\\tsaury\\RenderingEngine\\Shaders\\SimpleFragmentShader.fragmentshader" );
-
+    programID = loadShader::LoadShaders( "/Shaders/ColoredCube.vertexshader" , "/Shaders/ColoredCube.fragmentshader" );
 }
 
 void AppCube::main_loop() {
     glClearColor(0, 0, 0.4, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     // Use our shader
     glUseProgram(programID);
     // Draw triangle...
     // 1rst attribute buffer : vertices
+
+    // Enable depth test
+    glEnable(GL_DEPTH_TEST);
+    // Accept fragment if it closer to the camera than the former one
+    glDepthFunc(GL_LESS);
+
+    mat4 Projection = perspective(radians(120.0f), (float)width / (float)height, 0.1f, 100.0f);
+    //glm::mat4 Projection = ortho(-10.0f,10.0f,-10.0f,10.0f,0.0f,100.0f); // In world coordinates
+
+    mat4 View = lookAt(
+            vec3(4,3,3), // Camera is at (4,3,3), in World Space
+            vec3(0,0,0), // and looks at the origin
+            vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
+    );
+
+    mat4 Model = mat4(1.0f);
+    mat4 mvp = Projection * View * Model;
+    GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, value_ptr(mvp));
+
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    // 2nd attribute buffer : colors
+    glEnableVertexAttribArray(1);
+
+    glBindBuffer(GL_ARRAY_BUFFER, cube_vertexbuffer);
     glVertexAttribPointer(
             0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
             3,                  // size
@@ -132,32 +199,45 @@ void AppCube::main_loop() {
             0,                  // stride
             (void*)0            // array buffer offset
     );
+    glBindBuffer(GL_ARRAY_BUFFER, cube_colorbuffer);
+    glVertexAttribPointer(
+            1,                                // attribute. No particular reason for 1, but must match the layout in the shader.
+            3,                                // size
+            GL_FLOAT,                         // type
+            GL_FALSE,                         // normalized?
+            0,                                // stride
+            (void*)0                          // array buffer offset
+    );
     // Draw the triangle !
     glDrawArrays(GL_TRIANGLES, 0, 12*3); // 12*3 indices starting at 0 -> 12 triangles -> 6 squares
-
-    glm::mat4 Projection = glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 100.0f);
-    //glm::mat4 Projection = glm::ortho(-10.0f,10.0f,-10.0f,10.0f,0.0f,100.0f); // In world coordinates
-
-    glm::mat4 View = glm::lookAt(
-            glm::vec3(4,3,3), // Camera is at (4,3,3), in World Space
-            glm::vec3(0,0,0), // and looks at the origin
-            glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
+    glBindBuffer(GL_ARRAY_BUFFER, tetra_vertexbuffer);
+    glVertexAttribPointer(
+            0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+            3,                  // size
+            GL_FLOAT,           // type
+            GL_FALSE,           // normalized?
+            0,                  // stride
+            (void*)0            // array buffer offset
     );
-
-    glm::mat4 Model = glm::mat4(1.0f); glm::translate(Model, glm::vec3(1.0,180.0,1.0));
-    glm::mat4 mvp = Projection * View * Model;
-    GLuint MatrixID = glGetUniformLocation(programID, "MVP");
-    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0][0]);
-
-
+    Model = mat4(1.0f);
+    Model = translate(Model, vec3(0, 3, 0));
+    mvp = Projection * View * Model;
+    MatrixID = glGetUniformLocation(programID, "MVP");
+    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, value_ptr(mvp));
+    glDrawArrays(GL_TRIANGLES, 0, 6*3);
 
     glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
 }
 
 void AppCube::clean(){
     // Cleanup VBO
-    glDeleteBuffers(1, &vertexbuffer);
-    glDeleteVertexArrays(1, &VertexArrayID);
+    glDeleteBuffers(1, &cube_vertexbuffer);
+    glDeleteBuffers(1, &cube_colorbuffer);
+    glDeleteVertexArrays(1, &cube_arrayid);
+    glDeleteBuffers(1, &tetra_vertexbuffer);
+    glDeleteBuffers(1, &tetra_colorbuffer);
+    glDeleteVertexArrays(1, &tetra_arrayid);
     glDeleteProgram(programID);
 
     SDL_DestroyWindow(win);
