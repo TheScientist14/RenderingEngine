@@ -2,13 +2,28 @@
 // Created by tsaury on 11/03/2022.
 //
 
-#ifndef MOTEUR_BASEAPP_H
-#define MOTEUR_BASEAPP_H
+#pragma once
 
+struct SDL_Window;
 
 class BaseApp {
 
+public:
+    virtual void run();
+
+    SDL_Window* init_window();
+    virtual void gl_init() = 0;
+    virtual void handle_events();
+    virtual void main_loop() = 0;
+
+
+
+protected:
+    virtual void clean() = 0;
+
+    bool app_running;
+    int width = 1024;
+    int height = 768;
+
+    SDL_Window* win;
 };
-
-
-#endif //MOTEUR_BASEAPP_H

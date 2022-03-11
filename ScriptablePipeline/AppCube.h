@@ -7,7 +7,7 @@
 #pragma once
 
 
-class AppTriangle : public BaseApp{
+class AppCube : public BaseApp{
 
 public:
     void main_loop() override;
@@ -17,7 +17,7 @@ public:
     GLuint vertexbuffer;
     GLuint VertexArrayID;
     GLuint programID;
-    };
+};
 
 
 
