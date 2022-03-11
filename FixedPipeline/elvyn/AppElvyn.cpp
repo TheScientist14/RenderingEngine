@@ -6,13 +6,13 @@
 
 #include <cstdio>
 #ifdef _WIN32
-#include <windows.h>
+#include <Windows.h>
 #endif
 
 #include <gl/GL.h>
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
-#include <SDL.h>
+#include "glm/glm.hpp"
+#include "glm/ext.hpp"
+#include "SDL.h"
 #include <chrono>
 #include <type_traits>
 

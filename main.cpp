@@ -8,12 +8,13 @@ int main(int argc, char *argv[]) {
 
     int x;
 
-    std::cout << "App number :";
-    std::cin >> x;
+   /* std::cout << "App number :";
+    std::cin >> x;*/
     AppTom *appTom = new AppTom();
     AppAntoine *appAntoine = new AppAntoine();
     AppElvyn *appElvyn = new AppElvyn();
-    switch (x) {
+    appAntoine->run();
+    /*switch (x) {
         case 1:
             appTom->run();
             break;
@@ -26,7 +27,7 @@ int main(int argc, char *argv[]) {
             appElvyn->Run();
             break;
 
-    }
+    }*/
 
 
     return 0;

@@ -4,18 +4,18 @@
 
 #ifdef _WIN32
 
-#include <windows.h>
+#include <Windows.h>
 
 #endif
 
 #include <gl/GL.h>
-#include <SDL.h>
+#include "SDL.h"
 
 #include <type_traits>
 #include <chrono>
 
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
+#include "glm/glm.hpp"
+#include "glm/ext.hpp"
 
 float cube_vertices[] = {
         1, 1, 1, 1, -1, 1, -1, -1, 1, -1, 1, 1,

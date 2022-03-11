@@ -1,14 +1,14 @@
 #include "AppAntoine.h"
 #include <cstdio>
 #ifdef _WIN32
-#include <windows.h>
+#include <Windows.h>
 #endif
 
 #include <gl/GL.h>
-#include <SDL.h>
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "SDL.h"
+#include "glm/glm.hpp"
+#include "glm/ext.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 #include <chrono>
 
 void AppAntoine::run() {
@@ -33,16 +33,30 @@ void AppAntoine::run() {
 
     glm::vec3 vertex[] = {
             {-1,1,1}, {1,1,1}, {1,1,-1}, {-1,1,-1}, // top
+            {-1,-1,1}, {1,-1,1}, {1,-1,-1}, {-1,-1,-1},// down
+            {-1,1,1}, {1,1,1}, {1,1,-1}, {-1,1,-1}, // top
+            {-1,-1,1}, {1,-1,1}, {1,-1,-1}, {-1,-1,-1}, // down
+            {-1,1,1}, {1,1,1}, {1,1,-1}, {-1,1,-1}, // top
             {-1,-1,1}, {1,-1,1}, {1,-1,-1}, {-1,-1,-1} // down
+    };
+    glm::vec3 verticesNormal[]{
+            {0,1,0}, {0,1,0}, {0,1,0}, {0,1,0}, // top
+            {0,-1,0}, {0,-1,0}, {0,-1,0}, {0,-1,0},  // down
+            {-1,0,0}, {1,0,0}, {1,0,0}, {-1,0,0},// left right right left
+            {-1,0,0}, {1,0,0}, {1,0,0}, {-1,0,0},// left right right left
+            {0,0,1}, {0,0,1}, {0,0,-1}, {0,0,-1}, // front back
+            {0,0,1}, {0,0,1}, {0,0,-1}, {0,0,-1} // front back
     };
 
     int triangles[][3]{
-            {0,1,2}, {0,2,3}, //down
-            {2,3,7}, {2,6,7}, //face
-            {1,2,6}, {1,6,5}, //right
-            {7,4,0}, {7,3,0}, //left
-            {6,5,4}, {6,7,4}, //top
-            {1,0,5}, {0,4,5} //back
+            {0, 1, 2}, {0, 2, 3}, // top
+            {4, 5, 6}, {4, 6, 7}, // down
+
+            {9, 10, 13}, {10, 13, 14}, // right
+            {8, 11, 12}, {11, 12, 15}, // left
+
+            {18, 19, 22}, {19, 22, 23}, // back
+            {16, 17, 20}, {17, 20, 21}  // front
 
     };
 
@@ -96,12 +110,14 @@ void AppAntoine::run() {
         glEnable(GL_LIGHT0);
 
 
+        glEnableClientState(GL_NORMAL_ARRAY);
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_COLOR_ARRAY);
 
 
         glVertexPointer(3, GL_FLOAT, sizeof(glm::vec3), vertex);
         glColorPointer(3, GL_FLOAT, sizeof(glm::vec3), vertex);
+        glNormalPointer(GL_FLOAT, sizeof(glm::vec3), verticesNormal);
         glDrawElements(GL_TRIANGLES, 12*3, GL_UNSIGNED_INT, triangles);
 
 
