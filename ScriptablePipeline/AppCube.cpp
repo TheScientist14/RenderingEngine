@@ -127,6 +127,51 @@ void AppCube::gl_init(){
             0.982f,  0.099f,  0.879f
     };
 #pragma endregion color_buffer
+
+#pragma region UV_buffer
+
+    // Two UV coordinatesfor each vertex. They were created with Blender. You'll learn shortly how to do this yourself.
+    static const GLfloat g_uv_buffer_data[] = {
+            0.000059f, 1.0f-0.000004f,
+            0.000103f, 1.0f-0.336048f,
+            0.335973f, 1.0f-0.335903f,
+            1.000023f, 1.0f-0.000013f,
+            0.667979f, 1.0f-0.335851f,
+            0.999958f, 1.0f-0.336064f,
+            0.667979f, 1.0f-0.335851f,
+            0.336024f, 1.0f-0.671877f,
+            0.667969f, 1.0f-0.671889f,
+            1.000023f, 1.0f-0.000013f,
+            0.668104f, 1.0f-0.000013f,
+            0.667979f, 1.0f-0.335851f,
+            0.000059f, 1.0f-0.000004f,
+            0.335973f, 1.0f-0.335903f,
+            0.336098f, 1.0f-0.000071f,
+            0.667979f, 1.0f-0.335851f,
+            0.335973f, 1.0f-0.335903f,
+            0.336024f, 1.0f-0.671877f,
+            1.000004f, 1.0f-0.671847f,
+            0.999958f, 1.0f-0.336064f,
+            0.667979f, 1.0f-0.335851f,
+            0.668104f, 1.0f-0.000013f,
+            0.335973f, 1.0f-0.335903f,
+            0.667979f, 1.0f-0.335851f,
+            0.335973f, 1.0f-0.335903f,
+            0.668104f, 1.0f-0.000013f,
+            0.336098f, 1.0f-0.000071f,
+            0.000103f, 1.0f-0.336048f,
+            0.000004f, 1.0f-0.671870f,
+            0.336024f, 1.0f-0.671877f,
+            0.000103f, 1.0f-0.336048f,
+            0.336024f, 1.0f-0.671877f,
+            0.335973f, 1.0f-0.335903f,
+            0.667969f, 1.0f-0.671889f,
+            1.000004f, 1.0f-0.671847f,
+            0.667979f, 1.0f-0.335851f
+    };
+
+#pragma endregion UV_buffer
+
     glGenVertexArrays(1, &cube_arrayid);
     glBindVertexArray(cube_arrayid);
     // This will identify our vertex buffer
@@ -180,7 +225,6 @@ void AppCube::main_loop() {
             vec3(0,0,0), // and looks at the origin
             vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
     );
-
     mat4 Model = mat4(1.0f);
     mat4 mvp = Projection * View * Model;
     GLuint MatrixID = glGetUniformLocation(programID, "MVP");
