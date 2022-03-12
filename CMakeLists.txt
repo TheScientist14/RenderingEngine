@@ -23,7 +23,7 @@ add_executable(moteur
 		helper/find_exe_path.h
 		ScriptablePipeline/AppCube.cpp
 		ScriptablePipeline/AppCube.h
-		helper/stb_image.h)
+		helper/stb_image.h helper/stb_image.cpp)
 target_include_directories(moteur PRIVATE
 	${SDL_INCLUDE_DIR}
 	${GLM_INCLUDE_DIR}

@@ -11,6 +11,7 @@
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 #include <gl/GL.h>
+#include "../helper/stb_image.h"
 #include "../Shaders/loadShader.h"
 
 using namespace std;
@@ -188,16 +189,19 @@ void AppCube::gl_init(){
     glBindBuffer(GL_ARRAY_BUFFER, cube_colorbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
 
-    glGenVertexArrays(1, &tetra_arrayid);
-    glBindVertexArray(tetra_arrayid);
-    //vertex
-    glGenBuffers(1, &tetra_vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, tetra_vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_tetrahedron_vertex_buffer_data), g_tetrahedron_vertex_buffer_data, GL_STATIC_DRAW);
-    //color
-    glGenBuffers(1, &tetra_colorbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, tetra_colorbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+    glGenBuffers(1, &uv_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
+//    glGenVertexArrays(1, &tetra_arrayid);
+//    glBindVertexArray(tetra_arrayid);
+//    //vertex tetra
+//    glGenBuffers(1, &tetra_vertexbuffer);
+//    glBindBuffer(GL_ARRAY_BUFFER, tetra_vertexbuffer);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(g_tetrahedron_vertex_buffer_data), g_tetrahedron_vertex_buffer_data, GL_STATIC_DRAW);
+//    //color tetra
+//    glGenBuffers(1, &tetra_colorbuffer);
+//    glBindBuffer(GL_ARRAY_BUFFER, tetra_colorbuffer);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
 
     // Create and compile our GLSL program from the shaders
     programID = loadShader::LoadShaders( "/Shaders/ColoredCube.vertexshader" , "/Shaders/ColoredCube.fragmentshader" );
@@ -233,6 +237,7 @@ void AppCube::main_loop() {
     glEnableVertexAttribArray(0);
     // 2nd attribute buffer : colors
     glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
 
     glBindBuffer(GL_ARRAY_BUFFER, cube_vertexbuffer);
     glVertexAttribPointer(
@@ -252,26 +257,55 @@ void AppCube::main_loop() {
             0,                                // stride
             (void*)0                          // array buffer offset
     );
+       int width, height, channel;
+    stbi_uc *img = stbi_load("../Images/uvtemplate.bmp", &width, &height, &channel, 0);
+
+    GLuint textureID;
+    //glGenTextures(1, reinterpret_cast<GLuint *>(img));
+    glGenTextures(1, &textureID);
+    // "Bind" the newly created texture : all future texture functions will modify this texture
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    unsigned char * data;
+
+    data = new unsigned char [512*512*3];
+// Give the image to OpenGL
+    glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
+    glVertexAttribPointer(
+            2,                                // attribute. No particular reason for 1, but must match the layout in the shader.
+            2,                                // size
+            GL_FLOAT,                         // type
+            GL_FALSE,                         // normalized?
+            0,                                // stride
+            (void*)0                          // array buffer offset
+    );
+
     // Draw the triangle !
     glDrawArrays(GL_TRIANGLES, 0, 12*3); // 12*3 indices starting at 0 -> 12 triangles -> 6 squares
-    glBindBuffer(GL_ARRAY_BUFFER, tetra_vertexbuffer);
-    glVertexAttribPointer(
-            0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-            3,                  // size
-            GL_FLOAT,           // type
-            GL_FALSE,           // normalized?
-            0,                  // stride
-            (void*)0            // array buffer offset
-    );
-    Model = mat4(1.0f);
-    Model = translate(Model, vec3(0, 3, 0));
-    mvp = Projection * View * Model;
-    MatrixID = glGetUniformLocation(programID, "MVP");
-    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, value_ptr(mvp));
-    glDrawArrays(GL_TRIANGLES, 0, 6*3);
+//    glBindBuffer(GL_ARRAY_BUFFER, tetra_vertexbuffer);
+//    glVertexAttribPointer(
+//            0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+//            3,                  // size
+//            GL_FLOAT,           // type
+//            GL_FALSE,           // normalized?
+//            0,                  // stride
+//            (void*)0            // array buffer offset
+//    );
+//    Model = mat4(1.0f);
+//    Model = translate(Model, vec3(0, 3, 0));
+//    mvp = Projection * View * Model;
+//    MatrixID = glGetUniformLocation(programID, "MVP");
+//    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, value_ptr(mvp));
+    //glDrawArrays(GL_TRIANGLES, 0, 6*3);
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);
 }
 
 void AppCube::clean(){
@@ -285,4 +319,9 @@ void AppCube::clean(){
     glDeleteProgram(programID);
 
     SDL_DestroyWindow(win);
+}
+
+void AppCube::loadTexture(){
+    int width, height, channel;
+    stbi_uc *img = stbi_load("../Images/uvtemplate.bmp", &width, &height, &channel, 0);
 }
