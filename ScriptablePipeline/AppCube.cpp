@@ -192,7 +192,28 @@ void AppCube::gl_init(){
     glGenBuffers(1, &uv_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
-//    glGenVertexArrays(1, &tetra_arrayid);
+
+    //GLuint textureID;
+    glGenTextures(1, &textureID);
+    glActiveTexture(GL_TEXTURE0);
+    // "Bind" the newly created texture : all future texture functions will modify this texture
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    int width, height, channels;
+    unsigned char* img = stbi_load("../Images/uvtemplate.bmp", &width, &height, &channels, 0);
+    // Black/white checkerboard
+//    float pixels[] = {
+//            0.0f, 0.0f, 0.0f,   1.0f, 1.0f, 1.0f,
+//            1.0f, 1.0f, 1.0f,   0.0f, 0.0f, 0.0f
+//    };
+    // Give the image to OpenGL
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, img);
+
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+/*    glGenVertexArrays(1, &tetra_arrayid);
 //    glBindVertexArray(tetra_arrayid);
 //    //vertex tetra
 //    glGenBuffers(1, &tetra_vertexbuffer);
@@ -201,7 +222,7 @@ void AppCube::gl_init(){
 //    //color tetra
 //    glGenBuffers(1, &tetra_colorbuffer);
 //    glBindBuffer(GL_ARRAY_BUFFER, tetra_colorbuffer);
-//    glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);*/
 
     // Create and compile our GLSL program from the shaders
     programID = loadShader::LoadShaders( "/Shaders/ColoredCube.vertexshader" , "/Shaders/ColoredCube.fragmentshader" );
@@ -218,6 +239,8 @@ void AppCube::main_loop() {
 
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
+    // Cull triangles which normal is not towards the camera
+    glEnable(GL_CULL_FACE);
     // Accept fragment if it closer to the camera than the former one
     glDepthFunc(GL_LESS);
 
@@ -230,9 +253,12 @@ void AppCube::main_loop() {
             vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
     );
     mat4 Model = mat4(1.0f);
+    Model = rotate(Model, radians(30.0f), vec3(0, 1, 0));
     mat4 mvp = Projection * View * Model;
     GLuint MatrixID = glGetUniformLocation(programID, "MVP");
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, value_ptr(mvp));
+    GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
+    glUniform1i(TextureID, 0);
 
     glEnableVertexAttribArray(0);
     // 2nd attribute buffer : colors
@@ -257,23 +283,6 @@ void AppCube::main_loop() {
             0,                                // stride
             (void*)0                          // array buffer offset
     );
-       int width, height, channel;
-    stbi_uc *img = stbi_load("../Images/uvtemplate.bmp", &width, &height, &channel, 0);
-
-    GLuint textureID;
-    //glGenTextures(1, reinterpret_cast<GLuint *>(img));
-    glGenTextures(1, &textureID);
-    // "Bind" the newly created texture : all future texture functions will modify this texture
-    glBindTexture(GL_TEXTURE_2D, textureID);
-
-    unsigned char * data;
-
-    data = new unsigned char [512*512*3];
-// Give the image to OpenGL
-    glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
     glBindBuffer(GL_ARRAY_BUFFER, uv_buffer);
     glVertexAttribPointer(
@@ -317,6 +326,7 @@ void AppCube::clean(){
     glDeleteBuffers(1, &tetra_colorbuffer);
     glDeleteVertexArrays(1, &tetra_arrayid);
     glDeleteProgram(programID);
+    // delete texture ?
 
     SDL_DestroyWindow(win);
 }

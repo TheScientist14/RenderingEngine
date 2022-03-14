@@ -8,6 +8,7 @@
 #include "imgui.h"
 #include "backends/imgui_impl_sdl.h"
 #include "backends/imgui_impl_opengl2.h"
+#include "ScriptablePipeline/App.h"
 
 int main(int argc, char *argv[]) {
 
@@ -37,7 +38,7 @@ int main(int argc, char *argv[]) {
 //
 //    ImGui::StyleColorsDark();
 
-    BaseApp* app = new AppCube;
+    BaseApp* app = new App();
     app->run();
 
     return 0;

@@ -7,17 +7,18 @@
 #include "SDL.h"
 #include <GL/glew.h>
 #include "glm/glm.hpp"
-#include "glm/ext.hpp"
-#include <gl/GL.h>
 
 void BaseApp::run(){
     win = init_window();
     gl_init();
     app_running = true;
     while(app_running){
+        Uint32 nextTime = SDL_GetTicks();
+        deltaTime = nextTime - curTime;
         handle_events();
         main_loop();
         SDL_GL_SwapWindow(win);
+        curTime = nextTime;
     }
     clean();
 }
@@ -38,6 +39,7 @@ SDL_Window* BaseApp::init_window() {
     SDL_GL_MakeCurrent(win, context);
 
     SDL_ShowCursor(0);
+    curTime = SDL_GetTicks();
     //SDL_SetWindowGrab(win, SDL_TRUE);
 
     GLenum err = glewInit();
@@ -45,7 +47,6 @@ SDL_Window* BaseApp::init_window() {
     {
         /* Problem: glewInit failed, something is seriously wrong. */
         fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-
     }
 
     return win;

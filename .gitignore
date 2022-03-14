@@ -35,3 +35,4 @@ cmake-build-debug-visual-studio
 .idea
 .vs
 out
+/cmake-build-debug/

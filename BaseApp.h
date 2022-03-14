@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "SDL_stdinc.h"
+
 struct SDL_Window;
 
 class BaseApp {
@@ -16,14 +18,15 @@ public:
     virtual void handle_events();
     virtual void main_loop() = 0;
 
-
-
 protected:
     virtual void clean() = 0;
 
     bool app_running;
     int width = 1024;
     int height = 768;
+
+    Uint32 curTime;
+    int deltaTime;
 
     SDL_Window* win;
 };

@@ -23,7 +23,7 @@ add_executable(moteur
 		helper/find_exe_path.h
 		ScriptablePipeline/AppCube.cpp
 		ScriptablePipeline/AppCube.h
-		helper/stb_image.h helper/stb_image.cpp)
+		helper/stb_image.h helper/stb_image.cpp ScriptablePipeline/App.cpp ScriptablePipeline/App.h ScriptablePipeline/EngineObjects/Geometry.cpp ScriptablePipeline/EngineObjects/Geometry.h ScriptablePipeline/EngineObjects/Texture.cpp ScriptablePipeline/EngineObjects/Texture.h ScriptablePipeline/EngineObjects/Camera.cpp ScriptablePipeline/EngineObjects/Camera.h ScriptablePipeline/EngineObjects/EngineObject.cpp ScriptablePipeline/EngineObjects/EngineObject.h ScriptablePipeline/EngineObjects/Transform.cpp ScriptablePipeline/EngineObjects/Transform.h ScriptablePipeline/EngineObjects/GameObject.cpp ScriptablePipeline/EngineObjects/GameObject.h)
 target_include_directories(moteur PRIVATE
 	${SDL_INCLUDE_DIR}
 	${GLM_INCLUDE_DIR}
