@@ -10,9 +10,11 @@ mat4 Transform::getModelMatrix() {
 
     mat4 scaleMat = glm::scale(identity, scale);
 
-    mat4 rotateMatX = rotate(identity, radians(rotation.x), vec3(1.0f, 0.0f, 0.0f));
-    mat4 rotateMatY = rotate(identity, radians(rotation.y), vec3(0.0f,1.0f,0.0f));
     mat4 rotateMatZ = rotate(identity, radians(rotation.z), vec3(0.0f,0.0f,1.0f));
+    vec4 yAxis = rotateMatZ * vec4(0, 1, 0, 1);
+    mat4 rotateMatY = rotate(identity, radians(rotation.y), vec3(yAxis));
+    vec4 xAxis = rotateMatY * rotateMatZ  * vec4(1, 0, 0, 1);
+    mat4 rotateMatX = rotate(identity, radians(rotation.x), vec3(xAxis));
 
     mat4 translateMat = translate(identity, position);
 
