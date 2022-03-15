@@ -20,6 +20,7 @@ public:
     mat4 getViewMatrix();
     mat4 getProjectionMatrix();
     mat4 getProjectionViewMatrix();
+    void update(float deltaTime);
 
 protected:
     int width = 1024;

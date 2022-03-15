@@ -6,17 +6,17 @@
 
 mat4 Transform::getModelMatrix() {
 
-    mat4 model = glm::identity<mat4>();
+    mat4 identity = glm::identity<mat4>();
 
-    model = glm::scale(model,scale);
+    mat4 scaleMat = glm::scale(identity, scale);
 
-    model = glm::rotate(model, radians(rotation.x), vec3(1.0f,0.0f,0.0f));
-    model = glm::rotate(model, radians(rotation.y), vec3(0.0f,1.0f,0.0f));
-    model = glm::rotate(model, radians(rotation.z), vec3(0.0f,0.0f,1.0f));
+    mat4 rotateMatX = rotate(identity, radians(rotation.x), vec3(1.0f, 0.0f, 0.0f));
+    mat4 rotateMatY = rotate(identity, radians(rotation.y), vec3(0.0f,1.0f,0.0f));
+    mat4 rotateMatZ = rotate(identity, radians(rotation.z), vec3(0.0f,0.0f,1.0f));
 
-    model = glm::translate(model, position);
+    mat4 translateMat = translate(identity, position);
 
-    return model;
+    return translateMat * rotateMatX * rotateMatY * rotateMatZ * scaleMat;
 
 }
 

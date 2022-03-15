@@ -34,6 +34,7 @@ protected:
     vector<shared_ptr<Texture>> textures;
     vector<shared_ptr<EngineObject>> objects;
     shared_ptr<Camera> mainCamera;
+    bool isDragging;
 };
 
 

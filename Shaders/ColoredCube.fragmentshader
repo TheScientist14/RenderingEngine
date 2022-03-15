@@ -8,7 +8,7 @@ in vec2 UV;
 
 // Ouput data
 out vec3 color;
-in vec3 VtxColor;
+//in vec3 VtxColor;
 
 // Values that stay constant for the whole mesh.
 uniform sampler2D TextureSampler;

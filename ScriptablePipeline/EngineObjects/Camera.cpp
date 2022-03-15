@@ -36,9 +36,9 @@ Camera::~Camera() {
 
 mat4 Camera::getViewMatrix() {
 
-    //mat4 view = inverse(transform.getModelMatrix());
+    mat4 view = inverse(transform.getModelMatrix());
 
-    mat4 view = lookAt(transform.position, vec3(0,0,0), vec3(0,1,0));
+    //mat4 view = lookAt(transform.position, vec3(0,0,0), vec3(0,1,0));
 
     return view;
 }
@@ -60,4 +60,11 @@ mat4 Camera::getProjectionMatrix() {
 
 mat4 Camera::getProjectionViewMatrix() {
     return getProjectionMatrix() * getViewMatrix();
+}
+
+void Camera::update(float deltaTime){
+    EngineObject::update(deltaTime);
+
+    glClearColor(0, 0, 0.4, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
