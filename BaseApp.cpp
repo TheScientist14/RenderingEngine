@@ -6,9 +6,9 @@
 
 #include "SDL.h"
 #include <GL/glew.h>
-//#include "imgui.h"
-//#include "backends/imgui_impl_sdl.h"
-//#include "backends/imgui_impl_opengl2.h"
+#include "imgui.h"
+#include "backends/imgui_impl_sdl.h"
+#include "backends/imgui_impl_opengl3.h"
 #include "glm/glm.hpp"
 
 void BaseApp::run(){
@@ -23,6 +23,11 @@ void BaseApp::run(){
         SDL_GL_SwapWindow(win);
         curTime = nextTime;
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+
     clean();
 }
 
@@ -48,15 +53,16 @@ SDL_Window* BaseApp::init_window() {
     SDL_ShowCursor(0);
     curTime = SDL_GetTicks();
 
-//    IMGUI_CHECKVERSION();
-//    ImGui::CreateContext();
-//    ImGuiIO& io = ImGui::GetIO();
-//    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
-//
-//    ImGui_ImplSDL2_InitForOpenGL(win, context);
-//    ImGui_ImplOpenGL2_Init();
-//
-//    ImGui::StyleColorsDark();
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+
+    ImGui_ImplSDL2_InitForOpenGL(win, context);
+    ImGui_ImplOpenGL3_Init();
+
+    ImGui::StyleColorsDark();
     //SDL_SetWindowGrab(win, SDL_TRUE);
 
     GLenum err = glewInit();

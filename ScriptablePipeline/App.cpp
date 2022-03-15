@@ -11,6 +11,9 @@
 #include "../helper/stb_image.h"
 #include "../Shaders/loadShader.h"
 #include "EngineObjects/GameObject.h"
+#include <imgui.h>
+#include "imgui_impl_sdl.h"
+#include "imgui_impl_opengl3.h"
 
 using namespace std;
 
@@ -100,6 +103,12 @@ void App::gl_init(){
 
 #pragma endregion UV_buffer
 
+
+
+// Draw some widgets
+
+
+
     shared_ptr<Geometry> cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6*2*3, nullptr, 0);
     geometries.push_back(cubeMesh);
 
@@ -154,6 +163,21 @@ void App::gl_init(){
 
 void App::main_loop() {
     mainCamera->update(deltaTime);
+//Render Loop
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL2_NewFrame(win);
+
+    ImGui::NewFrame();
+
+    ImGui::Begin("Perfs");
+    ImGui::LabelText("Frame Time (ms) : ", "%f", deltaTime * 1e-3);
+    ImGui::LabelText("FPS : ", "%f", 1.0 / deltaTime);
+    ImGui::End();
+
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 
     for(int i = 0; i < objects.size(); i++){
         objects[i]->update(deltaTime);
