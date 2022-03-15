@@ -97,6 +97,7 @@ class Camera {
     +Camera()
     +mat4 getViewMatrix()
     +mat4 getProjectionMatrix()
+    +mat4 getProjectionViewMatrix()
     +~Camera()
 }
 

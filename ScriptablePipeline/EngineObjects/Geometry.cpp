@@ -39,8 +39,9 @@ void Geometry::bind() {
     glGenVertexArrays(1, &verticesID);
     glBindVertexArray(verticesID);
 
-    // Generate 3 buffer, put the resulting identifiers in buffersID
-    glGenBuffers(3, buffersID);
+    // Generate 3 buffers, put the resulting identifiers in buffersID
+    buffersID.resize(3);
+    glGenBuffers(3, buffersID.data());
 
     // The following commands will talk about our 'buffersID' buffer
     glBindBuffer(GL_ARRAY_BUFFER, buffersID[0]);
@@ -54,6 +55,10 @@ void Geometry::bind() {
 }
 
 void Geometry::draw(GLuint shaderID) const {
+    glEnableVertexAttribArray(0);
+    // 2nd attribute buffer : colors
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
     glBindBuffer(GL_ARRAY_BUFFER, buffersID[0]);
     glVertexAttribPointer(
             0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
@@ -82,5 +87,9 @@ void Geometry::draw(GLuint shaderID) const {
             0,                                // stride
             (void*)0                          // array buffer offset
     );
-    glDrawArrays(GL_TRIANGLES, 0, trianglesCount*3);
+    glDrawArrays(GL_TRIANGLES, 0, verticesCount);
+    glDisableVertexAttribArray(0);
+    // 2nd attribute buffer : colors
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);
 }

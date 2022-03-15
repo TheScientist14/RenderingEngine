@@ -6,9 +6,9 @@
 
 #include <GL/glew.h>
 #include <memory>
+#include <vector>
 
 using namespace std;
-//using namespace glm;
 
 class Geometry : public enable_shared_from_this<Geometry> {
 
@@ -21,7 +21,7 @@ protected:
     int trianglesCount;
 
     GLuint verticesID;
-    GLuint* buffersID;
+    vector<GLuint> buffersID;
 
 public:
     Geometry(const float* verticesPos, int verticesCount, const int* triangles, int trianglesCount);

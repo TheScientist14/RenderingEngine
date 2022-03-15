@@ -106,11 +106,15 @@ void App::gl_init(){
     shared_ptr<Texture> cube_texture = make_shared<Texture>("../Images/uvtemplate.bmp");
     textures.push_back(cube_texture);
 
+    for(int i = 0; i < geometries.size(); i++){
+        geometries[i]->bind();
+    }
+    for(int i = 0; i < textures.size(); i++){
+        textures[i]->bind();
+    }
+
     shared_ptr<EngineObject> cube = make_shared<GameObject>(this, 0, 0);
     objects.push_back(cube);
-    cube->transform.position = {0, 0, 0};
-    cube->transform.rotation = {0, 0, 0};
-    cube->transform.scale = {1, 1, 1};
 
     mainCamera = make_shared<Camera>(this);
 
