@@ -1,8 +1,16 @@
 //
 // Created by tsaury on 14/03/2022.
 //
-#include "Transform.h"
+
 #include "glm/ext.hpp"
+
+#include "Transform.h"
+
+Transform::Transform() {
+    this->position = vec3(0, 0, 0);
+    this->rotation = vec3(0, 0, 0);
+    this->scale = vec3(1, 1, 1);
+}
 
 mat4 Transform::getModelMatrix() {
 

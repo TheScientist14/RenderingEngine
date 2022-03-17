@@ -7,6 +7,8 @@
 #include <GL/glew.h>
 #include "glm/ext.hpp"
 
+#include "Transform.h"
+
 Camera::Camera(App* app) : Camera(app, 1024, 768, false, 90, 0.1f, 100.0f){
 
 }
@@ -20,7 +22,7 @@ Camera::Camera(App* app, int width, int height, bool isOrtho, float fieldOfView,
     this->nearPlane = nearPlane;
     this->farPlane = farPlane;
 
-    this->transform.position = vec3(0, 0, 10);
+    this->transform->position = vec3(0, 0, 10);
 
     // Enable depth buffer
     glEnable(GL_DEPTH_TEST);
@@ -36,7 +38,7 @@ Camera::~Camera() {
 
 mat4 Camera::getViewMatrix() {
 
-    mat4 view = inverse(transform.getModelMatrix());
+    mat4 view = inverse(transform->getModelMatrix());
 
     //mat4 view = lookAt(transform.position, vec3(0,0,0), vec3(0,1,0));
 

@@ -35,6 +35,9 @@ protected:
     vector<shared_ptr<EngineObject>> objects;
     shared_ptr<Camera> mainCamera;
     bool isDragging;
+
+    float mouseSensitivity = 0.5f;
+    float cameraSpeed = 0.5f;
 };
 
 

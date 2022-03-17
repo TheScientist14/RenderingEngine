@@ -88,6 +88,7 @@ void Geometry::draw(GLuint shaderID) const {
             (void*)0                          // array buffer offset
     );
     glDrawArrays(GL_TRIANGLES, 0, verticesCount);
+    //glDrawElements(GL_TRIANGLES, trianglesCount * 3, GL_UNSIGNED_INT, triangles);
     glDisableVertexAttribArray(0);
     // 2nd attribute buffer : colors
     glDisableVertexAttribArray(1);
