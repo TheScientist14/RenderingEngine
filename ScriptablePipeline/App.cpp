@@ -138,13 +138,28 @@ void App::gl_init(){
         float* vertexArray = (float*)pAiMesh[i]->mVertices;
         int nVertices = pAiMesh[i]->mNumVertices;
 
+        for (int j = 0; j < nVertices; ++j) {
+            printf("%f %f %f \n",pAiMesh[i]->mVertices[j].x,pAiMesh[i]->mVertices[j].y , pAiMesh[i]->mVertices[j].z);
+        }
+
         float* uvArray = (float*)pAiMesh[i]->mTextureCoords;
 
-        unsigned int* trianglesArray = (unsigned int*)pAiMesh[i]->mFaces;
+        //auto trianglesArray = pAiMesh[i]->mFaces;
         int nTriangles = pAiMesh[i]->mNumFaces;
 
+        vector<unsigned int> vertexIndices;
 
-        shared_ptr<Geometry> mesh = make_shared<Geometry>(vertexArray, vertexArray, uvArray, nVertices, trianglesArray, nTriangles);
+        for (int j = 0; j < nTriangles; ++j) {
+            for (int k = 0; k < pAiMesh[i]->mFaces[j].mNumIndices; ++k) {
+                vertexIndices.push_back(pAiMesh[i]->mFaces[j].mIndices[k]);
+                printf(" %d ", pAiMesh[i]->mFaces[j].mIndices[k]);
+            }
+            printf("\n");
+        }
+
+
+
+        shared_ptr<Geometry> mesh = make_shared<Geometry>(vertexArray, vertexArray, uvArray, nVertices, vertexIndices.data(), nTriangles);
         geometries.push_back(mesh);
 
         shared_ptr<EngineObject> suzanneI = make_shared<GameObject>(this, i, 0);
@@ -215,19 +230,19 @@ void App::gl_init(){
 void App::main_loop() {
     mainCamera->update(deltaTime);
 //Render Loop
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL2_NewFrame(win);
-
-    ImGui::NewFrame();
-
-    ImGui::Begin("Perfs");
-    ImGui::LabelText("Frame Time (ms) : ", "%f", deltaTime * 1e-3);
-    ImGui::LabelText("FPS : ", "%f", 1.0 / deltaTime);
-    ImGui::End();
-
-
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+//    ImGui_ImplOpenGL3_NewFrame();
+//    ImGui_ImplSDL2_NewFrame(win);
+//
+//    ImGui::NewFrame();
+//
+//    ImGui::Begin("Perfs");
+//    ImGui::LabelText("Frame Time (ms) : ", "%f", deltaTime * 1e-3);
+//    ImGui::LabelText("FPS : ", "%f", 1.0 / deltaTime);
+//    ImGui::End();
+//
+//
+//    ImGui::Render();
+//    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 
     for(int i = 0; i < objects.size(); i++){
