@@ -45,3 +45,12 @@ std::string GetAppPath()
 
     return exePathView;
 }
+
+std::string getRootPath(){
+
+    std::string path = GetAppPath();
+    char* rootFolder = "/RenderingEngine";
+    int pos = path.rfind(rootFolder);
+    return path.substr(0, pos + strlen(rootFolder));
+
+}

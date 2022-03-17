@@ -33,11 +33,9 @@ size_t replace_all(std::string& inout, string what, string with)
 
 GLuint loadShader::LoadShaders(const char * vertex_file_path, const char * fragment_file_path){
 
-    string path = GetAppPath();
-    char* rootFolder = "/RenderingEngine";
-    int pos = path.find(rootFolder);
-    string vertexPath = path.substr(0, pos + strlen(rootFolder)) + vertex_file_path;
-    string fragmentPath = path.substr(0, pos + strlen(rootFolder)) + fragment_file_path;
+    string path = getRootPath();
+    string vertexPath = path + vertex_file_path;
+    string fragmentPath = path + fragment_file_path;
 #ifdef _WIN32
     replace_all(vertexPath, "/", "\\");
     replace_all(fragmentPath, "/", "\\");

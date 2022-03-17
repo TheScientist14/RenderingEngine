@@ -4,6 +4,7 @@ project(moteur)
 
 include(cmake/glew.cmake)
 
+
 add_subdirectory(dep/SDL dep/SDL)
 
 set(SDL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dep/SDL/include)
@@ -23,7 +24,7 @@ add_executable(moteur
 		ScriptablePipeline/AppCube.cpp
 		ScriptablePipeline/AppCube.h
 		helper/stb_image.h
-		helper/stb_image.cpp
+		#helper/stb_image.cpp
 		ScriptablePipeline/App.cpp
 		ScriptablePipeline/App.h
 		ScriptablePipeline/EngineObjects/Geometry.cpp
@@ -37,15 +38,17 @@ add_executable(moteur
 		ScriptablePipeline/EngineObjects/Transform.cpp
 		ScriptablePipeline/EngineObjects/Transform.h
 		ScriptablePipeline/EngineObjects/GameObject.cpp
-		ScriptablePipeline/EngineObjects/GameObject.h)
+		ScriptablePipeline/EngineObjects/GameObject.h helper/ModelLoader.cpp helper/ModelLoader.h)
 
 set(IMGUI_USE_OGL3 true)
 include(cmake/imgui.cmake)
+include(cmake/assimp.cmake)
 
 target_include_directories(moteur PRIVATE
 		${SDL_INCLUDE_DIR}
 		${GLM_INCLUDE_DIR}
 		${IMGUI_INCLUDE_DIR}
+		${ASSIMP_INCLUDE_DIR}
 		)
 
-target_link_libraries(moteur PRIVATE SDL2-static SDL2main opengl32 glew imgui)
+target_link_libraries(moteur PRIVATE SDL2-static SDL2main opengl32 glew imgui assimp)

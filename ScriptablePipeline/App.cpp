@@ -11,6 +11,10 @@
 #include <imgui.h>
 #include "imgui_impl_sdl.h"
 #include "imgui_impl_opengl3.h"
+#include "../helper/ModelLoader.h"
+#include "assimp/scene.h"
+#include "assimp/vector3.h"
+#include "../helper/find_exe_path.h"
 
 #include "../helper/stb_image.h"
 #include "../Shaders/loadShader.h"
@@ -106,7 +110,7 @@ void App::gl_init(){
 
 #pragma endregion UV_buffer
 
-#pragma cube_vertex_elements
+#pragma region cube_vertex_elements
     float cube_vertices[] = {
             1, 1, 1, 1, -1, 1, -1, -1, 1, -1, 1, 1,
             1, 1, 1, 1, -1, 1, 1, -1, -1, 1, 1, -1,
@@ -115,16 +119,47 @@ void App::gl_init(){
             -1, 1, 1, -1, -1, 1, -1, -1, -1, -1, 1, -1,
             1, -1, 1, 1, -1, -1, -1, -1, -1, -1, -1, 1
     };
+#pragma endregion cube_vertex_elements
 
 // Draw some widgets
+    shared_ptr<Texture> cube_texture = make_shared<Texture>("../Images/uvtemplate.bmp");
+    textures.push_back(cube_texture);
+
+    ModelLoader* loader = new ModelLoader();
+    string str = getRootPath() + "/Models/Suzanne.obj";
 
 
+    const aiScene* aiScene = loader->import(&*str.begin());
+
+    aiMesh** pAiMesh = aiScene->mMeshes;
+    int numMesh = aiScene->mNumMeshes;
+    for(int i=0; i < numMesh;i++){
+
+        float* vertexArray = (float*)pAiMesh[i]->mVertices;
+        int nVertices = pAiMesh[i]->mNumVertices;
+
+        float* uvArray = (float*)pAiMesh[i]->mTextureCoords;
+
+        unsigned int* trianglesArray = (unsigned int*)pAiMesh[i]->mFaces;
+        int nTriangles = pAiMesh[i]->mNumFaces;
+
+
+        shared_ptr<Geometry> mesh = make_shared<Geometry>(vertexArray, vertexArray, uvArray, nVertices, trianglesArray, nTriangles);
+        geometries.push_back(mesh);
+
+        shared_ptr<EngineObject> suzanneI = make_shared<GameObject>(this, i, 0);
+        objects.push_back(suzanneI);
+
+
+    }
 
     shared_ptr<Geometry> cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6*2*3, nullptr, 0);
     geometries.push_back(cubeMesh);
+    shared_ptr<EngineObject> cube = make_shared<GameObject>(this, 1, 0);
+    objects.push_back(cube);
 
-    shared_ptr<Texture> cube_texture = make_shared<Texture>("../Images/uvtemplate.bmp");
-    textures.push_back(cube_texture);
+
+
 
     for(int i = 0; i < geometries.size(); i++){
         geometries[i]->bind();
@@ -144,30 +179,34 @@ void App::gl_init(){
     mainCamera = make_shared<Camera>(this);
     mainCamera->transform->position += vec3(0, 5, 0);
 
-    int n = 10;
-    float gap = 0.5;
-    float cubeSize = 2;
-    vector<int> cubesIndex;
-    for(int i = 0; i < n; i++){
-        shared_ptr<EngineObject> cube = make_shared<GameObject>(this, 0, 0);
-        cube->transform->rotation = vec3(0, 10 * i, 0);
-        cube->transform->position = vec3(-i * (cubeSize + gap), 0, -i * (cubeSize + gap));
-        cube->setParent(mainCamera);
-        cubesIndex.push_back(objects.size());
-        objects.push_back(cube);
-        for(int j = 0; j < i; j++){
-            shared_ptr<EngineObject> cube1 = make_shared<GameObject>(this, 0, 0);
-            shared_ptr<EngineObject> cube2 = make_shared<GameObject>(this, 0, 0);
-            cube1->transform->rotation = vec3(0, i * 10, 0);
-            cube1->transform->position = vec3(-j * (cubeSize + gap), 0, -i * (cubeSize + gap));
-            cube2->transform->rotation = vec3(0, i * 10, 0);
-            cube2->transform->position = vec3(-i * (cubeSize + gap), 0, -j * (cubeSize + gap));
-            cubesIndex.push_back(objects.size());
-            objects.push_back(cube1);
-            cubesIndex.push_back(objects.size());
-            objects.push_back(cube2);
-        }
-    }
+//    int n = 10;
+//    float gap = 0.5;
+//    float cubeSize = 2;
+//    vector<int> cubesIndex;
+//    for(int i = 0; i < n; i++){
+//        shared_ptr<EngineObject> cube = make_shared<GameObject>(this, 0, 0);
+//        cube->transform->rotation = vec3(0, 10 * i, 0);
+//        cube->transform->position = vec3(-i * (cubeSize + gap), 0, -i * (cubeSize + gap));
+//        cube->setParent(mainCamera);
+//        cubesIndex.push_back(objects.size());
+//        objects.push_back(cube);
+//        for(int j = 0; j < i; j++){
+//            shared_ptr<EngineObject> cube1 = make_shared<GameObject>(this, 0, 0);
+//            shared_ptr<EngineObject> cube2 = make_shared<GameObject>(this, 0, 0);
+//            cube1->transform->rotation = vec3(0, i * 10, 0);
+//            cube1->transform->position = vec3(-j * (cubeSize + gap), 0, -i * (cubeSize + gap));
+//            cube2->transform->rotation = vec3(0, i * 10, 0);
+//            cube2->transform->position = vec3(-i * (cubeSize + gap), 0, -j * (cubeSize + gap));
+//            cubesIndex.push_back(objects.size());
+//            objects.push_back(cube1);
+//            cubesIndex.push_back(objects.size());
+//            objects.push_back(cube2);
+//        }
+//    }
+
+
+
+
 
     shaderID = loadShader::LoadShaders( "/Shaders/ColoredCube.vertexshader" , "/Shaders/ColoredCube.fragmentshader" );
     glUseProgram(shaderID);

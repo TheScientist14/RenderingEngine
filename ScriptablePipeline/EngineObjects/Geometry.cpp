@@ -56,7 +56,7 @@ void Geometry::bind() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 2 * verticesCount, verticesUV, GL_STATIC_DRAW);
     //vertices index
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffersID[3]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, trianglesCount * sizeof(unsigned int) * 3, triangles, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 3 * trianglesCount, triangles, GL_STATIC_DRAW);
 }
 
 void Geometry::draw(GLuint shaderID) const {
