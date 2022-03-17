@@ -17,17 +17,17 @@ protected:
     const float* verticesNormal;
     const float* verticesUV;
     int verticesCount;
-    const int* triangles;
+    const unsigned int* triangles;
     int trianglesCount;
 
     GLuint verticesID;
     vector<GLuint> buffersID;
 
 public:
-    Geometry(const float* verticesPos, int verticesCount, const int* triangles, int trianglesCount);
-    Geometry(const float* verticesPos, const float* verticesUV, int verticesCount, const int* triangles, int trianglesCount);
-    //Geometry(const float* verticesPos, const float* verticesNormal, int verticesCount, const int* triangles, int trianglesCount);
-    Geometry(const float* verticesPos, const float* verticesNormal, const float* verticesUV, int verticesCount, const int* triangles, int trianglesCount);
+    Geometry(const float* verticesPos, int verticesCount, const unsigned int* triangles, int trianglesCount);
+    Geometry(const float* verticesPos, const float* verticesUV, int verticesCount, const unsigned int* triangles, int trianglesCount);
+    //Geometry(const float* verticesPos, const float* verticesNormal, int verticesCount, const unsigned int* triangles, int trianglesCount);
+    Geometry(const float* verticesPos, const float* verticesNormal, const float* verticesUV, int verticesCount, const unsigned int* triangles, int trianglesCount);
     virtual ~Geometry();
 
     void bind();

@@ -12,6 +12,8 @@ using namespace std;
 class App;
 class Transform;
 
+// TODO : test set of shared pointer
+
 class EngineObject : public enable_shared_from_this<EngineObject> {
 
 protected:
