@@ -27,12 +27,17 @@ void GameObject::update(float deltaTime) {
         parentCursor = parentCursor->getParent();
     }
 
-    mat4 mvp = app->getMainCamera()->getProjectionViewMatrix() * modelMatrix;
+    shared_ptr<Camera> mainCamera = app->getMainCamera();
+    mat4 mvp = mainCamera->getProjectionViewMatrix() * modelMatrix;
 
     GLuint shaderID = app->getShaderID();
 
-    GLuint MatrixID = glGetUniformLocation(shaderID, "MVP");
-    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, glm::value_ptr(mvp));
+    GLuint MvpID = glGetUniformLocation(shaderID, "MVP");
+    glUniformMatrix4fv(MvpID, 1, GL_FALSE, value_ptr(mvp));
+    GLuint MID = glGetUniformLocation(shaderID, "M");
+    glUniformMatrix4fv(MID, 1, GL_FALSE, value_ptr(modelMatrix));
+    GLuint VID = glGetUniformLocation(shaderID, "V");
+    glUniformMatrix4fv(VID, 1, GL_FALSE, value_ptr(mainCamera->getViewMatrix()));
 
     app->getTexture(textureIndex)->select(shaderID);
     app->getGeometry(geometryIndex)->draw(shaderID);
