@@ -22,6 +22,8 @@
 #include "EngineObjects/GameObject.h"
 #include "EngineObjects/Transform.h"
 
+#include "../../Minecraft/WorldGeneration.h"
+
 using namespace std;
 
 void App::gl_init() {
@@ -125,20 +127,31 @@ void App::gl_init() {
     shared_ptr<Texture> cube_texture = make_shared<Texture>("../Images/uvtemplate.bmp");
     textures.push_back(cube_texture);
 
-    ModelLoader *loader = new ModelLoader();
-    string str = getRootPath() + "/Models/Suzanne.obj";
-
-    loader->import(&*str.begin());
-    loader->loadMeshes(geometries);
-
-    for (int i = 0; i < loader->getNumMesh(); ++i) {
-
-        shared_ptr<EngineObject> suzanneI = make_shared<GameObject>(this, i, 0);
-        objects.push_back(suzanneI);
-    }
-
     //shared_ptr<Geometry> cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6*2*3, nullptr, 0);
     //geometries.push_back(cubeMesh);
+
+//    ModelLoader *loader = new ModelLoader();
+//    string str = getRootPath() + "/Models/MC_Grass.obj";
+//
+//    loader->import(&*str.begin());
+//    loader->loadMeshes(geometries);
+//
+//    for (int i = 0; i < loader->getNumMesh(); ++i) {
+//
+//        shared_ptr<EngineObject> grass = make_shared<GameObject>(this, i, 0);
+//        objects.push_back(grass);
+//    }
+
+    WorldGeneration *World = new WorldGeneration(32, 2);
+
+    auto temp = World->generateWorld(this);
+
+    objects.insert(objects.end(), temp.begin(), temp.end());
+
+
+    shared_ptr<Geometry> cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6*2*3, nullptr, 0);
+    geometries.push_back(cubeMesh);
+
     //shared_ptr<EngineObject> cube = make_shared<GameObject>(this, 1, 0);
     //objects.push_back(cube);
 
@@ -158,7 +171,7 @@ void App::gl_init() {
     cube2->transform.rotation = vec3(30, 45, 0);*/
 
     mainCamera = make_shared<Camera>(this);
-    mainCamera->transform->position += vec3(0, 5, 0);
+    mainCamera->transform->position += vec3(0, 55, 0);
 
 /*    int n = 10;
     float gap = 0.5;
@@ -192,11 +205,11 @@ void App::gl_init() {
 void App::main_loop() {
     mainCamera->update(deltaTime);
     GLuint LightWorldPosID = glGetUniformLocation(shaderID, "LightWorldPos");
-    glUniform3f(LightWorldPosID, 2, 5, 2);
+    glUniform3f(LightWorldPosID, 2, 200, 2);
     GLuint LightColorID = glGetUniformLocation(shaderID, "LightColor");
     glUniform3f(LightColorID, 1, 1, 1);
     GLuint LightPowerID = glGetUniformLocation(shaderID, "LightPower");
-    glUniform1f(LightPowerID, 60);
+    glUniform1f(LightPowerID, 12000);
 
 /*Render Loop
     ImGui_ImplOpenGL3_NewFrame();
