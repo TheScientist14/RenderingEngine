@@ -138,11 +138,15 @@ void App::gl_init(){
         float* vertexArray = (float*)pAiMesh[i]->mVertices;
         int nVertices = pAiMesh[i]->mNumVertices;
 
-        for (int j = 0; j < nVertices; ++j) {
-            printf("%f %f %f \n",pAiMesh[i]->mVertices[j].x,pAiMesh[i]->mVertices[j].y , pAiMesh[i]->mVertices[j].z);
+        vector<float> uvArray;
+        for (int j = 0; j < nVertices; j++) {
+            uvArray.push_back(pAiMesh[i]->mVertices[j].x);
+            uvArray.push_back(pAiMesh[i]->mVertices[j].y);
+            //printf("%f %f %f \n",pAiMesh[i]->mVertices[j].x,pAiMesh[i]->mVertices[j].y , pAiMesh[i]->mVertices[j].z);
         }
 
-        float* uvArray = (float*)pAiMesh[i]->mTextureCoords;
+        //float* uvArray = (float*)pAiMesh[i]->mTextureCoords;
+
 
         //auto trianglesArray = pAiMesh[i]->mFaces;
         int nTriangles = pAiMesh[i]->mNumFaces;
@@ -159,7 +163,7 @@ void App::gl_init(){
 
 
 
-        shared_ptr<Geometry> mesh = make_shared<Geometry>(vertexArray, vertexArray, uvArray, nVertices, vertexIndices.data(), nTriangles);
+        shared_ptr<Geometry> mesh = make_shared<Geometry>(vertexArray, vertexArray, uvArray.data(), nVertices, vertexIndices.data(), nTriangles);
         geometries.push_back(mesh);
 
         shared_ptr<EngineObject> suzanneI = make_shared<GameObject>(this, i, 0);
@@ -168,10 +172,10 @@ void App::gl_init(){
 
     }
 
-    shared_ptr<Geometry> cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6*2*3, nullptr, 0);
-    geometries.push_back(cubeMesh);
-    shared_ptr<EngineObject> cube = make_shared<GameObject>(this, 1, 0);
-    objects.push_back(cube);
+    //shared_ptr<Geometry> cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6*2*3, nullptr, 0);
+    //geometries.push_back(cubeMesh);
+    //shared_ptr<EngineObject> cube = make_shared<GameObject>(this, 1, 0);
+    //objects.push_back(cube);
 
 
 
@@ -270,16 +274,22 @@ void App::handle_events() {
                 }
             case SDL_KEYDOWN:
                 if(curEvent.key.keysym.sym == SDLK_LEFT || curEvent.key.keysym.sym == SDLK_q){
-                    mainCamera->transform->position[0] -= cameraSpeed * deltaTime;
+                    mainCamera->transform->position -= cameraSpeed * deltaTime * mainCamera->transform->getRight();
                 }
                 if(curEvent.key.keysym.sym == SDLK_RIGHT || curEvent.key.keysym.sym == SDLK_d){
-                    mainCamera->transform->position[0] += cameraSpeed * deltaTime;
+                    mainCamera->transform->position += cameraSpeed * deltaTime * mainCamera->transform->getRight();
                 }
                 if(curEvent.key.keysym.sym == SDLK_UP || curEvent.key.keysym.sym == SDLK_z){
-                    mainCamera->transform->position[2] -= cameraSpeed * deltaTime;
+                    mainCamera->transform->position -= cameraSpeed * deltaTime * mainCamera->transform->getForward();
                 }
                 if(curEvent.key.keysym.sym == SDLK_DOWN || curEvent.key.keysym.sym == SDLK_s){
-                    mainCamera->transform->position[2] += cameraSpeed * deltaTime;
+                    mainCamera->transform->position += cameraSpeed * deltaTime * mainCamera->transform->getForward();
+                }
+                if(curEvent.key.keysym.sym == SDLK_LCTRL || curEvent.key.keysym.sym == SDLK_a){
+                    mainCamera->transform->position[1] -= cameraSpeed * deltaTime;
+                }
+                if(curEvent.key.keysym.sym == SDLK_LSHIFT || curEvent.key.keysym.sym == SDLK_e){
+                    mainCamera->transform->position[1] += cameraSpeed * deltaTime;
                 }
                 if(curEvent.key.keysym.sym == SDLK_SPACE){
                     if(curEvent.key.keysym.mod == KMOD_SHIFT || curEvent.key.keysym.mod == KMOD_CTRL){

@@ -19,6 +19,10 @@ public:
 
     Transform();
 
+    mat4 getRotationMatrix();
     mat4 getModelMatrix();
+    vec3 getForward();
+    vec3 getRight();
+    vec3 getUp();
 
 };

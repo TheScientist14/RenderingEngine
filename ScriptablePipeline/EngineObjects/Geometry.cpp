@@ -8,27 +8,36 @@
 // TODO : variable size of vertex attributes
 
 Geometry::Geometry(const float *verticesPos, int verticesCount, const unsigned int *triangles, int trianglesCount) {
-    this->verticesPos = verticesPos;
+    for(int i = 0; i < verticesCount * 3; i++){
+        this->verticesPos.push_back(verticesPos[i]);
+    }
     this->verticesCount = verticesCount;
-    this->triangles = triangles;
+    for(int i = 0; i < trianglesCount * 3; i++){
+        this->triangles.push_back(triangles[i]);
+    }
     this->trianglesCount = trianglesCount;
 }
 
 Geometry::Geometry(const float *verticesPos, const float *verticesUV, int verticesCount, const unsigned int *triangles,
                    int trianglesCount) : Geometry(verticesPos, verticesCount, triangles, trianglesCount) {
-    this->verticesUV = verticesUV;
+    for(int i = 0; i < verticesCount * 2; i++){
+        this->verticesUV.push_back(verticesUV[i]);
+    }
 }
 
 //Geometry::Geometry(const float *verticesPos, const float *verticesNormal, int verticesCount, const unsigned int *triangles,
 //                   int trianglesCount) : Geometry(verticesPos, verticesCount, triangles, trianglesCount) {
-//    this->verticesNormal = verticesNormal;
+//    for(int i = 0; i < verticesCount * 3; i++){
+//        this->verticesNormal.push_back(verticesNormal[i]);
+//    }
 //}
 
 Geometry::Geometry(const float *verticesPos, const float *verticesNormal, const float *verticesUV, int verticesCount,
                    const unsigned int *triangles, int trianglesCount) :
-                   Geometry(verticesPos, verticesCount, triangles, trianglesCount) {
-    this->verticesNormal = verticesNormal;
-    this->verticesUV = verticesUV;
+                   Geometry(verticesPos, verticesUV, verticesCount, triangles, trianglesCount) {
+    for(int i = 0; i < verticesCount * 3; i++){
+        this->verticesNormal.push_back(verticesNormal[i]);
+    }
 }
 
 Geometry::~Geometry() {
@@ -47,16 +56,16 @@ void Geometry::bind() {
 
     // The following commands will talk about our 'buffersID' buffer
     glBindBuffer(GL_ARRAY_BUFFER, buffersID[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * verticesCount, verticesPos, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * verticesCount, verticesPos.data(), GL_STATIC_DRAW);
     //normal
     glBindBuffer(GL_ARRAY_BUFFER, buffersID[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * verticesCount, verticesNormal, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * verticesCount, verticesNormal.data(), GL_STATIC_DRAW);
     //uv
     glBindBuffer(GL_ARRAY_BUFFER, buffersID[2]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 2 * verticesCount, verticesUV, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 2 * verticesCount, verticesUV.data(), GL_STATIC_DRAW);
     //vertices index
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffersID[3]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 3 * trianglesCount, triangles, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 3 * trianglesCount, triangles.data(), GL_STATIC_DRAW);
 }
 
 void Geometry::draw(GLuint shaderID) const {
@@ -91,13 +100,14 @@ void Geometry::draw(GLuint shaderID) const {
             (void*)0                          // array buffer offset
     );
 
-    if(triangles){
+    if(triangles.empty()){
+        //printf("draw Arrays !!!!");
+        glDrawArrays(GL_TRIANGLES, 0, verticesCount);
+    }
+    else{
         // Index buffer
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffersID[3]);
         glDrawElements(GL_TRIANGLES, trianglesCount * 3, GL_UNSIGNED_INT, 0);
-    }
-    else{
-        glDrawArrays(GL_TRIANGLES, 0, verticesCount);
     }
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);

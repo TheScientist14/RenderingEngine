@@ -37,7 +37,7 @@ protected:
     bool isDragging;
 
     float mouseSensitivity = 0.5f;
-    float cameraSpeed = 0.5f;
+    float cameraSpeed = 0.01f;
 };
 
 

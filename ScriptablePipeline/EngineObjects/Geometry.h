@@ -13,11 +13,11 @@ using namespace std;
 class Geometry : public enable_shared_from_this<Geometry> {
 
 protected:
-    const float* verticesPos;
-    const float* verticesNormal;
-    const float* verticesUV;
+    vector<float> verticesPos;
+    vector<float> verticesNormal;
+    vector<float> verticesUV;
     int verticesCount;
-    const unsigned int* triangles;
+    vector<unsigned int> triangles;
     int trianglesCount;
 
     GLuint verticesID;
