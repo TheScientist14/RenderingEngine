@@ -128,7 +128,6 @@ void App::gl_init() {
     ModelLoader *loader = new ModelLoader();
     string str = getRootPath() + "/Models/Suzanne.obj";
 
-
     loader->import(&*str.begin());
     loader->loadMeshes(geometries);
 
@@ -138,17 +137,10 @@ void App::gl_init() {
         objects.push_back(suzanneI);
     }
 
-
-
-
-
     //shared_ptr<Geometry> cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6*2*3, nullptr, 0);
     //geometries.push_back(cubeMesh);
     //shared_ptr<EngineObject> cube = make_shared<GameObject>(this, 1, 0);
     //objects.push_back(cube);
-
-
-
 
     for (int i = 0; i < geometries.size(); i++) {
         geometries[i]->bind();
@@ -157,45 +149,41 @@ void App::gl_init() {
         textures[i]->bind();
     }
 
-//    shared_ptr<EngineObject> cube = make_shared<GameObject>(this, 0, 0);
-//    objects.push_back(cube);
-//    cube->transform.rotation = vec3(30, 45, 0);
-//    shared_ptr<EngineObject> cube2 = make_shared<GameObject>(this, 0, 0);
-//    objects.push_back(cube2);
-//    cube2->transform.position = vec3(2, 0, 0);
-//    cube2->transform.rotation = vec3(30, 45, 0);
+/*    shared_ptr<EngineObject> cube = make_shared<GameObject>(this, 0, 0);
+    objects.push_back(cube);
+    cube->transform.rotation = vec3(30, 45, 0);
+    shared_ptr<EngineObject> cube2 = make_shared<GameObject>(this, 0, 0);
+    objects.push_back(cube2);
+    cube2->transform.position = vec3(2, 0, 0);
+    cube2->transform.rotation = vec3(30, 45, 0);*/
 
     mainCamera = make_shared<Camera>(this);
     mainCamera->transform->position += vec3(0, 5, 0);
 
-//    int n = 10;
-//    float gap = 0.5;
-//    float cubeSize = 2;
-//    vector<int> cubesIndex;
-//    for(int i = 0; i < n; i++){
-//        shared_ptr<EngineObject> cube = make_shared<GameObject>(this, 0, 0);
-//        cube->transform->rotation = vec3(0, 10 * i, 0);
-//        cube->transform->position = vec3(-i * (cubeSize + gap), 0, -i * (cubeSize + gap));
-//        cube->setParent(mainCamera);
-//        cubesIndex.push_back(objects.size());
-//        objects.push_back(cube);
-//        for(int j = 0; j < i; j++){
-//            shared_ptr<EngineObject> cube1 = make_shared<GameObject>(this, 0, 0);
-//            shared_ptr<EngineObject> cube2 = make_shared<GameObject>(this, 0, 0);
-//            cube1->transform->rotation = vec3(0, i * 10, 0);
-//            cube1->transform->position = vec3(-j * (cubeSize + gap), 0, -i * (cubeSize + gap));
-//            cube2->transform->rotation = vec3(0, i * 10, 0);
-//            cube2->transform->position = vec3(-i * (cubeSize + gap), 0, -j * (cubeSize + gap));
-//            cubesIndex.push_back(objects.size());
-//            objects.push_back(cube1);
-//            cubesIndex.push_back(objects.size());
-//            objects.push_back(cube2);
-//        }
-//    }
-
-
-
-
+/*    int n = 10;
+    float gap = 0.5;
+    float cubeSize = 2;
+    vector<int> cubesIndex;
+    for(int i = 0; i < n; i++){
+        shared_ptr<EngineObject> cube = make_shared<GameObject>(this, 0, 0);
+        cube->transform->rotation = vec3(0, 10 * i, 0);
+        cube->transform->position = vec3(-i * (cubeSize + gap), 0, -i * (cubeSize + gap));
+        cube->setParent(mainCamera);
+        cubesIndex.push_back(objects.size());
+        objects.push_back(cube);
+        for(int j = 0; j < i; j++){
+            shared_ptr<EngineObject> cube1 = make_shared<GameObject>(this, 0, 0);
+            shared_ptr<EngineObject> cube2 = make_shared<GameObject>(this, 0, 0);
+            cube1->transform->rotation = vec3(0, i * 10, 0);
+            cube1->transform->position = vec3(-j * (cubeSize + gap), 0, -i * (cubeSize + gap));
+            cube2->transform->rotation = vec3(0, i * 10, 0);
+            cube2->transform->position = vec3(-i * (cubeSize + gap), 0, -j * (cubeSize + gap));
+            cubesIndex.push_back(objects.size());
+            objects.push_back(cube1);
+            cubesIndex.push_back(objects.size());
+            objects.push_back(cube2);
+        }
+    }*/
 
     shaderID = loadShader::LoadShaders("/Shaders/ColoredCube.vertexshader", "/Shaders/ColoredCube.fragmentshader");
     glUseProgram(shaderID);
@@ -210,20 +198,20 @@ void App::main_loop() {
     GLuint LightPowerID = glGetUniformLocation(shaderID, "LightPower");
     glUniform1f(LightPowerID, 60);
 
-//Render Loop
-//    ImGui_ImplOpenGL3_NewFrame();
-//    ImGui_ImplSDL2_NewFrame(win);
-//
-//    ImGui::NewFrame();
-//
-//    ImGui::Begin("Perfs");
-//    ImGui::LabelText("Frame Time (ms) : ", "%f", deltaTime * 1e-3);
-//    ImGui::LabelText("FPS : ", "%f", 1.0 / deltaTime);
-//    ImGui::End();
-//
-//
-//    ImGui::Render();
-//    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+/*Render Loop
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL2_NewFrame(win);
+
+    ImGui::NewFrame();
+
+    ImGui::Begin("Perfs");
+    ImGui::LabelText("Frame Time (ms) : ", "%f", deltaTime * 1e-3);
+    ImGui::LabelText("FPS : ", "%f", 1.0 / deltaTime);
+    ImGui::End();
+
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());*/
 
 
     for (int i = 0; i < objects.size(); i++) {
@@ -250,32 +238,57 @@ void App::handle_events() {
                     mainCamera->transform->rotation[0] -= curEvent.motion.yrel * mouseSensitivity * deltaTime;
                 }
             case SDL_KEYDOWN:
-                if (curEvent.key.keysym.sym == SDLK_LEFT || curEvent.key.keysym.sym == SDLK_q) {
-                    mainCamera->transform->position -= cameraSpeed * deltaTime * mainCamera->transform->getRight();
+                switch (curEvent.key.keysym.sym) {
+                    case SDLK_LEFT | SDLK_q :
+                        cameraVelocity[0] = -cameraSpeed;
+                        printf("left");
+                        break;
+                    case SDLK_RIGHT | SDLK_d :
+                        cameraVelocity[0] = cameraSpeed;
+                        printf("right");
+                        break;
+                    case SDLK_UP | SDLK_z :
+                        cameraVelocity[2] = -cameraSpeed;
+                        printf("forward");
+                        break;
+                    case SDLK_DOWN | SDLK_s :
+                        cameraVelocity[2] = cameraSpeed;
+                        printf("back");
+                        break;
+                    case SDLK_LCTRL | SDLK_a :
+                        cameraVelocity[1] = -cameraSpeed;
+                        printf("down");
+                        break;
+                    case SDLK_LSHIFT | SDLK_e :
+                        cameraVelocity[1] = cameraSpeed;
+                        printf("up");
+                        break;
                 }
-                if (curEvent.key.keysym.sym == SDLK_RIGHT || curEvent.key.keysym.sym == SDLK_d) {
-                    mainCamera->transform->position += cameraSpeed * deltaTime * mainCamera->transform->getRight();
-                }
-                if (curEvent.key.keysym.sym == SDLK_UP || curEvent.key.keysym.sym == SDLK_z) {
-                    mainCamera->transform->position -= cameraSpeed * deltaTime * mainCamera->transform->getForward();
-                }
-                if (curEvent.key.keysym.sym == SDLK_DOWN || curEvent.key.keysym.sym == SDLK_s) {
-                    mainCamera->transform->position += cameraSpeed * deltaTime * mainCamera->transform->getForward();
-                }
-                if (curEvent.key.keysym.sym == SDLK_LCTRL || curEvent.key.keysym.sym == SDLK_a) {
-                    mainCamera->transform->position[1] -= cameraSpeed * deltaTime;
-                }
-                if (curEvent.key.keysym.sym == SDLK_LSHIFT || curEvent.key.keysym.sym == SDLK_e) {
-                    mainCamera->transform->position[1] += cameraSpeed * deltaTime;
-                }
-                if (curEvent.key.keysym.sym == SDLK_SPACE) {
-                    if (curEvent.key.keysym.mod == KMOD_SHIFT || curEvent.key.keysym.mod == KMOD_CTRL) {
-                        mainCamera->transform->position[1] -= cameraSpeed * deltaTime;
-                    } else {
-                        mainCamera->transform->position[1] += cameraSpeed * deltaTime;
-                    }
+            case SDL_KEYUP:
+                switch (curEvent.key.keysym.sym) {
+                    case SDLK_LEFT | SDLK_q :
+                        cameraVelocity[0] = 0;
+                        break;
+                    case SDLK_RIGHT | SDLK_d :
+                        cameraVelocity[0] = 0;
+                        break;
+                    case SDLK_UP | SDLK_z :
+                        cameraVelocity[2] = 0;
+                        break;
+                    case SDLK_DOWN | SDLK_s :
+                        cameraVelocity[2] = 0;
+                        break;
+                    case SDLK_LCTRL | SDLK_a :
+                        cameraVelocity[1] = 0;
+                        break;
+                    case SDLK_LSHIFT | SDLK_e :
+                        cameraVelocity[1] = 0;
+                        break;
                 }
         }
+        mainCamera->transform->position += cameraVelocity[2] * deltaTime * mainCamera->transform->getForward();
+        mainCamera->transform->position += cameraVelocity[0] * deltaTime * mainCamera->transform->getRight();
+        mainCamera->transform->position += cameraVelocity[1] * deltaTime * mainCamera->transform->getUp();
     }
 }
 

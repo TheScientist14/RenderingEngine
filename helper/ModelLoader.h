@@ -18,6 +18,8 @@ public:
     const class aiScene* aiScene;
     class aiMesh** pAiMesh;
 
+    ModelLoader();
+    virtual ~ModelLoader();
 
     int loadMeshes(vector<shared_ptr<Geometry>> &prmGeometries);
 

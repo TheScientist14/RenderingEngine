@@ -36,8 +36,9 @@ protected:
     shared_ptr<Camera> mainCamera;
     bool isDragging;
 
-    float mouseSensitivity = 0.5f;
+    float mouseSensitivity = 0.1f;
     float cameraSpeed = 0.01f;
+    vec3 cameraVelocity;
 };
 
 

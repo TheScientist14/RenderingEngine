@@ -125,4 +125,12 @@ int ModelLoader::loadMeshes(vector<shared_ptr<Geometry>> &prmGeometries) {
     return getNumMesh();
 }
 
+ModelLoader::ModelLoader() {
+
+}
+
+ModelLoader::~ModelLoader() {
+
+}
+
 
