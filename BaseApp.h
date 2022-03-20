@@ -7,6 +7,7 @@
 #include "SDL_stdinc.h"
 
 struct SDL_Window;
+struct ImGuiIO;
 
 class BaseApp {
 
@@ -29,4 +30,5 @@ protected:
     int deltaTime;
 
     SDL_Window* win;
+    //ImGuiIO &io;
 };

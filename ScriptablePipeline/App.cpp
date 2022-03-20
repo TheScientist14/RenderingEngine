@@ -4,25 +4,31 @@
 
 #include "App.h"
 
+#include <string>
+
 #include "SDL.h"
 
 #include <GL/glew.h>
 
 #include "imgui_impl_sdl.h"
+#include "backends/imgui_impl_sdl.h"
+#include "backends/imgui_impl_opengl3.h"
 
-#include <assimp/scene.h>
-#include <assimp/vector3.h>
+
 #include <assimp/postprocess.h>
-
 #include "../helper/ModelLoader.h"
+
 #include "../helper/stb_image.h"
 #include "../helper/find_exe_path.h"
 #include "../Shaders/loadShader.h"
-
 #include "EngineObjects/GameObject.h"
-#include "EngineObjects/Transform.h"
 
+#include "EngineObjects/Transform.h"
 #include "../../Minecraft/WorldGeneration.h"
+
+#include <assimp/cimport.h>
+#include <assimp/scene.h>
+#include <assimp/vector3.h>
 
 using namespace std;
 
@@ -130,30 +136,32 @@ void App::gl_init() {
     //shared_ptr<Geometry> cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6*2*3, nullptr, 0);
     //geometries.push_back(cubeMesh);
 
-//    ModelLoader *loader = new ModelLoader();
-//    string str = getRootPath() + "/Models/MC_Grass.obj";
-//
-//    loader->import(&*str.begin());
-//    loader->loadMeshes(geometries);
-//
-//    for (int i = 0; i < loader->getNumMesh(); ++i) {
-//
-//        shared_ptr<EngineObject> grass = make_shared<GameObject>(this, i, 0);
-//        objects.push_back(grass);
-//    }
+    ModelLoader *loader = new ModelLoader();
+    string str = getRootPath() + "/Models/untitled.obj";
 
-    WorldGeneration *World = new WorldGeneration(32, 2);
+    loader->import(&*str.begin());
+    loader->loadMeshes(geometries);
+
+    for (int i = 0; i < loader->getNumMesh(); ++i) {
+
+        shared_ptr<EngineObject> grass = make_shared<GameObject>(this, i, 0);
+        objects.push_back(grass);
+    }
+
+    WorldGeneration *World = new WorldGeneration(32, 2, 0.5);
 
     auto temp = World->generateWorld(this);
 
     objects.insert(objects.end(), temp.begin(), temp.end());
+    aiReleaseImport( loader->getAiScene());
 
 
-    shared_ptr<Geometry> cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6*2*3, nullptr, 0);
+    shared_ptr<Geometry> cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
+                                                          nullptr, 0);
     geometries.push_back(cubeMesh);
 
-    //shared_ptr<EngineObject> cube = make_shared<GameObject>(this, 1, 0);
-    //objects.push_back(cube);
+    shared_ptr<EngineObject> cube = make_shared<GameObject>(this, 1, 0);
+    objects.push_back(cube);
 
     for (int i = 0; i < geometries.size(); i++) {
         geometries[i]->bind();
@@ -211,20 +219,20 @@ void App::main_loop() {
     GLuint LightPowerID = glGetUniformLocation(shaderID, "LightPower");
     glUniform1f(LightPowerID, 12000);
 
-/*Render Loop
+    //Render Loop
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(win);
 
     ImGui::NewFrame();
 
     ImGui::Begin("Perfs");
-    ImGui::LabelText("Frame Time (ms) : ", "%f", deltaTime * 1e-3);
-    ImGui::LabelText("FPS : ", "%f", 1.0 / deltaTime);
+    ImGui::Text("Frame Time (ms) new : %d", deltaTime);
+    ImGui::Text("FPS : %f", 1.0 / (float)deltaTime * 1000) ;
+    ImGui::InputFloat("Sens", &mouseSensitivity);
     ImGui::End();
 
-
     ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());*/
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 
     for (int i = 0; i < objects.size(); i++) {
@@ -234,75 +242,110 @@ void App::main_loop() {
 
 void App::handle_events() {
     SDL_Event curEvent;
+    ImGuiIO& io = ImGui::GetIO();
+    float epsilon = 0.00001f;
     while (SDL_PollEvent(&curEvent)) {
+        ImGui_ImplSDL2_ProcessEvent(&curEvent);
         switch (curEvent.type) {
             case SDL_QUIT:
                 app_running = false;
                 return;
             case SDL_MOUSEBUTTONDOWN:
-                isDragging = true;
+                if (!io.WantCaptureMouse)
+                {
+                    isDragging = true;
+                }
+                //... app processing other events;
                 break;
             case SDL_MOUSEBUTTONUP:
-                isDragging = false;
+                isDragging = false; // cancelling dragging even if imgui captures mouse events
                 break;
             case SDL_MOUSEMOTION:
-                if (isDragging) {
-                    mainCamera->transform->rotation[1] -= curEvent.motion.xrel * mouseSensitivity * deltaTime;
-                    mainCamera->transform->rotation[0] -= curEvent.motion.yrel * mouseSensitivity * deltaTime;
+                if (!io.WantCaptureMouse){
+                    if (isDragging) {
+                        mainCamera->transform->rotation[1] -= curEvent.motion.xrel * mouseSensitivity * deltaTime;
+                        mainCamera->transform->rotation[0] -= curEvent.motion.yrel * mouseSensitivity * deltaTime;
+                    }
                 }
+                break;
             case SDL_KEYDOWN:
-                switch (curEvent.key.keysym.sym) {
-                    case SDLK_LEFT | SDLK_q :
-                        cameraVelocity[0] = -cameraSpeed;
-                        printf("left");
-                        break;
-                    case SDLK_RIGHT | SDLK_d :
-                        cameraVelocity[0] = cameraSpeed;
-                        printf("right");
-                        break;
-                    case SDLK_UP | SDLK_z :
-                        cameraVelocity[2] = -cameraSpeed;
-                        printf("forward");
-                        break;
-                    case SDLK_DOWN | SDLK_s :
-                        cameraVelocity[2] = cameraSpeed;
-                        printf("back");
-                        break;
-                    case SDLK_LCTRL | SDLK_a :
-                        cameraVelocity[1] = -cameraSpeed;
-                        printf("down");
-                        break;
-                    case SDLK_LSHIFT | SDLK_e :
-                        cameraVelocity[1] = cameraSpeed;
-                        printf("up");
-                        break;
+                if (!io.WantCaptureKeyboard)
+                {
+                    switch (curEvent.key.keysym.sym) {
+                        case SDLK_LEFT: case SDLK_q:
+                            if(cameraVelocity[0] >= -epsilon){
+                                cameraVelocity[0] = -cameraSpeed;
+                            }
+                            break;
+                        case SDLK_RIGHT: case SDLK_d:
+                            if(cameraVelocity[0] <= epsilon) {
+                                cameraVelocity[0] = cameraSpeed;
+                            }
+                            break;
+                        case SDLK_UP: case SDLK_z:
+                            if(cameraVelocity[2] >= -epsilon) {
+                                cameraVelocity[2] = -cameraSpeed;
+                            }
+                            break;
+                        case SDLK_DOWN: case SDLK_s:
+                            if(cameraVelocity[2] <= epsilon) {
+                                cameraVelocity[2] = cameraSpeed;
+                            }
+                            break;
+                        case SDLK_LCTRL: case SDLK_a:
+                            if(cameraVelocity[1] >= -epsilon) {
+                                cameraVelocity[1] = -cameraSpeed;
+                            }
+                            break;
+                        case SDLK_LSHIFT: case SDLK_e:
+                            if(cameraVelocity[1] <= epsilon) {
+                                cameraVelocity[1] = cameraSpeed;
+                            }
+                            break;
+                    }
                 }
+                break;
             case SDL_KEYUP:
-                switch (curEvent.key.keysym.sym) {
-                    case SDLK_LEFT | SDLK_q :
-                        cameraVelocity[0] = 0;
-                        break;
-                    case SDLK_RIGHT | SDLK_d :
-                        cameraVelocity[0] = 0;
-                        break;
-                    case SDLK_UP | SDLK_z :
-                        cameraVelocity[2] = 0;
-                        break;
-                    case SDLK_DOWN | SDLK_s :
-                        cameraVelocity[2] = 0;
-                        break;
-                    case SDLK_LCTRL | SDLK_a :
-                        cameraVelocity[1] = 0;
-                        break;
-                    case SDLK_LSHIFT | SDLK_e :
-                        cameraVelocity[1] = 0;
-                        break;
+                if(!io.WantCaptureKeyboard){
+                    switch (curEvent.key.keysym.sym) {
+                        case SDLK_LEFT: case SDLK_q:
+                            if(cameraVelocity[0] < -epsilon) {
+                                cameraVelocity[0] = 0;
+                            }
+                            break;
+                        case SDLK_RIGHT: case SDLK_d:
+                            if(cameraVelocity[0] > epsilon) {
+                                cameraVelocity[0] = 0;
+                            }
+                            break;
+                        case SDLK_UP: case SDLK_z:
+                            if(cameraVelocity[2] < -epsilon) {
+                                cameraVelocity[2] = 0;
+                            }
+                            break;
+                        case SDLK_DOWN: case SDLK_s:
+                            if(cameraVelocity[2] > epsilon) {
+                                cameraVelocity[2] = 0;
+                            }
+                            break;
+                        case SDLK_LCTRL: case SDLK_a:
+                            if(cameraVelocity[1] < -epsilon) {
+                                cameraVelocity[1] = 0;
+                            }
+                            break;
+                        case SDLK_LSHIFT: case SDLK_e:
+                            if(cameraVelocity[1] > epsilon) {
+                                cameraVelocity[1] = 0;
+                            }
+                            break;
+                    }
                 }
+                break;
         }
-        mainCamera->transform->position += cameraVelocity[2] * deltaTime * mainCamera->transform->getForward();
-        mainCamera->transform->position += cameraVelocity[0] * deltaTime * mainCamera->transform->getRight();
-        mainCamera->transform->position += cameraVelocity[1] * deltaTime * mainCamera->transform->getUp();
     }
+    mainCamera->transform->position += cameraVelocity[2] * deltaTime * mainCamera->transform->getForward();
+    mainCamera->transform->position += cameraVelocity[0] * deltaTime * mainCamera->transform->getRight();
+    mainCamera->transform->position += cameraVelocity[1] * deltaTime;
 }
 
 void App::clean() {

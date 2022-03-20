@@ -11,11 +11,12 @@ class WorldGeneration {
 
 public:
 
-    WorldGeneration(int prmSize, int prmBockSize);
+    WorldGeneration(int prmSize, int prmBockSize, float prmBlockScaleFactor);
 
     float *generatedNoise;
     int size;
     int blockSize;
+    float blockScaleFactor;
 
     vector<shared_ptr<EngineObject>> generateWorld(App* prmApp) const;
     float* generateNoise() const;

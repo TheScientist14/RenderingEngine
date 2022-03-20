@@ -24,9 +24,9 @@ void BaseApp::run(){
         curTime = nextTime;
     }
 
-    /*ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();*/
+    ImGui::DestroyContext();
 
     clean();
 }
@@ -51,10 +51,12 @@ SDL_Window* BaseApp::init_window() {
     SDL_GL_MakeCurrent(win, context);
 
     //SDL_ShowCursor(1);
-    SDL_SetWindowGrab(win, SDL_TRUE);
+    //SDL_SetWindowGrab(win, SDL_TRUE);
+
+
     curTime = SDL_GetTicks();
 
-/*    IMGUI_CHECKVERSION();
+    IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
@@ -62,7 +64,8 @@ SDL_Window* BaseApp::init_window() {
     ImGui_ImplSDL2_InitForOpenGL(win, context);
     ImGui_ImplOpenGL3_Init();
 
-    ImGui::StyleColorsDark();*/
+    ImGui::StyleColorsDark();
+
 
     GLenum err = glewInit();
     if (GLEW_OK != err)

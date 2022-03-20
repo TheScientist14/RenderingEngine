@@ -80,8 +80,8 @@ vector<float> ModelLoader::getUvArray(int prmMeshIndex) const {
     for (int j = 0; j < getNVertices(prmMeshIndex); j++) {
         uvArray.push_back(pAiMesh[prmMeshIndex]->mVertices[j].x);
         uvArray.push_back(pAiMesh[prmMeshIndex]->mVertices[j].y);
-        printf("%f %f %f \n", pAiMesh[prmMeshIndex]->mVertices[j].x, pAiMesh[prmMeshIndex]->mVertices[j].y,
-               pAiMesh[prmMeshIndex]->mVertices[j].z);
+//        printf("%f %f %f \n", pAiMesh[prmMeshIndex]->mVertices[j].x, pAiMesh[prmMeshIndex]->mVertices[j].y,
+//               pAiMesh[prmMeshIndex]->mVertices[j].z);
     }
 
     return uvArray;
@@ -98,9 +98,9 @@ vector<unsigned int> ModelLoader::getVertexIndices(int prmMeshIndex) const {
     for (int j = 0; j < getNTriangles(prmMeshIndex); ++j) {
         for (int k = 0; k < pAiMesh[prmMeshIndex]->mFaces[j].mNumIndices; ++k) {
             vertexIndices.push_back(pAiMesh[prmMeshIndex]->mFaces[j].mIndices[k]);
-            printf(" %d ", pAiMesh[prmMeshIndex]->mFaces[j].mIndices[k]);
+//            printf(" %d ", pAiMesh[prmMeshIndex]->mFaces[j].mIndices[k]);
         }
-        printf("\n");
+//        printf("\n");
     }
 
     return vertexIndices;

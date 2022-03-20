@@ -7,6 +7,7 @@
 #include <GL/glew.h>
 #include "glm/ext.hpp"
 
+#include "../App.h"
 #include "Transform.h"
 
 Camera::Camera(App* app) : Camera(app, 1024, 768, false, 45, 0.1f, 100.0f){
@@ -69,4 +70,7 @@ void Camera::update(float deltaTime){
 
     glClearColor(0, 0, 0.4, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    GLuint VID = glGetUniformLocation(app->getShaderID(), "V");
+    glUniformMatrix4fv(VID, 1, GL_FALSE, value_ptr(getViewMatrix()));
 }

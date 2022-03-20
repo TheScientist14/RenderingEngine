@@ -36,8 +36,6 @@ void GameObject::update(float deltaTime) {
     glUniformMatrix4fv(MvpID, 1, GL_FALSE, value_ptr(mvp));
     GLuint MID = glGetUniformLocation(shaderID, "M");
     glUniformMatrix4fv(MID, 1, GL_FALSE, value_ptr(modelMatrix));
-    GLuint VID = glGetUniformLocation(shaderID, "V");
-    glUniformMatrix4fv(VID, 1, GL_FALSE, value_ptr(mainCamera->getViewMatrix()));
 
     app->getTexture(textureIndex)->select(shaderID);
     app->getGeometry(geometryIndex)->draw(shaderID);

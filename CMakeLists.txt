@@ -38,7 +38,12 @@ add_executable(moteur
 		ScriptablePipeline/EngineObjects/Transform.cpp
 		ScriptablePipeline/EngineObjects/Transform.h
 		ScriptablePipeline/EngineObjects/GameObject.cpp
-		ScriptablePipeline/EngineObjects/GameObject.h helper/ModelLoader.cpp helper/ModelLoader.h Minecraft/WorldGeneration.cpp Minecraft/WorldGeneration.h helper/FastNoiseLite.h)
+		ScriptablePipeline/EngineObjects/GameObject.h
+		helper/ModelLoader.cpp
+		helper/ModelLoader.h
+		Minecraft/WorldGeneration.cpp
+		Minecraft/WorldGeneration.h
+		helper/FastNoiseLite.h)
 
 set(IMGUI_USE_OGL3 true)
 include(cmake/imgui.cmake)
