@@ -3,8 +3,7 @@
 //
 
 #include "Geometry.h"
-#include <GL/glew.h>
-
+const Geometry* Geometry::selectedGeometry = nullptr;
 // TODO : variable size of vertex attributes
 
 Geometry::Geometry(const float *verticesPos, int verticesCount, const unsigned int *triangles, int trianglesCount) {
@@ -68,7 +67,31 @@ void Geometry::bind() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 3 * trianglesCount, triangles.data(), GL_STATIC_DRAW);
 }
 
-void Geometry::draw(GLuint shaderID) const {
+void Geometry::draw() const {
+    if(selectedGeometry != this){
+        if(selectedGeometry != nullptr){
+            selectedGeometry->unselect();
+        }
+        select();
+    }
+    drawFast();
+}
+
+/**
+ * the geometry must be selected before being drawn fast
+ */
+void Geometry::drawFast() const{
+    if(triangles.empty()){
+        glDrawArrays(GL_TRIANGLES, 0, verticesCount);
+    }
+    else{
+        // Index buffer
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffersID[3]);
+        glDrawElements(GL_TRIANGLES, trianglesCount * 3, GL_UNSIGNED_INT, 0);
+    }
+}
+
+void Geometry::select() const{
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
@@ -99,17 +122,17 @@ void Geometry::draw(GLuint shaderID) const {
             0,                                // stride
             (void*)0                          // array buffer offset
     );
+    selectedGeometry = this;
+}
 
-    if(triangles.empty()){
-        //printf("draw Arrays !!!!");
-        glDrawArrays(GL_TRIANGLES, 0, verticesCount);
-    }
-    else{
-        // Index buffer
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffersID[3]);
-        glDrawElements(GL_TRIANGLES, trianglesCount * 3, GL_UNSIGNED_INT, 0);
-    }
+void Geometry::unselect() const{
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(2);
+    selectedGeometry = nullptr;
 }
+
+// calculate mvp then render
+// optimize rotations
+// caching mvp
+// rendering context

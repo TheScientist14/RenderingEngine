@@ -17,6 +17,18 @@ public:
     vec3 rotation;
     vec3 scale;
 
+    vec3 prevPosition;
+    vec3 prevRotation;
+    vec3 prevScale;
+    mat4 prevRotationMatrix;
+    mat4 prevModelMatrix;
+    vec3 prevRotationForward;
+    vec3 prevForward;
+    vec3 prevRotationRight;
+    vec3 prevRight;
+    vec3 prevRotationUp;
+    vec3 prevUp;
+
     Transform();
 
     mat4 getRotationMatrix();

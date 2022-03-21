@@ -4,9 +4,10 @@
 
 #pragma once
 
-#include <GL/glew.h>
 #include <memory>
 #include <vector>
+
+#include <GL/glew.h>
 
 using namespace std;
 
@@ -23,6 +24,8 @@ protected:
     GLuint verticesID;
     vector<GLuint> buffersID;
 
+    const static Geometry* selectedGeometry;
+
 public:
     Geometry(const float* verticesPos, int verticesCount, const unsigned int* triangles, int trianglesCount);
     Geometry(const float* verticesPos, const float* verticesUV, int verticesCount, const unsigned int* triangles, int trianglesCount);
@@ -31,7 +34,10 @@ public:
     virtual ~Geometry();
 
     void bind();
-    void draw(GLuint shaderID) const;
+    void draw() const;
+    void drawFast() const;
+    void select() const;
+    void unselect() const;
 };
 
 

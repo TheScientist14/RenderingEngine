@@ -38,6 +38,6 @@ void GameObject::update(float deltaTime) {
     glUniformMatrix4fv(MID, 1, GL_FALSE, value_ptr(modelMatrix));
 
     app->getTexture(textureIndex)->select(shaderID);
-    app->getGeometry(geometryIndex)->draw(shaderID);
+    app->getGeometry(geometryIndex)->draw();
 
 }
