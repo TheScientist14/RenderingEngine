@@ -24,6 +24,7 @@ public:
     GLuint tetra_colorbuffer;
 
     GLuint programID;
+    GLuint textureID;
 };
 
 

@@ -1,0 +1,127 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+'abstract class AbstractList
+'abstract AbstractCollection
+'interface List
+'interface Collection
+'
+'List <|-- AbstractList
+'Collection <|-- AbstractCollection
+'
+'Collection <|- List
+'AbstractCollection <|- AbstractList
+'AbstractList <|-- ArrayList
+'
+'class ArrayList {
+'Object[] elementData
+'size()
+'}
+'
+'enum TimeUnit {
+'DAYS
+'HOURS
+'MINUTES
+'}
+
+class enable_shared_from_this<T>
+
+BaseApp <|-- App
+
+Geometry --> App
+Texture --> App
+Camera -> App
+
+enable_shared_from_this <|-- EngineObject
+enable_shared_from_this <|-- Geometry
+enable_shared_from_this <|-- Texture
+
+EngineObject <|-- Camera
+EngineObject <|- GameObject
+
+EngineObject --> App
+
+Transform -> EngineObject
+
+class BaseApp {
+    #bool app_running
+    #int width = 1024
+    #int height = 768
+    #SDL_Window* win
+
+    virtual void run()
+    SDL_Window* init_window()
+    virtual void gl_init() = 0
+    virtual void handle_events()
+    virtual void main_loop() = 0
+    #virtual void clean() = 0
+}
+
+class App {
+    #vector<unique_ptr<Geometry>> geometries
+    #vector<unique_ptr<Geometry>> textures
+    #vector<EngineObject> objects
+    #unique_ptr<Camera> mainCamera
+    // light
+}
+
+class Geometry {
+    float[] verticesPos
+    float[] verticesNormal
+    float[] verticesUV
+    int verticesCount
+    int[] triangles
+
+    void bind() const
+    void draw() const
+    +~Geometry()
+}
+
+class Texture {
+    unsigned char[] texels
+    int width
+    int height
+    int channel
+
+    void bind()
+    void select()
+    +~Texture()
+}
+
+class Camera {
+    +bool isOrtho = false
+    +float fov = 120f
+    +float nearPlane = 0.1f
+    +float farPlane = 100
+
+    +Camera()
+    +mat4 getViewMatrix()
+    +mat4 getProjectionMatrix()
+    +mat4 getProjectionViewMatrix()
+    +~Camera()
+}
+
+class Transform {
+    +vec3 position
+    +vec3 rotation
+    +vec3 scale
+
+    +mat4 getModelMatrix()
+}
+
+class EngineObject {
+    +Transform transform
+
+    +EngineObject()
+    +virtual void update(float deltaTime)
+    +~EngineObject()
+}
+
+class GameObject {
+    +int geometryIndex
+    +int textureIndex
+
+    +void update(float deltaTime)
+}
+
+@enduml

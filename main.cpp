@@ -5,9 +5,7 @@
 #include "SDL.h"
 #include <GL/glew.h>
 #include "glm/glm.hpp"
-#include "imgui.h"
-#include "backends/imgui_impl_sdl.h"
-#include "backends/imgui_impl_opengl2.h"
+#include "ScriptablePipeline/App.h"
 
 int main(int argc, char *argv[]) {
 
@@ -27,17 +25,9 @@ int main(int argc, char *argv[]) {
 //
 //    glewInit();
 //
-//    IMGUI_CHECKVERSION();
-//    ImGui::CreateContext();
-//    ImGuiIO& io = ImGui::GetIO();
-//    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
-//
-//    ImGui_ImplSDL2_InitForOpenGL(win, context);
-//    ImGui_ImplOpenGL2_Init();
-//
-//    ImGui::StyleColorsDark();
 
-    BaseApp* app = new AppCube;
+
+    BaseApp* app = new App();
     app->run();
 
     return 0;

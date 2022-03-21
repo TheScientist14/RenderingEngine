@@ -6,19 +6,28 @@
 
 #include "SDL.h"
 #include <GL/glew.h>
+#include "imgui.h"
+#include "backends/imgui_impl_sdl.h"
+#include "backends/imgui_impl_opengl3.h"
 #include "glm/glm.hpp"
-#include "glm/ext.hpp"
-#include <gl/GL.h>
 
 void BaseApp::run(){
     win = init_window();
     gl_init();
     app_running = true;
     while(app_running){
+        Uint32 nextTime = SDL_GetTicks();
+        deltaTime = nextTime - curTime;
         handle_events();
         main_loop();
         SDL_GL_SwapWindow(win);
+        curTime = nextTime;
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+
     clean();
 }
 
@@ -34,18 +43,35 @@ SDL_Window* BaseApp::init_window() {
                                        width,height, windowFlags
     );
 
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
     SDL_GLContext context = SDL_GL_CreateContext(win);
     SDL_GL_MakeCurrent(win, context);
 
-    SDL_ShowCursor(0);
+    //SDL_ShowCursor(1);
     //SDL_SetWindowGrab(win, SDL_TRUE);
+
+
+    curTime = SDL_GetTicks();
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+
+    ImGui_ImplSDL2_InitForOpenGL(win, context);
+    ImGui_ImplOpenGL3_Init();
+
+    ImGui::StyleColorsDark();
+
 
     GLenum err = glewInit();
     if (GLEW_OK != err)
     {
         /* Problem: glewInit failed, something is seriously wrong. */
         fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-
     }
 
     return win;
