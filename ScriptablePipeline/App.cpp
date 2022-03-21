@@ -11,26 +11,25 @@
 #include <GL/glew.h>
 
 #include "imgui_impl_sdl.h"
-#include "backends/imgui_impl_sdl.h"
 #include "backends/imgui_impl_opengl3.h"
-
-
-#include <assimp/postprocess.h>
-#include "../helper/ModelLoader.h"
-
-#include "../helper/stb_image.h"
-#include "../helper/find_exe_path.h"
-#include "../Shaders/loadShader.h"
-#include "EngineObjects/GameObject.h"
-
-#include "EngineObjects/Transform.h"
-#include "../../Minecraft/WorldGeneration.h"
 
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
 #include <assimp/vector3.h>
 
-using namespace std;
+#include "../helper/ModelLoader.h"
+#include "../helper/stb_image.h"
+#include "../helper/find_exe_path.h"
+#include "../Shaders/loadShader.h"
+#include "../../Minecraft/WorldGeneration.h"
+
+#include "EngineObjects/Transform.h"
+#include "EngineObjects/Geometry.h"
+#include "EngineObjects/Texture.h"
+#include "EngineObjects/Camera.h"
+#include "EngineObjects/EngineObject.h"
+#include "EngineObjects/GameObject.h"
+#include "EngineObjects/RenderingContext.h"
 
 void App::gl_init() {
 
@@ -155,7 +154,6 @@ void App::gl_init() {
     objects.insert(objects.end(), temp.begin(), temp.end());
     aiReleaseImport( loader->getAiScene());
 
-
     shared_ptr<Geometry> cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
                                                           nullptr, 0);
     geometries.push_back(cubeMesh);
@@ -170,41 +168,8 @@ void App::gl_init() {
         textures[i]->bind();
     }
 
-/*    shared_ptr<EngineObject> cube = make_shared<GameObject>(this, 0, 0);
-    objects.push_back(cube);
-    cube->transform.rotation = vec3(30, 45, 0);
-    shared_ptr<EngineObject> cube2 = make_shared<GameObject>(this, 0, 0);
-    objects.push_back(cube2);
-    cube2->transform.position = vec3(2, 0, 0);
-    cube2->transform.rotation = vec3(30, 45, 0);*/
-
     mainCamera = make_shared<Camera>(this);
-    mainCamera->transform->position += vec3(0, 55, 0);
-
-/*    int n = 10;
-    float gap = 0.5;
-    float cubeSize = 2;
-    vector<int> cubesIndex;
-    for(int i = 0; i < n; i++){
-        shared_ptr<EngineObject> cube = make_shared<GameObject>(this, 0, 0);
-        cube->transform->rotation = vec3(0, 10 * i, 0);
-        cube->transform->position = vec3(-i * (cubeSize + gap), 0, -i * (cubeSize + gap));
-        cube->setParent(mainCamera);
-        cubesIndex.push_back(objects.size());
-        objects.push_back(cube);
-        for(int j = 0; j < i; j++){
-            shared_ptr<EngineObject> cube1 = make_shared<GameObject>(this, 0, 0);
-            shared_ptr<EngineObject> cube2 = make_shared<GameObject>(this, 0, 0);
-            cube1->transform->rotation = vec3(0, i * 10, 0);
-            cube1->transform->position = vec3(-j * (cubeSize + gap), 0, -i * (cubeSize + gap));
-            cube2->transform->rotation = vec3(0, i * 10, 0);
-            cube2->transform->position = vec3(-i * (cubeSize + gap), 0, -j * (cubeSize + gap));
-            cubesIndex.push_back(objects.size());
-            objects.push_back(cube1);
-            cubesIndex.push_back(objects.size());
-            objects.push_back(cube2);
-        }
-    }*/
+    mainCamera->transform->position += vec3(0, 65, 10);
 
     shaderID = loadShader::LoadShaders("/Shaders/ColoredCube.vertexshader", "/Shaders/ColoredCube.fragmentshader");
     glUseProgram(shaderID);
@@ -234,10 +199,8 @@ void App::main_loop() {
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-
-    for (int i = 0; i < objects.size(); i++) {
-        objects[i]->update(deltaTime);
-    }
+    RenderingContext* renderingContext = new RenderingContext(this);
+    renderingContext->render();
 }
 
 void App::handle_events() {
@@ -345,7 +308,7 @@ void App::handle_events() {
     }
     mainCamera->transform->position += cameraVelocity[2] * deltaTime * mainCamera->transform->getForward();
     mainCamera->transform->position += cameraVelocity[0] * deltaTime * mainCamera->transform->getRight();
-    mainCamera->transform->position += cameraVelocity[1] * deltaTime;
+    mainCamera->transform->position[1] += cameraVelocity[1] * deltaTime;
 }
 
 void App::clean() {
@@ -364,6 +327,38 @@ shared_ptr<Camera> App::getMainCamera() {
     return shared_ptr<Camera>(mainCamera);
 }
 
+shared_ptr<EngineObject> App::getObject(int i) {
+    return shared_ptr<EngineObject>(objects[i]);
+}
+
+int App::getObjectsCount() {
+    return objects.size();
+}
+
+vector<shared_ptr<EngineObject>>::iterator App::getObjectsIterator() {
+    return objects.begin();
+}
+
+shared_ptr<GameObject> App::getObjectToRender(int i) {
+    return shared_ptr<GameObject>(objectsToRender[i]);
+}
+
+int App::getObjectsToRenderCount() {
+    return objectsToRender.size();
+}
+
+vector<shared_ptr<GameObject>>::iterator App::getObjectsToRenderIterator() {
+    return objectsToRender.begin();
+}
+
+int App::getDeltaTime() {
+    return deltaTime;
+}
+
 GLuint App::getShaderID() {
     return shaderID;
+}
+
+App::~App() {
+
 }

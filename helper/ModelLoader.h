@@ -10,12 +10,14 @@
 
 using namespace std;
 
+struct aiScene;
+
 class ModelLoader {
 
 public:
 
     char* pFile;
-    const class aiScene* aiScene;
+    const aiScene* scene;
     class aiMesh** pAiMesh;
 
     ModelLoader();
@@ -26,7 +28,7 @@ public:
 
     const void import(char* pFile);
 
-    const struct aiScene *getAiScene() const;
+    const aiScene *getAiScene() const;
 
     float *getVertexArray(int prmMeshIndex) const;
 

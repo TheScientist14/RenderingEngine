@@ -43,7 +43,7 @@ add_executable(moteur
 		helper/ModelLoader.h
 		Minecraft/WorldGeneration.cpp
 		Minecraft/WorldGeneration.h
-		helper/FastNoiseLite.h)
+		helper/FastNoiseLite.h ScriptablePipeline/EngineObjects/RenderingContext.cpp ScriptablePipeline/EngineObjects/RenderingContext.h)
 
 set(IMGUI_USE_OGL3 true)
 include(cmake/imgui.cmake)

@@ -7,6 +7,9 @@
 #include "../App.h"
 #include "GameObject.h"
 #include "Transform.h"
+#include "Texture.h"
+#include "Geometry.h"
+#include "Camera.h"
 
 using namespace glm;
 

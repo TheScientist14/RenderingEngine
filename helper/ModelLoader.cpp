@@ -15,17 +15,17 @@ const void ModelLoader::import(char *pFile) {
     // Start the import on the given file with some example postprocessing
     // Usually - if speed is not the most important aspect for you - you'll t
     // probably to request more postprocessing than we do in this example.
-    aiScene = aiImportFile(pFile,
+    scene = aiImportFile(pFile,
                            aiProcess_CalcTangentSpace |
                            aiProcess_Triangulate |
                            aiProcess_JoinIdenticalVertices |
                            aiProcess_SortByPType);
     // If the import failed, report it
-    if (!aiScene) {
+    if (!scene) {
         printf("%s", aiGetErrorString());
     }
 
-    pAiMesh = aiScene->mMeshes;
+    pAiMesh = scene->mMeshes;
 
 //    for(int i=0; i < numMesh;i++) {
 //
@@ -57,7 +57,7 @@ const void ModelLoader::import(char *pFile) {
 }
 
 const aiScene *ModelLoader::getAiScene() const {
-    return aiScene;
+    return scene;
 }
 
 float *ModelLoader::getVertexArray(int prmMeshIndex) const {
@@ -69,7 +69,7 @@ int ModelLoader::getNVertices(int prmMeshIndex) const {
 }
 
 int ModelLoader::getNumMesh() const {
-    return aiScene->mNumMeshes;;
+    return scene->mNumMeshes;;
 }
 
 vector<float> ModelLoader::getUvArray(int prmMeshIndex) const {

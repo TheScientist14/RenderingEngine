@@ -26,7 +26,7 @@ protected:
     int width = 1024;
     int height = 768;
 
-    Uint32 curTime;
+    Uint64 curTime;
     int deltaTime;
 
     SDL_Window* win;

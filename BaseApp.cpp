@@ -16,7 +16,7 @@ void BaseApp::run(){
     gl_init();
     app_running = true;
     while(app_running){
-        Uint32 nextTime = SDL_GetTicks();
+        Uint64 nextTime = SDL_GetTicks64();
         deltaTime = nextTime - curTime;
         handle_events();
         main_loop();
@@ -54,7 +54,7 @@ SDL_Window* BaseApp::init_window() {
     //SDL_SetWindowGrab(win, SDL_TRUE);
 
 
-    curTime = SDL_GetTicks();
+    curTime = SDL_GetTicks64();
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
