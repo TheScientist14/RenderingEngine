@@ -151,11 +151,12 @@ void App::gl_init() {
         objects.push_back(grass);
     }
 
-    WorldGeneration *World = new WorldGeneration(32, 2, 0.5);
+    WorldGeneration *World = new WorldGeneration(2, 0.5);
 
-    auto temp = World->generateWorld(this);
+    World->generateWorld(this);
+    VectorEngineObject1D generatedCubes = World->getCubes();
 
-    objects.insert(objects.end(), temp.begin(), temp.end());
+    objects.insert(objects.end(), generatedCubes.begin(), generatedCubes.end());
     aiReleaseImport( loader->getAiScene());
 
     shared_ptr<Geometry> cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,

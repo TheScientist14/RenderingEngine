@@ -19,8 +19,10 @@ protected:
     int geometryIndex;
     int textureIndex;
     ModelShaderData shaderData;
+    bool visible=true;
 
 public:
+    GameObject(App* app, int geometryIndex, int textureIndex, bool visible);
     GameObject(App* app, int geometryIndex, int textureIndex);
 
     void update(float deltaTime) override;
