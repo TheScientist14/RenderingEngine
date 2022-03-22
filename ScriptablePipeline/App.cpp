@@ -149,9 +149,9 @@ void App::gl_init() {
 
     WorldGeneration *World = new WorldGeneration(32, 2, 0.5);
 
-    auto temp = World->generateWorld(this);
+    vector<shared_ptr<EngineObject>> generatedCubes = World->generateWorld(this);
 
-    objects.insert(objects.end(), temp.begin(), temp.end());
+    objects.insert(objects.end(), generatedCubes.begin(), generatedCubes.end());
     aiReleaseImport( loader->getAiScene());
 
     shared_ptr<Geometry> cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
