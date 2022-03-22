@@ -12,8 +12,10 @@ class GameObject : public EngineObject{
 protected:
     int geometryIndex;
     int textureIndex;
+    bool visible=true;
 
 public:
+    GameObject(App* app, int geometryIndex, int textureIndex, bool visible);
     GameObject(App* app, int geometryIndex, int textureIndex);
 
 protected:

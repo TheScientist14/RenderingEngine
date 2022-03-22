@@ -5,22 +5,26 @@
 #pragma once
 
 
+#include <vector>
 #include "../ScriptablePipeline/EngineObjects/EngineObject.h"
+
+typedef vector<shared_ptr<EngineObject>> VectorEngineObject1D;
 
 class WorldGeneration {
 
 public:
 
-    WorldGeneration(int prmSize, int prmBockSize, float prmBlockScaleFactor);
+    WorldGeneration(int prmBockSize, float prmBlockScaleFactor);
 
     float *generatedNoise;
-    int size;
+    const static int size = 16;
     int blockSize;
     float blockScaleFactor;
+    VectorEngineObject1D cubes;
 
-    vector<shared_ptr<EngineObject>> generateWorld(App* prmApp) const;
-    float* generateNoise() const;
-
+    void generateWorld(App* prmApp);
+    float* generateNoise();
+    VectorEngineObject1D getCubes();
 
 };
 

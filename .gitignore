@@ -39,3 +39,4 @@ out
 /cmake-build-release/
 /cmake-build-release-visual-studio/
 /cmake-build-relwithdebinfo/
+/cmake-build-relwithdebinfo-visual-studio/

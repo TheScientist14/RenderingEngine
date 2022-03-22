@@ -13,6 +13,13 @@
 
 using namespace glm;
 
+GameObject::GameObject(App* app, int geometryIndex, int textureIndex, bool visible) : EngineObject(app){
+
+    this->geometryIndex = geometryIndex;
+    this->textureIndex = textureIndex;
+    this->visible = visible;
+
+}
 GameObject::GameObject(App* app, int geometryIndex, int textureIndex) : EngineObject(app){
 
     this->geometryIndex = geometryIndex;
@@ -22,7 +29,7 @@ GameObject::GameObject(App* app, int geometryIndex, int textureIndex) : EngineOb
 
 void GameObject::update(float deltaTime) {
     EngineObject::update(deltaTime);
-
+if(visible) {
     mat4 modelMatrix = transform->getModelMatrix();
     shared_ptr<EngineObject> parentCursor = parent;
     while(parentCursor.get() != nullptr){
@@ -40,7 +47,8 @@ void GameObject::update(float deltaTime) {
     GLuint MID = glGetUniformLocation(shaderID, "M");
     glUniformMatrix4fv(MID, 1, GL_FALSE, value_ptr(modelMatrix));
 
-    app->getTexture(textureIndex)->select(shaderID);
-    app->getGeometry(geometryIndex)->draw();
 
+        app->getTexture(textureIndex)->select(shaderID);
+        app->getGeometry(geometryIndex)->draw();
+    }
 }

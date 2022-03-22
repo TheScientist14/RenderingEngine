@@ -31,6 +31,8 @@
 #include "EngineObjects/GameObject.h"
 #include "EngineObjects/RenderingContext.h"
 
+
+
 void App::gl_init() {
 
 #pragma region cube_vertex
@@ -147,9 +149,10 @@ void App::gl_init() {
         objects.push_back(grass);
     }
 
-    WorldGeneration *World = new WorldGeneration(32, 2, 0.5);
+    WorldGeneration *World = new WorldGeneration(2, 0.5);
 
-    vector<shared_ptr<EngineObject>> generatedCubes = World->generateWorld(this);
+    World->generateWorld(this);
+    VectorEngineObject1D generatedCubes = World->getCubes();
 
     objects.insert(objects.end(), generatedCubes.begin(), generatedCubes.end());
     aiReleaseImport( loader->getAiScene());
