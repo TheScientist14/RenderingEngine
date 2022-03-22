@@ -12,7 +12,7 @@ EngineObject::EngineObject(App* app) {
 
     this->app = app;
 
-    this->transform = new Transform();
+    this->transform = new Transform(this);
 }
 
 EngineObject::~EngineObject() {
@@ -23,7 +23,7 @@ void EngineObject::update(float deltaTime) {
 
 }
 
-// TODO : recompoute transform
+// TODO : recompute transform
 void EngineObject::setParent(shared_ptr<EngineObject> newParent){
     if(parent != nullptr){
         parent->removeChild(shared_from_this());
@@ -34,23 +34,23 @@ void EngineObject::setParent(shared_ptr<EngineObject> newParent){
     }
 }
 
-void EngineObject::addChild(shared_ptr<EngineObject> newChild){
+void EngineObject::addChild(shared_ptr<EngineObject> newChild) {
     if(newChild != nullptr){
         children.insert(newChild);
     }
 }
 
-void EngineObject::removeChild(shared_ptr<EngineObject> removingChild){
+void EngineObject::removeChild(shared_ptr<EngineObject> removingChild) {
     if(removingChild != nullptr){
         children.erase(removingChild);
     }
 }
 
-shared_ptr<EngineObject> EngineObject::getParent() {
+shared_ptr<EngineObject> EngineObject::getParent() const {
     return shared_ptr<EngineObject>(parent);
 }
 
-set<shared_ptr<EngineObject>> EngineObject::getChildren() {
+set<shared_ptr<EngineObject>> EngineObject::getChildren() const {
     set<shared_ptr<EngineObject>> childrenCopy;
     for_each(children.cbegin(), children.cend(), [&childrenCopy](shared_ptr<EngineObject> child) {
         childrenCopy.insert(shared_ptr<EngineObject>(child));

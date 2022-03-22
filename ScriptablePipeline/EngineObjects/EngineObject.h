@@ -7,7 +7,10 @@
 #include <memory>
 #include <set>
 
+#include <glm/mat4x4.hpp>
+
 using namespace std;
+using namespace glm;
 
 class App;
 class Transform;
@@ -33,8 +36,9 @@ public:
 
     virtual void update(float deltaTime);
     void setParent(shared_ptr<EngineObject> newParent);
-    shared_ptr<EngineObject> getParent();
-    set<shared_ptr<EngineObject>> getChildren();
+
+    shared_ptr<EngineObject> getParent() const;
+    set<shared_ptr<EngineObject>> getChildren() const;
 };
 
 

@@ -31,6 +31,10 @@
 #include "EngineObjects/GameObject.h"
 #include "EngineObjects/RenderingContext.h"
 
+App::~App() {
+
+}
+
 void App::gl_init() {
 
 #pragma region cube_vertex
@@ -169,20 +173,18 @@ void App::gl_init() {
     }
 
     mainCamera = make_shared<Camera>(this);
-    mainCamera->transform->position += vec3(0, 65, 10);
+    mainCamera->transform->move(vec3(0, 65, 10));
 
     shaderID = loadShader::LoadShaders("/Shaders/ColoredCube.vertexshader", "/Shaders/ColoredCube.fragmentshader");
     glUseProgram(shaderID);
+
+    LightWorldPosID = glGetUniformLocation(shaderID, "LightWorldPos");
+    LightColorID = glGetUniformLocation(shaderID, "LightColor");
+    LightPowerID = glGetUniformLocation(shaderID, "LightPower");
 }
 
 void App::main_loop() {
     mainCamera->update(deltaTime);
-    GLuint LightWorldPosID = glGetUniformLocation(shaderID, "LightWorldPos");
-    glUniform3f(LightWorldPosID, 2, 200, 2);
-    GLuint LightColorID = glGetUniformLocation(shaderID, "LightColor");
-    glUniform3f(LightColorID, 1, 1, 1);
-    GLuint LightPowerID = glGetUniformLocation(shaderID, "LightPower");
-    glUniform1f(LightPowerID, 12000);
 
     //Render Loop
     ImGui_ImplOpenGL3_NewFrame();
@@ -226,8 +228,7 @@ void App::handle_events() {
             case SDL_MOUSEMOTION:
                 if (!io.WantCaptureMouse){
                     if (isDragging) {
-                        mainCamera->transform->rotation[1] -= curEvent.motion.xrel * mouseSensitivity * deltaTime;
-                        mainCamera->transform->rotation[0] -= curEvent.motion.yrel * mouseSensitivity * deltaTime;
+                        mainCamera->transform->rotate(vec3(-curEvent.motion.yrel * mouseSensitivity * deltaTime, curEvent.motion.xrel * mouseSensitivity * deltaTime, 0));
                     }
                 }
                 break;
@@ -306,9 +307,12 @@ void App::handle_events() {
                 break;
         }
     }
-    mainCamera->transform->position += cameraVelocity[2] * deltaTime * mainCamera->transform->getForward();
-    mainCamera->transform->position += cameraVelocity[0] * deltaTime * mainCamera->transform->getRight();
-    mainCamera->transform->position[1] += cameraVelocity[1] * deltaTime;
+    mainCamera->transform->move(
+            cameraVelocity[2] * deltaTime * mainCamera->transform->getForward()
+            + cameraVelocity[0] * deltaTime * mainCamera->transform->getRight());
+    vec3 tmpPos = mainCamera->transform->getPosition();
+    tmpPos[1] += cameraVelocity[1] * deltaTime;
+    mainCamera->transform->setPosition(tmpPos);
 }
 
 void App::clean() {
@@ -335,8 +339,12 @@ int App::getObjectsCount() {
     return objects.size();
 }
 
-vector<shared_ptr<EngineObject>>::iterator App::getObjectsIterator() {
+vector<shared_ptr<EngineObject>>::iterator App::getObjectsBegin() {
     return objects.begin();
+}
+
+vector<shared_ptr<EngineObject>>::iterator App::getObjectsEnd() {
+    return objects.end();
 }
 
 shared_ptr<GameObject> App::getObjectToRender(int i) {
@@ -347,8 +355,12 @@ int App::getObjectsToRenderCount() {
     return objectsToRender.size();
 }
 
-vector<shared_ptr<GameObject>>::iterator App::getObjectsToRenderIterator() {
+vector<shared_ptr<GameObject>>::iterator App::getObjectsToRenderBegin() {
     return objectsToRender.begin();
+}
+
+vector<shared_ptr<GameObject>>::iterator App::getObjectsToRenderEnd() {
+    return objectsToRender.end();
 }
 
 int App::getDeltaTime() {
@@ -359,6 +371,8 @@ GLuint App::getShaderID() {
     return shaderID;
 }
 
-App::~App() {
-
+void App::setUpGlobalUniforms() {
+    glUniform3f(LightWorldPosID, 2, 200, 2);
+    glUniform3f(LightColorID, 1, 1, 1);
+    glUniform1f(LightPowerID, 12000);
 }

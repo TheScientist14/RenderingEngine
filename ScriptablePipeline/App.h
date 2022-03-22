@@ -33,19 +33,26 @@ public:
     shared_ptr<Geometry> getGeometry(int geometryID);
     shared_ptr<Texture> getTexture(int textureID);
     shared_ptr<Camera> getMainCamera();
-    vector<shared_ptr<EngineObject>>::iterator getObjectsIterator();
+    vector<shared_ptr<EngineObject>>::iterator getObjectsBegin();
+    vector<shared_ptr<EngineObject>>::iterator getObjectsEnd();
     shared_ptr<EngineObject> getObject(int i);
     int getObjectsCount();
-    vector<shared_ptr<GameObject>>::iterator getObjectsToRenderIterator();
+    vector<shared_ptr<GameObject>>::iterator getObjectsToRenderBegin();
+    vector<shared_ptr<GameObject>>::iterator getObjectsToRenderEnd();
     shared_ptr<GameObject> getObjectToRender(int i);
     int getObjectsToRenderCount();
     int getDeltaTime();
     GLuint getShaderID();
 
+    void setUpGlobalUniforms();
+
     virtual ~App();
 
 protected:
     GLuint shaderID;
+    GLuint LightWorldPosID;
+    GLuint LightColorID;
+    GLuint LightPowerID;
     vector<shared_ptr<Geometry>> geometries;
     vector<shared_ptr<Texture>> textures;
     vector<shared_ptr<EngineObject>> objects;

@@ -23,7 +23,7 @@ Camera::Camera(App* app, int width, int height, bool isOrtho, float fieldOfView,
     this->nearPlane = nearPlane;
     this->farPlane = farPlane;
 
-    this->transform->position = vec3(0, 0, 10);
+    this->transform->setPosition(vec3(0, 0, 10));
 
     // Enable depth buffer
     glEnable(GL_DEPTH_TEST);

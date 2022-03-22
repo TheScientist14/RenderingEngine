@@ -3,7 +3,7 @@
 //
 
 #include "Geometry.h"
-const Geometry* Geometry::selectedGeometry = nullptr;
+
 // TODO : variable size of vertex attributes
 
 Geometry::Geometry(const float *verticesPos, int verticesCount, const unsigned int *triangles, int trianglesCount) {
@@ -68,13 +68,9 @@ void Geometry::bind() {
 }
 
 void Geometry::draw() const {
-    if(selectedGeometry != this){
-        if(selectedGeometry != nullptr){
-            selectedGeometry->unselect();
-        }
-        select();
-    }
+    select();
     drawFast();
+    unselect();
 }
 
 /**
@@ -122,14 +118,12 @@ void Geometry::select() const{
             0,                                // stride
             (void*)0                          // array buffer offset
     );
-    selectedGeometry = this;
 }
 
 void Geometry::unselect() const{
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(2);
-    selectedGeometry = nullptr;
 }
 
 // calculate mvp then render

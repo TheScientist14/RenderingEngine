@@ -5,17 +5,23 @@
 #pragma once
 
 #include <memory>
+#include <vector>
+#include <map>
 
 class Geometry;
+class GameObject;
 class App;
+class ModelShaderData;
 
 using namespace std;
 
 class RenderingContext {
 
 protected:
-    Geometry* selectedGeometry;
     App* app;
+
+    shared_ptr<Geometry> selectedGeometry = nullptr;
+    map<shared_ptr<Geometry>, vector<pair<shared_ptr<GameObject>, ModelShaderData*>>> computedShaderData;
 
 public:
     RenderingContext(App* app);

@@ -9,15 +9,28 @@
 
 class GameObject : public EngineObject{
 
+public:
+    struct ModelShaderData {
+        mat4 MVP;
+        mat4 M;
+    };
+
 protected:
     int geometryIndex;
     int textureIndex;
+    ModelShaderData shaderData;
 
 public:
     GameObject(App* app, int geometryIndex, int textureIndex);
 
-protected:
-
     void update(float deltaTime) override;
+
+    void render() const;
+    void fastRender() const;
+
+    int getGeometryIndex() const;
+    int getTextureIndex() const;
+
+    ModelShaderData* computeShaderData();
 
 };

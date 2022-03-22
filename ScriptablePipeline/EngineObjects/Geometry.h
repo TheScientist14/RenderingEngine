@@ -24,7 +24,7 @@ protected:
     GLuint verticesID;
     vector<GLuint> buffersID;
 
-    const static Geometry* selectedGeometry;
+    //const static Geometry* selectedGeometry;
 
 public:
     Geometry(const float* verticesPos, int verticesCount, const unsigned int* triangles, int trianglesCount);
