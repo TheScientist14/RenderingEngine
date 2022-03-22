@@ -41,9 +41,9 @@ void WorldGeneration::generateWorld(App *prmApp) {
                 }
 
                 shared_ptr<EngineObject> cube = make_shared<GameObject>(prmApp, 0, 0, visible);
-                cube->transform->position = vec3(x * blockSize * blockScaleFactor,
+                cube->transform->setPosition(vec3(x * blockSize * blockScaleFactor,
                                 y * blockSize * blockScaleFactor,
-                                z * blockSize * blockScaleFactor);
+                                z * blockSize * blockScaleFactor));
 
 
                 //                cube->transform->scale = vec3(blockScaleFactor, blockScaleFactor, blockScaleFactor);

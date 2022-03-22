@@ -29,13 +29,19 @@ void Transform::updateModelMatrix() {
             scaleFactor * c2 * c3,                  scaleFactor * c2 * s3,                  scaleFactor * (-s2),   position.x,
             scaleFactor * (s1 * s2 * c3 - c1 * s3), scaleFactor * (s1 * s2 * s3 + c1 * c3), scaleFactor * s1 * c1, position.y,
             scaleFactor * (c1 * s2 * c3 + s1 * s3), scaleFactor * (c1 * s2 * s3 - s1 * c3), scaleFactor * c1 * c2, position.z,
-            0,                      0,                      0,       1
+            0,                                      0,                                      0,                     1
     );
     isModelMatrixDirty = false;
 }
 
 void Transform::updateWorldMatrix() {
-    prevWorldMatrix = object->getParent()->transform->getWorldModelMatrix() * getModelMatrix();
+    shared_ptr<EngineObject> parent = object->getParent();
+    if(parent == nullptr){
+        prevWorldMatrix = prevModelMatrix;
+    }
+    else{
+        prevWorldMatrix = object->getParent()->transform->getWorldModelMatrix() * getModelMatrix();
+    }
     isWorldMatrixDirty = false;
 }
 
