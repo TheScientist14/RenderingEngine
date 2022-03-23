@@ -157,6 +157,7 @@ void App::gl_init() {
     VectorEngineObject1D generatedCubes = World->getCubes();
 
     objects.insert(objects.end(), generatedCubes.begin(), generatedCubes.end());
+    objectsToRender.insert(objectsToRender.end(), generatedCubes.begin(), generatedCubes.end());
     aiReleaseImport( loader->getAiScene());
 
     shared_ptr<Geometry> cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,

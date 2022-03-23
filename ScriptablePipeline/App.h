@@ -22,6 +22,12 @@ class Camera;
 class EngineObject;
 class GameObject;
 
+typedef shared_ptr<Geometry> Sp_Geometry;
+typedef shared_ptr<Texture> Sp_Texture;
+typedef shared_ptr<Camera> Sp_Camera;
+typedef shared_ptr<EngineObject> Sp_EngineObject;
+typedef shared_ptr<GameObject> Sp_GameObject;
+
 class App : public BaseApp {
 
 public:
@@ -30,16 +36,16 @@ public:
     void clean() override;
     void handle_events() override;
 
-    shared_ptr<Geometry> getGeometry(int geometryID);
-    shared_ptr<Texture> getTexture(int textureID);
-    shared_ptr<Camera> getMainCamera();
-    vector<shared_ptr<EngineObject>>::iterator getObjectsBegin();
-    vector<shared_ptr<EngineObject>>::iterator getObjectsEnd();
-    shared_ptr<EngineObject> getObject(int i);
+    Sp_Geometry getGeometry(int geometryID);
+    Sp_Texture getTexture(int textureID);
+    Sp_Camera getMainCamera();
+    vector<Sp_EngineObject>::iterator getObjectsBegin();
+    vector<Sp_EngineObject>::iterator getObjectsEnd();
+    Sp_EngineObject getObject(int i);
     int getObjectsCount();
-    vector<shared_ptr<GameObject>>::iterator getObjectsToRenderBegin();
-    vector<shared_ptr<GameObject>>::iterator getObjectsToRenderEnd();
-    shared_ptr<GameObject> getObjectToRender(int i);
+    vector<Sp_GameObject>::iterator getObjectsToRenderBegin();
+    vector<Sp_GameObject>::iterator getObjectsToRenderEnd();
+    Sp_GameObject getObjectToRender(int i);
     int getObjectsToRenderCount();
     int getDeltaTime();
     GLuint getShaderID();

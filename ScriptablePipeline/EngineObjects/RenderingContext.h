@@ -21,7 +21,6 @@ protected:
     App* app;
 
     shared_ptr<Geometry> selectedGeometry = nullptr;
-    map<shared_ptr<Geometry>, vector<pair<shared_ptr<GameObject>, ModelShaderData*>>> computedShaderData;
 
 public:
     RenderingContext(App* app);

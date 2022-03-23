@@ -34,6 +34,6 @@ void RenderingContext::render() {
             selectedGeometry = curGeometry;
             curGeometry->select();
         }
-        curGeometry->drawFast();
+        (*iter)->fastRender();
     }
 }

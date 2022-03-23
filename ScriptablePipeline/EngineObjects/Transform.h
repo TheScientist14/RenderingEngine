@@ -7,6 +7,7 @@
 
 #include "glm/mat4x4.hpp"
 #include "glm/vec3.hpp"
+#include <glm/gtc/quaternion.hpp>
 
 using namespace std;
 using namespace glm;
@@ -17,7 +18,7 @@ class Transform {
 
 protected:
     vec3 position;
-    vec3 eulerAngles;
+    quat orientation;
     float scaleFactor;
 
     // caches
@@ -45,6 +46,7 @@ public:
 
     void setPosition(vec3 localPosition);
     void setRotation(vec3 localEulerAngles);
+    void setRotation(quat localOrientation);
     void setScale(float localScaleFactor);
 
     void move(vec3 positionOffset);
@@ -52,7 +54,8 @@ public:
     void scale(float scaleFactor);
 
     void setWorldPosition(vec3 worldPosition);
-    void setWorldRotation(vec3 worldRotation);
+    void setWorldRotation(vec3 worldEulerAngles);
+    void setWorldRotation(quat worldOrientation);
     void setWorldScale(float worldScale);
 
     void setWorldMatrixIsDirty(bool isDirty);

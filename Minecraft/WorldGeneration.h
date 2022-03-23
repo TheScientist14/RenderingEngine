@@ -6,9 +6,14 @@
 
 
 #include <vector>
-#include "../ScriptablePipeline/EngineObjects/EngineObject.h"
+#include <memory>
 
-typedef vector<shared_ptr<EngineObject>> VectorEngineObject1D;
+using namespace std;
+
+class GameObject;
+class App;
+
+typedef vector<shared_ptr<GameObject>> VectorEngineObject1D;
 
 class WorldGeneration {
 
@@ -16,7 +21,7 @@ public:
 
     WorldGeneration(int prmBockSize, float prmBlockScaleFactor);
 
-    float *generatedNoise;
+    float* generatedNoise;
     const static int size = 16;
     int blockSize;
     float blockScaleFactor;
