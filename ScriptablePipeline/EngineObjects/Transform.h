@@ -23,9 +23,9 @@ protected:
 
     // caches
     bool isModelMatrixDirty = true;
-    mat4 prevModelMatrix;
+    mat4 modelMatrix;
     bool isWorldMatrixDirty = true;
-    mat4 prevWorldMatrix;
+    mat4 worldMatrix;
 
     void updateModelMatrix();
     void updateWorldMatrix();
@@ -42,6 +42,7 @@ public:
     vec3 getUp();
     vec3 getPosition() const;
     vec3 getEulerAngles() const;
+    quat getOrientation() const;
     float getScale() const;
 
     void setPosition(vec3 localPosition);
@@ -50,7 +51,8 @@ public:
     void setScale(float localScaleFactor);
 
     void move(vec3 positionOffset);
-    void rotate(vec3 eulerAngles);
+    __declspec(deprecated) void rotate(vec3 eulerAngles);
+    void rotate(quat orientationAdded);
     void scale(float scaleFactor);
 
     void setWorldPosition(vec3 worldPosition);

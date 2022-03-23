@@ -147,8 +147,9 @@ void App::gl_init() {
 
     for (int i = 0; i < loader->getNumMesh(); ++i) {
 
-        shared_ptr<EngineObject> grass = make_shared<GameObject>(this, i, 0);
+        shared_ptr<GameObject> grass = make_shared<GameObject>(this, i, 0);
         objects.push_back(grass);
+        objectsToRender.push_back(grass);
     }
 
     WorldGeneration *World = new WorldGeneration(2, 0.5);
@@ -164,8 +165,9 @@ void App::gl_init() {
                                                           nullptr, 0);
     geometries.push_back(cubeMesh);
 
-    shared_ptr<EngineObject> cube = make_shared<GameObject>(this, 1, 0);
+    shared_ptr<GameObject> cube = make_shared<GameObject>(this, 1, 0);
     objects.push_back(cube);
+    objectsToRender.push_back(cube);
 
     for (int i = 0; i < geometries.size(); i++) {
         geometries[i]->bind();
@@ -175,7 +177,7 @@ void App::gl_init() {
     }
 
     mainCamera = make_shared<Camera>(this);
-    mainCamera->transform->move(vec3(0, 65, 10));
+    mainCamera->transform->move(vec3(0, 0, 10));
 
     shaderID = loadShader::LoadShaders("/Shaders/ColoredCube.vertexshader", "/Shaders/ColoredCube.fragmentshader");
     glUseProgram(shaderID);
@@ -230,7 +232,11 @@ void App::handle_events() {
             case SDL_MOUSEMOTION:
                 if (!io.WantCaptureMouse){
                     if (isDragging) {
-                        mainCamera->transform->rotate(vec3(-curEvent.motion.yrel * mouseSensitivity * deltaTime, curEvent.motion.xrel * mouseSensitivity * deltaTime, 0));
+                        quat quatX = quat(radians(-curEvent.motion.yrel * mouseSensitivity * deltaTime), mainCamera->transform->getRight());
+                        mainCamera->transform->rotate(quatX);
+                        // can be optimized
+                        quat quatY = quat(radians(curEvent.motion.xrel * mouseSensitivity * deltaTime), mainCamera->transform->getUp());
+                        mainCamera->transform->rotate(quatY);
                     }
                 }
                 break;

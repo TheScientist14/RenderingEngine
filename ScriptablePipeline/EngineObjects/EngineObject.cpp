@@ -32,6 +32,7 @@ void EngineObject::setParent(shared_ptr<EngineObject> newParent){
     if(parent != nullptr){
         parent->addChild(shared_from_this());
     }
+    transform->setWorldMatrixIsDirty(true);
 }
 
 void EngineObject::addChild(shared_ptr<EngineObject> newChild) {
