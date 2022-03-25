@@ -47,6 +47,6 @@ void main(){
 //    color = rgb * LightColor * LightPower * cosTheta / (distanceVertexLight * distanceVertexLight)
 //        + rgb * AmbientLightColor
 //        + rgb * LightColor * LightPower * pow(cosAlpha, 5) / (distanceVertexLight * distanceVertexLight);
-    color = texture( TextureSampler, UV ).rgb;
+    color = rgb;
 
 }
