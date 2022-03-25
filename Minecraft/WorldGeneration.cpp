@@ -69,21 +69,17 @@ void WorldGeneration::generateNoise() {
     noise.SetFractalPingPongStrength(1.6);
 
 // Gather noise data
-    int index = 0;
-
     int y;
 
     for (int z = 0; z < size; z++) {
         for (int x = 0; x < size; x++) {
 
             y = trunc((noise.GetNoise((float) x, (float) z)+ 1)*3);
-            printf("%d ", y);
             cubes[z * size * size + y * size + x]->visible = true;
             y++;
             for (y; y < size; y++) {
-                cubes[z * size * size + y * size + x]->visible = false;
+                cubes[z * size * size + y * size + x] = nullptr;
             }
-            //noiseData[index++] = noise.GetNoise((float) x, (float) z);
         }
     }
 
@@ -95,4 +91,51 @@ void WorldGeneration::generateNoise() {
 
 VectorEngineObject1D WorldGeneration::getCubes() {
     return cubes;
+}
+
+void WorldGeneration::combineVerticesByAxis() {
+    //x = Left Right
+    //y = Top Down
+    //z = Front Back
+
+    bool isChanged = false;
+    bool isPreviousBlockEmpty = true;
+    bool isNull = false;
+
+    for (int x = 0; x < size; x++) {
+        for (int z = 0; z < size ; z++) {
+            for (int y = 0; y < size; ++y) {
+
+                if (cubes[z * size * size + y * size + x] == nullptr){
+
+                    isNull = true;
+                    if (isNull == isPreviousBlockEmpty){
+                        //DoNothing
+                    }
+                    else{
+                        isPreviousBlockEmpty = true;
+                        //make block draw left face
+                    }
+
+                }
+                else if (cubes[z * size * size + y * size + x] != nullptr){
+
+                    isNull=false;
+                    if (isNull == isPreviousBlockEmpty){
+                        //DoNothing
+                    }
+                    else{
+                        isPreviousBlockEmpty = false;
+                        //make previous block draw right face
+                    }
+
+                }
+
+                cubes[z * size * size + 0 * size + x];
+            }
+
+
+        }
+    }
+
 }

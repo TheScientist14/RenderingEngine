@@ -29,6 +29,7 @@ public:
 
     void generateWorld(App* prmApp);
     void generateNoise();
+    void combineVerticesByAxis();
     VectorEngineObject1D getCubes();
 
 };

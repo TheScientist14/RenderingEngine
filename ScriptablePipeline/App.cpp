@@ -133,10 +133,10 @@ void App::gl_init() {
 #pragma endregion cube_vertex_elements
 
 // Draw some widgets
-    shared_ptr<Texture> cube_texture = make_shared<Texture>("../Images/dirt.bmp");
+    Sp_Texture cube_texture = make_shared<Texture>("../Images/dirt.bmp");
     textures.push_back(cube_texture);
 
-    //shared_ptr<Geometry> cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6*2*3, nullptr, 0);
+    //Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6*2*3, nullptr, 0);
     //geometries.push_back(cubeMesh);
 
     ModelLoader *loader = new ModelLoader();
@@ -147,7 +147,7 @@ void App::gl_init() {
 
     for (int i = 0; i < loader->getNumMesh(); ++i) {
 
-        shared_ptr<GameObject> grass = make_shared<GameObject>(this, i, 0);
+        Sp_GameObject grass = make_shared<GameObject>(this, i, 0);
         objects.push_back(grass);
         objectsToRender.push_back(grass);
     }
@@ -161,11 +161,11 @@ void App::gl_init() {
     objectsToRender.insert(objectsToRender.end(), generatedCubes.begin(), generatedCubes.end());
     aiReleaseImport(loader->getAiScene());
 
-    shared_ptr<Geometry> cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
+    Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
                                                           nullptr, 0);
     geometries.push_back(cubeMesh);
 
-    shared_ptr<GameObject> cube = make_shared<GameObject>(this, 1, 0);
+    Sp_GameObject cube = make_shared<GameObject>(this, 1, 0);
     objects.push_back(cube);
     objectsToRender.push_back(cube);
 
@@ -182,9 +182,18 @@ void App::gl_init() {
     shaderID = loadShader::LoadShaders("/Shaders/ColoredCube.vertexshader", "/Shaders/ColoredCube.fragmentshader");
     glUseProgram(shaderID);
 
-    LightWorldPosID = glGetUniformLocation(shaderID, "LightWorldPos");
-    LightColorID = glGetUniformLocation(shaderID, "LightColor");
-    LightPowerID = glGetUniformLocation(shaderID, "LightPower");
+    pointLightWorldPosID = glGetUniformLocation(shaderID, "PointLightWorldPos");
+    pointLightColorID = glGetUniformLocation(shaderID, "PointLightColor");
+    pointLightPowerID = glGetUniformLocation(shaderID, "PointLightPower");
+
+    ambientLightColorID = glGetUniformLocation(shaderID, "AmbientLightColor");
+    ambientLightPowerID = glGetUniformLocation(shaderID, "AmbientLightPower");
+
+    directionalLightColorID = glGetUniformLocation(shaderID, "DirectionalLightColor");
+    directionalLightDirectionID = glGetUniformLocation(shaderID, "DirectionalLightDirection");
+    directionalLightPowerID = glGetUniformLocation(shaderID, "DirectionalLightPower");
+
+    specularPowerID = glGetUniformLocation(shaderID, "SpecularPower");
 }
 
 void App::main_loop() {
@@ -199,7 +208,15 @@ void App::main_loop() {
     ImGui::Begin("Perfs");
     ImGui::Text("Frame Time (ms) new : %d", deltaTime);
     ImGui::Text("FPS : %f", 1.0 / (float) deltaTime * 1000);
-    ImGui::InputFloat("Sens", &mouseSensitivity);
+    ImGui::InputFloat("Mouse sensitivity : ", &mouseSensitivity);
+    ImGui::Checkbox("Wireframe : ", &mainCamera->isWireframe);
+    ImGui::InputFloat("Light power : ", &pointLightPower);
+    ImGui::InputFloat3("Light color : ", &pointLightColor[0]);
+    ImGui::DragFloat3("drag ligtColor", &pointLightColor[0], 0.01f, 0.0f, 1.0f);
+    ImGui::SliderFloat3("slider pointLightColor", &pointLightColor[0], 0.0f, 1.0f);
+    ImGui::InputFloat3("Light world pos : ", &pointLightWorldPos[0]);
+    ImGui::DragFloat3("drag pointLightWorldPos", &pointLightWorldPos[0], 0.01f, 0.0f, 1.0f);
+    ImGui::SliderFloat3("slider pointLightWorldPos", &pointLightWorldPos[0], 0.0f, 1.0f);
     ImGui::End();
 
     ImGui::Render();
@@ -372,47 +389,47 @@ void App::clean() {
     // TODO : Call desctructor ?
 }
 
-shared_ptr<Geometry> App::getGeometry(int geometryID) {
-    return shared_ptr<Geometry>(geometries[geometryID]);
+Sp_Geometry App::getGeometry(int geometryID) {
+    return Sp_Geometry(geometries[geometryID]);
 }
 
-shared_ptr<Texture> App::getTexture(int textureID) {
-    return shared_ptr<Texture>(textures[textureID]);
+Sp_Texture App::getTexture(int textureID) {
+    return Sp_Texture(textures[textureID]);
 }
 
-shared_ptr<Camera> App::getMainCamera() {
-    return shared_ptr<Camera>(mainCamera);
+Sp_Camera App::getMainCamera() {
+    return Sp_Camera(mainCamera);
 }
 
-shared_ptr<EngineObject> App::getObject(int i) {
-    return shared_ptr<EngineObject>(objects[i]);
+Sp_EngineObject App::getObject(int i) {
+    return Sp_EngineObject(objects[i]);
 }
 
 int App::getObjectsCount() {
     return objects.size();
 }
 
-vector<shared_ptr<EngineObject>>::iterator App::getObjectsBegin() {
+vector<Sp_EngineObject>::iterator App::getObjectsBegin() {
     return objects.begin();
 }
 
-vector<shared_ptr<EngineObject>>::iterator App::getObjectsEnd() {
+vector<Sp_EngineObject>::iterator App::getObjectsEnd() {
     return objects.end();
 }
 
-shared_ptr<GameObject> App::getObjectToRender(int i) {
-    return shared_ptr<GameObject>(objectsToRender[i]);
+Sp_GameObject App::getObjectToRender(int i) {
+    return Sp_GameObject(objectsToRender[i]);
 }
 
 int App::getObjectsToRenderCount() {
     return objectsToRender.size();
 }
 
-vector<shared_ptr<GameObject>>::iterator App::getObjectsToRenderBegin() {
+vector<Sp_GameObject>::iterator App::getObjectsToRenderBegin() {
     return objectsToRender.begin();
 }
 
-vector<shared_ptr<GameObject>>::iterator App::getObjectsToRenderEnd() {
+vector<Sp_GameObject>::iterator App::getObjectsToRenderEnd() {
     return objectsToRender.end();
 }
 
@@ -425,7 +442,20 @@ GLuint App::getShaderID() {
 }
 
 void App::setUpGlobalUniforms() {
-    glUniform3f(LightWorldPosID, 2, 200, 2);
-    glUniform3f(LightColorID, 1, 1, 1);
-    glUniform1f(LightPowerID, 12000);
+    // point light
+    glUniform3fv(pointLightWorldPosID, 1, &pointLightWorldPos[0]);
+    glUniform3fv(pointLightColorID, 1, &pointLightColor[0]);
+    glUniform1f(pointLightPowerID, pointLightPower);
+
+    // ambient light
+    glUniform3fv(ambientLightColorID, 1, &ambientLightColor[0]);
+    glUniform1f(ambientLightPowerID, ambientLightPower);
+
+    // directional light (sun)
+    glUniform3fv(directionalLightDirectionID, 1, &directionalLightDirection[0]);
+    glUniform3fv(directionalLightColorID, 1, &directionalLightColor[0]);
+    glUniform1f(directionalLightPowerID, directionalLightPower);
+
+    //specular power
+    glUniform1f(specularPowerID, specularPower);
 }

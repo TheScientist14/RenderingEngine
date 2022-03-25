@@ -21,19 +21,23 @@ void RenderingContext::render() {
     app->setUpGlobalUniforms();
 
     for (int i = 0; i < app->getObjectsCount(); i++) {
-        app->getObject(i)->update(app->getDeltaTime());
+        if(app->getObject(i) != nullptr) {
+            app->getObject(i)->update(app->getDeltaTime());
+        }
     }
 
     vector<shared_ptr<GameObject>>::iterator iter;
     for(iter = app->getObjectsToRenderBegin(); iter != app->getObjectsToRenderEnd(); ++iter){
-        shared_ptr<Geometry> curGeometry = app->getGeometry((*iter)->getGeometryIndex());
-        if(selectedGeometry != curGeometry){
-            if(selectedGeometry != nullptr){
-                selectedGeometry->unselect();
+        if((*iter) != nullptr){
+            shared_ptr<Geometry> curGeometry = app->getGeometry((*iter)->getGeometryIndex());
+            if(selectedGeometry != curGeometry){
+                if(selectedGeometry != nullptr){
+                    selectedGeometry->unselect();
+                }
+                selectedGeometry = curGeometry;
+                curGeometry->select();
             }
-            selectedGeometry = curGeometry;
-            curGeometry->select();
+            (*iter)->fastRender();
         }
-        (*iter)->fastRender();
     }
 }

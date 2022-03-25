@@ -56,9 +56,6 @@ public:
 
 protected:
     GLuint shaderID;
-    GLuint LightWorldPosID;
-    GLuint LightColorID;
-    GLuint LightPowerID;
     vector<shared_ptr<Geometry>> geometries;
     vector<shared_ptr<Texture>> textures;
     vector<shared_ptr<EngineObject>> objects;
@@ -69,6 +66,32 @@ protected:
     float mouseSensitivity = 0.08f;
     float cameraSpeed = 0.01f;
     vec3 cameraVelocity;
+
+    /**
+     *  ----------- LIGHTS -----------
+     **/
+
+    GLuint specularPowerID;
+    float specularPower
+
+    GLuint pointLightWorldPosID;
+    GLuint pointLightColorID;
+    GLuint pointLightPowerID;
+    float pointLightPower = 1000;
+    vec3 pointLightColor = vec3(1, 1, 1);
+    vec3 pointLightWorldPos = vec3(0, 200, 0);
+
+    GLuint ambientLightColorID;
+    GLuint ambientLightPowerID;
+    float ambientLightPower = 0.1;
+    vec3 ambientLightColor = vec3(1,1,1);
+
+    GLuint directionalLightDirectionID;
+    GLuint directionalLightColorID;
+    GLuint directionalLightPowerID;
+    float directionalLightPower = 1;
+    vec3 directionalLightColor = vec3(1,1,1);
+    vec3 directionalLightDirection = vec3(0, 1, 0.1f);
 };
 
 

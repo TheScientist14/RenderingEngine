@@ -11,15 +11,16 @@ layout(location = 2) in vec2 vertexUV;
 out vec2 UV;
 out vec3 VertexPos_cameraspace;
 out vec3 Normal_cameraspace;
-out vec3 LightDirection_cameraspace;
-out float distanceVertexLight;
+out vec3 PointLightDirection_cameraspace;
+out float DistanceVertexPointLight;
+out vec3 DirectionalLightDirection_cameraspace;
 
 // Values that stay constant for the whole mesh.
 uniform mat4 MVP;
 uniform mat4 M;
 uniform mat4 V;
 uniform vec3 LightWorldPos;
-
+uniform vec3 DirectionalLightDirection;
 
 void main(){
     // Output position of the vertex, in clip space : MVP * position
@@ -41,11 +42,13 @@ void main(){
     //vec3 EyeDirection_cameraspace = vec3(0,0,0) - vertexPosition_cameraspace;
 
     // Vector that goes from the vertex to the light, in camera space. M is ommited because it's identity.
-    vec3 LightPosition_cameraspace = ( V * vec4(LightWorldPos,1)).xyz;
-    LightDirection_cameraspace = LightPosition_cameraspace - vertexPosition_cameraspace;
+    vec3 PointLightPosition_cameraspace = ( V * vec4(PointLightWorldPos,1)).xyz;
+    PointLightDirection_cameraspace = PointLightPosition_cameraspace - vertexPosition_cameraspace;
 
     // Normal of the the vertex, in camera space
     Normal_cameraspace = ( V * M * vec4(vertexNormal_modelspace,0)).xyz; // Only correct if ModelMatrix does not scale the model ! Use its inverse transpose if not.
 
-    distanceVertexLight = distance(Position_worldspace, LightWorldPos);
+    DistanceVertexPointLight = distance(Position_worldspace, PointLightWorldPos);
+
+    DirectionalLightDirection_cameraspace = ( V * vec4(DirectionalLightDirection,1)).xyz;
 }
