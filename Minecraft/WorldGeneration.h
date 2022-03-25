@@ -22,13 +22,13 @@ public:
     WorldGeneration(int prmBockSize, float prmBlockScaleFactor);
 
     float* generatedNoise;
-    const static int size = 16;
+    const static int size = 64;
     int blockSize;
     float blockScaleFactor;
     VectorEngineObject1D cubes;
 
     void generateWorld(App* prmApp);
-    float* generateNoise();
+    void generateNoise();
     VectorEngineObject1D getCubes();
 
 };

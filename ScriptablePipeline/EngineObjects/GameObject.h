@@ -14,12 +14,12 @@ public:
         mat4 MVP;
         mat4 M;
     };
+    bool visible=true;
 
 protected:
     int geometryIndex;
     int textureIndex;
     ModelShaderData shaderData;
-    bool visible=true;
 
 public:
     GameObject(App* app, int geometryIndex, int textureIndex, bool visible);

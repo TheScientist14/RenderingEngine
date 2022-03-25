@@ -18,17 +18,16 @@ WorldGeneration::WorldGeneration(int prmBockSize, float prmBlockScaleFactor) {
     blockSize = prmBockSize;
     blockScaleFactor = prmBlockScaleFactor;
 
-    generatedNoise = generateNoise();
 
 }
 
 void WorldGeneration::generateWorld(App *prmApp) {
 
     // Create and configure FastNoise object
-    FastNoiseLite noise;
-    noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
-    noise.SetFractalType(FastNoiseLite::FractalType_PingPong);
-    noise.SetFractalPingPongStrength(1.6);
+//    FastNoiseLite noise;
+//    noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+//    noise.SetFractalType(FastNoiseLite::FractalType_PingPong);
+//    noise.SetFractalPingPongStrength(1.6);
 
     for (int x = 0; x < size; ++x) {
         for (int y = 0; y < size; ++y) {
@@ -36,14 +35,14 @@ void WorldGeneration::generateWorld(App *prmApp) {
                 bool visible = true;
 
                 // dont draw inside of cube
-                if((x != 0 && x != size-1) && (y != 0 && y != size-1) && (z != 0 && z != size-1)) {
+                if ((x != 0 && x != size - 1) && (y != 0 && y != size - 1) && (z != 0 && z != size - 1)) {
                     visible = false;
                 }
 
                 shared_ptr<GameObject> cube = make_shared<GameObject>(prmApp, 0, 0, visible);
                 cube->transform->setPosition(vec3(x * blockSize * blockScaleFactor,
-                                y * blockSize * blockScaleFactor,
-                                z * blockSize * blockScaleFactor));
+                                                  y * blockSize * blockScaleFactor,
+                                                  z * blockSize * blockScaleFactor));
 
 
                 //                cube->transform->scale = vec3(blockScaleFactor, blockScaleFactor, blockScaleFactor);
@@ -55,34 +54,44 @@ void WorldGeneration::generateWorld(App *prmApp) {
                 //                printf("%f ", trunc(noise.GetNoise((float) x, (float) y) * 2 + 50));
 
                 cubes.push_back(cube);
-                }
             }
         }
     }
 
-    float *WorldGeneration::generateNoise() {
+    generateNoise();
+}
+
+void WorldGeneration::generateNoise() {
 // Create and configure FastNoise object
-        FastNoiseLite noise;
-        noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
+    FastNoiseLite noise;
+    noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+    noise.SetFractalType(FastNoiseLite::FractalType_PingPong);
+    noise.SetFractalPingPongStrength(1.6);
 
 // Gather noise data
-        float *noiseData = new float[size * size]{};
-        int index = 0;
+    int index = 0;
 
-        for (int y = 0; y < size; y++) {
-            for (int x = 0; x < size; x++) {
+    int y;
 
-                noiseData[index++] = noise.GetNoise((float) x, (float) y);
+    for (int z = 0; z < size; z++) {
+        for (int x = 0; x < size; x++) {
+
+            y = trunc((noise.GetNoise((float) x, (float) z)+ 1)*3);
+            printf("%d ", y);
+            cubes[z * size * size + y * size + x]->visible = true;
+            y++;
+            for (y; y < size; y++) {
+                cubes[z * size * size + y * size + x]->visible = false;
             }
+            //noiseData[index++] = noise.GetNoise((float) x, (float) z);
         }
-
-        return noiseData;
+    }
 
 // Do something with this data...
 
 // Free data later
 
-    }
+}
 
 VectorEngineObject1D WorldGeneration::getCubes() {
     return cubes;

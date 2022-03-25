@@ -133,14 +133,14 @@ void App::gl_init() {
 #pragma endregion cube_vertex_elements
 
 // Draw some widgets
-    shared_ptr<Texture> cube_texture = make_shared<Texture>("../Images/uvtemplate.bmp");
+    shared_ptr<Texture> cube_texture = make_shared<Texture>("../Images/diamond_block.bmp");
     textures.push_back(cube_texture);
 
     //shared_ptr<Geometry> cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6*2*3, nullptr, 0);
     //geometries.push_back(cubeMesh);
 
     ModelLoader *loader = new ModelLoader();
-    string str = getRootPath() + "/Models/untitled.obj";
+    string str = getRootPath() + "/Models/cube.obj";
 
     loader->import(&*str.begin());
     loader->loadMeshes(geometries);
