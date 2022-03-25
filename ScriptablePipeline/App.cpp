@@ -212,7 +212,6 @@ void App::main_loop() {
 void App::handle_events() {
     SDL_Event curEvent;
     ImGuiIO& io = ImGui::GetIO();
-    float epsilon = 0.00001f;
     while (SDL_PollEvent(&curEvent)) {
         ImGui_ImplSDL2_ProcessEvent(&curEvent);
         switch (curEvent.type) {
@@ -231,18 +230,42 @@ void App::handle_events() {
                 break;
             case SDL_MOUSEMOTION:
                 if (!io.WantCaptureMouse){
+                    float epsilon = 0.01f;
                     if (isDragging) {
-                        quat quatX = quat(radians(-curEvent.motion.yrel * mouseSensitivity * deltaTime), mainCamera->transform->getRight());
-                        mainCamera->transform->rotate(quatX);
-                        // can be optimized
-                        quat quatY = quat(radians(curEvent.motion.xrel * mouseSensitivity * deltaTime), mainCamera->transform->getUp());
-                        mainCamera->transform->rotate(quatY);
+                        vec3 eulerAngles = mainCamera->transform->getEulerAngles();
+                        if(abs(eulerAngles.y) > 80) {
+                            printf("%f, %f, %f", eulerAngles.x, eulerAngles.y, eulerAngles.z);
+                        }
+                        // 0 -90 0 ~ 180 -90- 180
+                        eulerAngles.x += -curEvent.motion.yrel * mouseSensitivity * deltaTime;
+                        eulerAngles.y += -curEvent.motion.xrel * mouseSensitivity * deltaTime;
+                        if(abs(eulerAngles.z) < epsilon){
+                            if(eulerAngles.y < -90){
+                                eulerAngles.x += 180;
+                                eulerAngles.y += 180;
+                                eulerAngles.z = 180;
+                            }
+                            else if(eulerAngles.y > 90){
+                                eulerAngles.x += 180;
+                                eulerAngles.y -= 180;
+                                eulerAngles.z = 180;
+                            }
+                        }
+
+                        if(abs(eulerAngles.y) > 80){
+                            printf(" %f, %f, %f\n", eulerAngles.x, eulerAngles.y, eulerAngles.z);
+                        }
+
+                        quat quatPitch = angleAxis(radians(eulerAngles.x), vec3(1,0,0));
+                        quat quatYaw = angleAxis(radians(eulerAngles.y), vec3(0,1,0));
+                        mainCamera->transform->setRotation(mat4_cast(normalize(quatYaw * quatPitch)));
                     }
                 }
                 break;
             case SDL_KEYDOWN:
                 if (!io.WantCaptureKeyboard)
                 {
+                    float epsilon = 0.0001f;
                     switch (curEvent.key.keysym.sym) {
                         case SDLK_LEFT: case SDLK_q:
                             if(cameraVelocity[0] >= -epsilon){
@@ -279,6 +302,7 @@ void App::handle_events() {
                 break;
             case SDL_KEYUP:
                 if(!io.WantCaptureKeyboard){
+                    float epsilon = 0.0001f;
                     switch (curEvent.key.keysym.sym) {
                         case SDLK_LEFT: case SDLK_q:
                             if(cameraVelocity[0] < -epsilon) {
