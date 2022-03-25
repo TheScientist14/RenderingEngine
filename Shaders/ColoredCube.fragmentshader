@@ -44,9 +44,9 @@ void main(){
     float cosAlpha = clamp( dot( E,R ), 0,1 );
 
     vec3 rgb = texture( TextureSampler, UV ).rgb;
-//    color = rgb * LightColor * LightPower * cosTheta / (distanceVertexLight * distanceVertexLight)
-//        + rgb * AmbientLightColor
-//        + rgb * LightColor * LightPower * pow(cosAlpha, 5) / (distanceVertexLight * distanceVertexLight);
-    color = rgb;
+    color = rgb * LightColor * LightPower * cosTheta / (distanceVertexLight * distanceVertexLight)
+        + rgb * AmbientLightColor
+        + rgb * LightColor * LightPower * pow(cosAlpha, 5) / (distanceVertexLight * distanceVertexLight);
+    //color = rgb;
 
 }
