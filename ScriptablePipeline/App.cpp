@@ -159,7 +159,7 @@ void App::gl_init() {
 
     objects.insert(objects.end(), generatedCubes.begin(), generatedCubes.end());
     objectsToRender.insert(objectsToRender.end(), generatedCubes.begin(), generatedCubes.end());
-    aiReleaseImport( loader->getAiScene());
+    aiReleaseImport(loader->getAiScene());
 
     shared_ptr<Geometry> cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
                                                           nullptr, 0);
@@ -198,20 +198,20 @@ void App::main_loop() {
 
     ImGui::Begin("Perfs");
     ImGui::Text("Frame Time (ms) new : %d", deltaTime);
-    ImGui::Text("FPS : %f", 1.0 / (float)deltaTime * 1000) ;
+    ImGui::Text("FPS : %f", 1.0 / (float) deltaTime * 1000);
     ImGui::InputFloat("Sens", &mouseSensitivity);
     ImGui::End();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    RenderingContext* renderingContext = new RenderingContext(this);
+    RenderingContext *renderingContext = new RenderingContext(this);
     renderingContext->render();
 }
 
 void App::handle_events() {
     SDL_Event curEvent;
-    ImGuiIO& io = ImGui::GetIO();
+    ImGuiIO &io = ImGui::GetIO();
     while (SDL_PollEvent(&curEvent)) {
         ImGui_ImplSDL2_ProcessEvent(&curEvent);
         switch (curEvent.type) {
@@ -219,8 +219,7 @@ void App::handle_events() {
                 app_running = false;
                 return;
             case SDL_MOUSEBUTTONDOWN:
-                if (!io.WantCaptureMouse)
-                {
+                if (!io.WantCaptureMouse) {
                     isDragging = true;
                 }
                 //... app processing other events;
@@ -229,71 +228,87 @@ void App::handle_events() {
                 isDragging = false; // cancelling dragging even if imgui captures mouse events
                 break;
             case SDL_MOUSEMOTION:
-                if (!io.WantCaptureMouse){
+                if (!io.WantCaptureMouse) {
                     float epsilon = 0.01f;
                     if (isDragging) {
                         vec3 eulerAngles = mainCamera->transform->getEulerAngles();
-                        if(abs(eulerAngles.y) > 80) {
+                        if (abs(eulerAngles.y) > 80) {
                             printf("%f, %f, %f", eulerAngles.x, eulerAngles.y, eulerAngles.z);
                         }
                         // 0 -90 0 ~ 180 -90- 180
-                        eulerAngles.x += -curEvent.motion.yrel * mouseSensitivity * deltaTime;
-                        eulerAngles.y += -curEvent.motion.xrel * mouseSensitivity * deltaTime;
-                        if(abs(eulerAngles.z) < epsilon){
-                            if(eulerAngles.y < -90){
+                        if (abs(eulerAngles.z) < epsilon) {
+                            eulerAngles.x += -curEvent.motion.yrel * mouseSensitivity * deltaTime;
+                            eulerAngles.y += -curEvent.motion.xrel * mouseSensitivity * deltaTime;
+                            if (eulerAngles.y < -90) {
                                 eulerAngles.x += 180;
-                                eulerAngles.y += 180;
-                                eulerAngles.z = 180;
+                                eulerAngles.y = -eulerAngles.y - 180;
+                                eulerAngles.z += 180;
+                            } else if (eulerAngles.y > 90) {
+                                eulerAngles.x += 180;
+                                eulerAngles.y = -eulerAngles.y + 180;
+                                eulerAngles.z += 180;
                             }
-                            else if(eulerAngles.y > 90){
+                        } else {
+                            eulerAngles.x += curEvent.motion.yrel * mouseSensitivity * deltaTime;
+                            eulerAngles.y += curEvent.motion.xrel * mouseSensitivity * deltaTime;
+                            if (eulerAngles.y < -90) {
                                 eulerAngles.x += 180;
-                                eulerAngles.y -= 180;
-                                eulerAngles.z = 180;
+                                eulerAngles.y = -eulerAngles.y + 180;
+                                eulerAngles.z += 180;
+                            } else if (eulerAngles.y > 90) {
+                                eulerAngles.x += 180;
+                                eulerAngles.y = -eulerAngles.y - 180;
+                                eulerAngles.z += 180;
                             }
                         }
 
-                        if(abs(eulerAngles.y) > 80){
+                        if (abs(eulerAngles.y) > 80) {
                             printf(" %f, %f, %f\n", eulerAngles.x, eulerAngles.y, eulerAngles.z);
                         }
-
-                        quat quatPitch = angleAxis(radians(eulerAngles.x), vec3(1,0,0));
-                        quat quatYaw = angleAxis(radians(eulerAngles.y), vec3(0,1,0));
-                        mainCamera->transform->setRotation(mat4_cast(normalize(quatYaw * quatPitch)));
+                        quat quatPitch = angleAxis(radians(eulerAngles.x), vec3(1, 0, 0));
+                        quat quatYaw = angleAxis(radians(eulerAngles.y), vec3(0, 1, 0));
+                        quat quatRoll = angleAxis(radians(eulerAngles.z), vec3(0, 0, 1));
+                        mainCamera->transform->setRotation(mat4_cast(normalize(quatRoll * quatYaw * quatPitch)));
                     }
                 }
                 break;
             case SDL_KEYDOWN:
-                if (!io.WantCaptureKeyboard)
-                {
+                if (!io.WantCaptureKeyboard) {
                     float epsilon = 0.0001f;
                     switch (curEvent.key.keysym.sym) {
-                        case SDLK_LEFT: case SDLK_q:
-                            if(cameraVelocity[0] >= -epsilon){
+                        case SDLK_LEFT:
+                        case SDLK_q:
+                            if (cameraVelocity[0] >= -epsilon) {
                                 cameraVelocity[0] = -cameraSpeed;
                             }
                             break;
-                        case SDLK_RIGHT: case SDLK_d:
-                            if(cameraVelocity[0] <= epsilon) {
+                        case SDLK_RIGHT:
+                        case SDLK_d:
+                            if (cameraVelocity[0] <= epsilon) {
                                 cameraVelocity[0] = cameraSpeed;
                             }
                             break;
-                        case SDLK_UP: case SDLK_z:
-                            if(cameraVelocity[2] >= -epsilon) {
+                        case SDLK_UP:
+                        case SDLK_z:
+                            if (cameraVelocity[2] >= -epsilon) {
                                 cameraVelocity[2] = -cameraSpeed;
                             }
                             break;
-                        case SDLK_DOWN: case SDLK_s:
-                            if(cameraVelocity[2] <= epsilon) {
+                        case SDLK_DOWN:
+                        case SDLK_s:
+                            if (cameraVelocity[2] <= epsilon) {
                                 cameraVelocity[2] = cameraSpeed;
                             }
                             break;
-                        case SDLK_LCTRL: case SDLK_a:
-                            if(cameraVelocity[1] >= -epsilon) {
+                        case SDLK_LCTRL:
+                        case SDLK_a:
+                            if (cameraVelocity[1] >= -epsilon) {
                                 cameraVelocity[1] = -cameraSpeed;
                             }
                             break;
-                        case SDLK_LSHIFT: case SDLK_e:
-                            if(cameraVelocity[1] <= epsilon) {
+                        case SDLK_LSHIFT:
+                        case SDLK_e:
+                            if (cameraVelocity[1] <= epsilon) {
                                 cameraVelocity[1] = cameraSpeed;
                             }
                             break;
@@ -301,36 +316,42 @@ void App::handle_events() {
                 }
                 break;
             case SDL_KEYUP:
-                if(!io.WantCaptureKeyboard){
+                if (!io.WantCaptureKeyboard) {
                     float epsilon = 0.0001f;
                     switch (curEvent.key.keysym.sym) {
-                        case SDLK_LEFT: case SDLK_q:
-                            if(cameraVelocity[0] < -epsilon) {
+                        case SDLK_LEFT:
+                        case SDLK_q:
+                            if (cameraVelocity[0] < -epsilon) {
                                 cameraVelocity[0] = 0;
                             }
                             break;
-                        case SDLK_RIGHT: case SDLK_d:
-                            if(cameraVelocity[0] > epsilon) {
+                        case SDLK_RIGHT:
+                        case SDLK_d:
+                            if (cameraVelocity[0] > epsilon) {
                                 cameraVelocity[0] = 0;
                             }
                             break;
-                        case SDLK_UP: case SDLK_z:
-                            if(cameraVelocity[2] < -epsilon) {
+                        case SDLK_UP:
+                        case SDLK_z:
+                            if (cameraVelocity[2] < -epsilon) {
                                 cameraVelocity[2] = 0;
                             }
                             break;
-                        case SDLK_DOWN: case SDLK_s:
-                            if(cameraVelocity[2] > epsilon) {
+                        case SDLK_DOWN:
+                        case SDLK_s:
+                            if (cameraVelocity[2] > epsilon) {
                                 cameraVelocity[2] = 0;
                             }
                             break;
-                        case SDLK_LCTRL: case SDLK_a:
-                            if(cameraVelocity[1] < -epsilon) {
+                        case SDLK_LCTRL:
+                        case SDLK_a:
+                            if (cameraVelocity[1] < -epsilon) {
                                 cameraVelocity[1] = 0;
                             }
                             break;
-                        case SDLK_LSHIFT: case SDLK_e:
-                            if(cameraVelocity[1] > epsilon) {
+                        case SDLK_LSHIFT:
+                        case SDLK_e:
+                            if (cameraVelocity[1] > epsilon) {
                                 cameraVelocity[1] = 0;
                             }
                             break;

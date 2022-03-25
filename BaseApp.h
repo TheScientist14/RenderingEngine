@@ -22,13 +22,13 @@ public:
 protected:
     virtual void clean() = 0;
 
-    bool app_running;
+    bool app_running = false;
     int width = 1024;
     int height = 768;
 
-    Uint64 curTime;
-    int deltaTime;
+    Uint64 curTime = 0;
+    int deltaTime = 0;
 
-    SDL_Window* win;
+    SDL_Window* win = nullptr;
     //ImGuiIO &io;
 };

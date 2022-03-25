@@ -34,7 +34,7 @@ public:
     EngineObject(App* app);
     virtual ~EngineObject();
 
-    virtual void update(float deltaTime);
+    virtual void update(int deltaTime);
     void setParent(shared_ptr<EngineObject> newParent);
 
     shared_ptr<EngineObject> getParent() const;

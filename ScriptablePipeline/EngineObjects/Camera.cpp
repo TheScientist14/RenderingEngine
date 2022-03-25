@@ -10,11 +10,12 @@
 #include "../App.h"
 #include "Transform.h"
 
-Camera::Camera(App* app) : Camera(app, 1024, 768, false, 45, 0.1f, 100.0f){
+Camera::Camera(App *app) : Camera(app, 1024, 768, false, 45, 0.1f, 100.0f) {
 
 }
 
-Camera::Camera(App* app, int width, int height, bool isOrtho, float fieldOfView, float nearPlane, float farPlane) : EngineObject(app){
+Camera::Camera(App *app, int width, int height, bool isOrtho, float fieldOfView, float nearPlane, float farPlane)
+        : EngineObject(app) {
 
     this->width = width;
     this->height = height;
@@ -65,7 +66,7 @@ mat4 Camera::getProjectionViewMatrix() {
     return getProjectionMatrix() * getViewMatrix();
 }
 
-void Camera::update(float deltaTime){
+void Camera::update(int deltaTime) {
     EngineObject::update(deltaTime);
 
     glClearColor(0, 0, 0.4, 0);
@@ -73,4 +74,10 @@ void Camera::update(float deltaTime){
 
     GLuint VID = glGetUniformLocation(app->getShaderID(), "V");
     glUniformMatrix4fv(VID, 1, GL_FALSE, value_ptr(getViewMatrix()));
+
+    if (isWireframe) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    } else {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
 }

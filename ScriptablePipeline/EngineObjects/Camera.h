@@ -20,7 +20,7 @@ public:
     mat4 getViewMatrix();
     mat4 getProjectionMatrix();
     mat4 getProjectionViewMatrix();
-    void update(float deltaTime);
+    void update(int deltaTime);
 
 protected:
     int width = 1024;
@@ -29,5 +29,7 @@ protected:
     float fieldOfView = 90;
     float nearPlane = 0.1f;
     float farPlane = 100.0f;
+
+    bool isWireframe = false;
 };
 
