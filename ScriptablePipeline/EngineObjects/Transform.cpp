@@ -145,9 +145,14 @@ vec3 Transform::getPosition() const {
     return position;
 }
 
+/**
+ *
+ * @return euler angles within range [-180, 180], [-90, 90], [-180, 180]
+ */
 vec3 Transform::getEulerAngles() const {
     vec3 eulerAnglesRadians = eulerAngles(orientation);
-    return vec3(degrees(eulerAnglesRadians.x), degrees(eulerAnglesRadians.y), degrees(eulerAnglesRadians.z));
+    vec3 eulerAnglesDegrees = vec3(degrees(eulerAnglesRadians.x), degrees(eulerAnglesRadians.y), degrees(eulerAnglesRadians.z));
+    return eulerAnglesDegrees;
 }
 
 quat Transform::getOrientation() const {
