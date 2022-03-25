@@ -19,7 +19,7 @@ EngineObject::~EngineObject() {
 
 }
 
-void EngineObject::update(float deltaTime) {
+void EngineObject::update(int deltaTime) {
 
 }
 

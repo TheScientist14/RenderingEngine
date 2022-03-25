@@ -27,7 +27,7 @@ GameObject::GameObject(App* app, int geometryIndex, int textureIndex) : EngineOb
 
 }
 
-void GameObject::update(float deltaTime) {
+void GameObject::update(int deltaTime) {
     EngineObject::update(deltaTime);
 
 }

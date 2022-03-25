@@ -25,7 +25,7 @@ public:
     GameObject(App* app, int geometryIndex, int textureIndex, bool visible);
     GameObject(App* app, int geometryIndex, int textureIndex);
 
-    void update(float deltaTime) override;
+    void update(int deltaTime) override;
 
     void render() const;
     void fastRender() const;

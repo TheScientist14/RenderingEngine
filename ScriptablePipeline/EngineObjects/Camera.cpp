@@ -65,7 +65,7 @@ mat4 Camera::getProjectionViewMatrix() {
     return getProjectionMatrix() * getViewMatrix();
 }
 
-void Camera::update(float deltaTime){
+void Camera::update(int deltaTime){
     EngineObject::update(deltaTime);
 
     glClearColor(0, 0, 0.4, 0);
