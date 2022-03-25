@@ -29,5 +29,7 @@ protected:
     float fieldOfView = 90;
     float nearPlane = 0.1f;
     float farPlane = 100.0f;
+
+    bool isWireframe = false;
 };
 
