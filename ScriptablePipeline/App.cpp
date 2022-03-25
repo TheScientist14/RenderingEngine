@@ -199,31 +199,19 @@ void App::gl_init() {
 void App::main_loop() {
     mainCamera->update(deltaTime);
 
-    //Render Loop
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL2_NewFrame(win);
-
-    ImGui::NewFrame();
-
-    ImGui::Begin("Perfs");
-    ImGui::Text("Frame Time (ms) new : %d", deltaTime);
-    ImGui::Text("FPS : %f", 1.0 / (float) deltaTime * 1000);
-    ImGui::InputFloat("Mouse sensitivity : ", &mouseSensitivity);
-    ImGui::Checkbox("Wireframe : ", &mainCamera->isWireframe);
-    ImGui::InputFloat("Light power : ", &pointLightPower);
-    ImGui::InputFloat3("Light color : ", &pointLightColor[0]);
-    ImGui::DragFloat3("drag ligtColor", &pointLightColor[0], 0.01f, 0.0f, 1.0f);
-    ImGui::SliderFloat3("slider pointLightColor", &pointLightColor[0], 0.0f, 1.0f);
-    ImGui::InputFloat3("Light world pos : ", &pointLightWorldPos[0]);
-    ImGui::DragFloat3("drag pointLightWorldPos", &pointLightWorldPos[0], 0.01f, 0.0f, 1.0f);
-    ImGui::SliderFloat3("slider pointLightWorldPos", &pointLightWorldPos[0], 0.0f, 1.0f);
-    ImGui::End();
-
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    if(isDayCycleEnabled){
+        dayTime += deltaTime * 10;
+        while(dayTime >= dayTimeLength){
+            dayTime -= dayTimeLength;
+        }
+        float angle = (dayTime / (float)dayTimeLength) * 2 * pi<float>();
+        directionalLightDirection = vec3(-cos(angle), sin(angle), 0.1f);
+    }
 
     RenderingContext *renderingContext = new RenderingContext(this);
     renderingContext->render();
+
+    drawImGUI();
 }
 
 void App::handle_events() {
@@ -249,13 +237,9 @@ void App::handle_events() {
                     float epsilon = 0.01f;
                     if (isDragging) {
                         vec3 eulerAngles = mainCamera->transform->getEulerAngles();
-                        if (abs(eulerAngles.y) > 80) {
-                            printf("%f, %f, %f", eulerAngles.x, eulerAngles.y, eulerAngles.z);
-                        }
-                        // 0 -90 0 ~ 180 -90- 180
                         if (abs(eulerAngles.z) < epsilon) {
-                            eulerAngles.x += -curEvent.motion.yrel * mouseSensitivity * deltaTime;
-                            eulerAngles.y += -curEvent.motion.xrel * mouseSensitivity * deltaTime;
+                            eulerAngles.x -= curEvent.motion.yrel * mouseSensitivity * deltaTime;
+                            eulerAngles.y -= curEvent.motion.xrel * mouseSensitivity * deltaTime;
                             if (eulerAngles.y < -90) {
                                 eulerAngles.x += 180;
                                 eulerAngles.y = -eulerAngles.y - 180;
@@ -266,7 +250,7 @@ void App::handle_events() {
                                 eulerAngles.z += 180;
                             }
                         } else {
-                            eulerAngles.x += curEvent.motion.yrel * mouseSensitivity * deltaTime;
+                            eulerAngles.x -= curEvent.motion.yrel * mouseSensitivity * deltaTime;
                             eulerAngles.y += curEvent.motion.xrel * mouseSensitivity * deltaTime;
                             if (eulerAngles.y < -90) {
                                 eulerAngles.x += 180;
@@ -277,10 +261,6 @@ void App::handle_events() {
                                 eulerAngles.y = -eulerAngles.y - 180;
                                 eulerAngles.z += 180;
                             }
-                        }
-
-                        if (abs(eulerAngles.y) > 80) {
-                            printf(" %f, %f, %f\n", eulerAngles.x, eulerAngles.y, eulerAngles.z);
                         }
                         quat quatPitch = angleAxis(radians(eulerAngles.x), vec3(1, 0, 0));
                         quat quatYaw = angleAxis(radians(eulerAngles.y), vec3(0, 1, 0));
@@ -458,4 +438,66 @@ void App::setUpGlobalUniforms() {
 
     //specular power
     glUniform1f(specularPowerID, specularPower);
+}
+
+void App::drawImGUI(){
+    //Render Loop
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL2_NewFrame(win);
+
+    ImGui::NewFrame();
+
+    ImGui::Begin("Perfs");
+    ImGui::Text("Frame Time (ms) new : %d", deltaTime);
+    ImGui::Text("FPS : %f", 1.0 / (float) deltaTime * 1000);
+    ImGui::End();
+
+    ImGui::Begin("Rendering");
+    ImGui::Text("Mouse sensitivity : ");
+    ImGui::SameLine();
+    ImGui::InputFloat("##1", &mouseSensitivity);
+    ImGui::Text("Wireframe : ");
+    ImGui::SameLine();
+    ImGui::Checkbox("##2", &mainCamera->isWireframe);
+
+    ImGui::Text("Point light power : ");
+    ImGui::SameLine();
+    ImGui::InputFloat("##3", &pointLightPower);
+    ImGui::Text("Point light color : ");
+    ImGui::SameLine();
+    ImGui::ColorEdit3("##4", &pointLightColor[0]);
+    ImGui::Text("Point light world pos : ");
+    ImGui::SameLine();
+    ImGui::InputFloat3("##5", &pointLightWorldPos[0]);
+
+    ImGui::Text("Ambient light power : ");
+    ImGui::SameLine();
+    ImGui::InputFloat("##6", &ambientLightPower);
+    ImGui::Text("Ambient light color : ");
+    ImGui::SameLine();
+    ImGui::ColorEdit3("##7", &ambientLightColor[0]);
+
+    ImGui::Text("Enable day cycle : ");
+    ImGui::SameLine();
+    ImGui::Checkbox("##12", &isDayCycleEnabled);
+    if(isDayCycleEnabled){
+        ImGui::Text("Day time : ");
+        ImGui::SameLine();
+        ImGui::SliderInt("##8", &dayTime, 0, dayTimeLength);
+    }else{
+        ImGui::Text("Directional light direction : ");
+        ImGui::SameLine();
+        ImGui::InputFloat3("##9", &directionalLightDirection[0]);
+    }
+    ImGui::Text("Directional light power : ");
+    ImGui::SameLine();
+    ImGui::InputFloat("##10", &directionalLightPower);
+    ImGui::Text("Directional light color : ");
+    ImGui::SameLine();
+    ImGui::ColorEdit3("##11", &directionalLightColor[0]);
+
+    ImGui::End();
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

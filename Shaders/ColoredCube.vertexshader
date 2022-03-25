@@ -19,7 +19,7 @@ out vec3 DirectionalLightDirection_cameraspace;
 uniform mat4 MVP;
 uniform mat4 M;
 uniform mat4 V;
-uniform vec3 LightWorldPos;
+uniform vec3 PointLightWorldPos;
 uniform vec3 DirectionalLightDirection;
 
 void main(){
@@ -50,5 +50,5 @@ void main(){
 
     DistanceVertexPointLight = distance(Position_worldspace, PointLightWorldPos);
 
-    DirectionalLightDirection_cameraspace = ( V * vec4(DirectionalLightDirection,1)).xyz;
+    DirectionalLightDirection_cameraspace = ( V * vec4(DirectionalLightDirection,0)).xyz;
 }

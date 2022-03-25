@@ -63,6 +63,8 @@ protected:
     shared_ptr<Camera> mainCamera;
     bool isDragging;
 
+    void drawImGUI();
+
     float mouseSensitivity = 0.08f;
     float cameraSpeed = 0.01f;
     vec3 cameraVelocity;
@@ -72,26 +74,29 @@ protected:
      **/
 
     GLuint specularPowerID;
-    float specularPower
+    float specularPower = 5;
 
     GLuint pointLightWorldPosID;
     GLuint pointLightColorID;
     GLuint pointLightPowerID;
-    float pointLightPower = 1000;
+    float pointLightPower = 60;
     vec3 pointLightColor = vec3(1, 1, 1);
-    vec3 pointLightWorldPos = vec3(0, 200, 0);
+    vec3 pointLightWorldPos = vec3(0, 20, 0);
 
     GLuint ambientLightColorID;
     GLuint ambientLightPowerID;
     float ambientLightPower = 0.1;
     vec3 ambientLightColor = vec3(1,1,1);
 
+    bool isDayCycleEnabled = true;
+    int dayTime = 0;
+    const int dayTimeLength = 1200000; // 1000 * 60 * 20 = 20 min
     GLuint directionalLightDirectionID;
     GLuint directionalLightColorID;
     GLuint directionalLightPowerID;
     float directionalLightPower = 1;
-    vec3 directionalLightColor = vec3(1,1,1);
-    vec3 directionalLightDirection = vec3(0, 1, 0.1f);
+    vec3 directionalLightColor = vec3(0.953125f, 0.91015625f, 0.60546875f);
+    vec3 directionalLightDirection = vec3(0, -1, 0.1f);
 };
 
 

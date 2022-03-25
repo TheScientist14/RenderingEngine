@@ -52,11 +52,12 @@ void main(){
 
     vec3 dL = normalize(-DirectionalLightDirection_cameraspace);
     float cosDirectionalLight = clamp( dot (n, dL), 0,1);
+    float cosUp = clamp(dot(vec3(0,1,0), dL), 0,1);
 
     vec3 rgb = texture( TextureSampler, UV ).rgb;
-    colorPointLighted = rgb * PointLightColor * PointLightPower * cosPointLightDiffuse / (DistanceVertexPointLight * DistanceVertexPointLight)
-        + rgb * PointLightColor * PointLightPower * pow(cosPointLightSpecular, SpecularPower) / (DistanceVertexPointLight * DistanceVertexPointLight);
-    colorAmbientLighted = rgb * AmbientLightColor * AmbientLightPower;
-    colorDirectionalLighted = rgb * DirectionalLightPower * DirectionalLightColor * cosDirectionalLight;
-
+    vec3 colorPointLighted = rgb * PointLightColor * PointLightPower * (cosPointLightDiffuse + pow(cosPointLightSpecular, SpecularPower)) / (DistanceVertexPointLight * DistanceVertexPointLight);
+    vec3 colorAmbientLighted = rgb * AmbientLightColor * AmbientLightPower;
+    vec3 colorDirectionalLighted = rgb * DirectionalLightPower * DirectionalLightColor * cosDirectionalLight * cosUp;
+    //color = DirectionalLightDirection_cameraspace;
+    color = colorPointLighted + colorAmbientLighted + colorDirectionalLighted;
 }
