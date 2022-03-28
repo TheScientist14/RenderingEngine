@@ -23,6 +23,7 @@ class EngineObject;
 class RenderedObject;
 class Quad;
 class GameObject;
+class Skybox;
 
 typedef shared_ptr<Geometry> Sp_Geometry;
 typedef shared_ptr<Texture> Sp_Texture;
@@ -72,6 +73,8 @@ protected:
     float mouseSensitivity = 0.08f;
     float cameraSpeed = 0.01f;
     vec3 cameraVelocity;
+
+    shared_ptr<Skybox> skybox;
 
     /**
      *  ----------- LIGHTS -----------

@@ -30,6 +30,7 @@
 #include "EngineObjects/EngineObject.h"
 #include "EngineObjects/GameObject.h"
 #include "EngineObjects/RenderingContext.h"
+#include "EngineObjects/Skybox.h"
 
 App::~App() {
 
@@ -132,53 +133,59 @@ void App::gl_init() {
     };
 #pragma endregion cube_vertex_elements
 
-
 // Draw some widgets
     Sp_Texture cube_texture = make_shared<Texture>("../Images/dirt.bmp");
-    //textures.push_back(cube_texture);
+    textures.push_back(cube_texture);
 
     //Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6*2*3, nullptr, 0);
     //geometries.push_back(cubeMesh);
 
     ModelLoader *loader = new ModelLoader();
-    string str = getRootPath() + "/Models/cube.obj";
+    string str = getRootPath() + "/Models/untitled.obj";
 
     loader->import(&*str.begin());
-    //loader->loadMeshes(geometries);
+    loader->loadMeshes(geometries);
 
-//    for (int i = 0; i < loader->getNumMesh(); ++i) {
-//
-//        Sp_GameObject grass = make_shared<GameObject>(this, geometries[0], textures[0], 0);
-//        objects.push_back(grass);
-//        objectsToRender.push_back(grass);
-//    }
-    mainCamera = make_shared<Camera>(this);
-    mainCamera->transform->move(vec3(0, 0, 10));
-    WorldGeneration *World = new WorldGeneration(this, 2, 0.5);
+    for (int i = 0; i < loader->getNumMesh(); ++i) {
+
+        Sp_GameObject grass = make_shared<GameObject>(this, i, 0);
+        objects.push_back(grass);
+        objectsToRender.push_back(grass);
+    }
+
+    WorldGeneration *World = new WorldGeneration(2, 0.5);
 
     World->generateWorld(this);
-    VectorQuadObject1D generatedQuads = World->getQuads();
+    VectorEngineObject1D generatedCubes = World->getCubes();
 
-    objects.insert(objects.end(), generatedQuads.begin(), generatedQuads.end());
-    objectsToRender.insert(objectsToRender.end(), generatedQuads.begin(), generatedQuads.end());
+    objects.insert(objects.end(), generatedCubes.begin(), generatedCubes.end());
+    objectsToRender.insert(objectsToRender.end(), generatedCubes.begin(), generatedCubes.end());
     aiReleaseImport(loader->getAiScene());
 
-//    Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
-//                                                          nullptr, 0);
-//    geometries.push_back(cubeMesh);
+    Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
+                                                 nullptr, 0);
+    geometries.push_back(cubeMesh);
 
-   /* Sp_GameObject cube = make_shared<GameObject>(this, 1, 0);
+    Sp_GameObject cube = make_shared<GameObject>(this, 1, 0);
     objects.push_back(cube);
-    objectsToRender.push_back(cube);*/
+    objectsToRender.push_back(cube);
 
-//    for (int i = 0; i < geometries.size(); i++) {
-//        geometries[i]->bind();
-//    }
-//    for (int i = 0; i < textures.size(); i++) {
-//        textures[i]->bind();
-//    }
+    for (int i = 0; i < geometries.size(); i++) {
+        geometries[i]->bind();
+    }
+    for (int i = 0; i < textures.size(); i++) {
+        textures[i]->bind();
+    }
 
+    mainCamera = make_shared<Camera>(this);
+    mainCamera->transform->move(vec3(0, 0, 10));
 
+    skybox = make_shared<Skybox>(this, "../Images/skybox/skybox_right.bmp",
+                                 "../Images/skybox/skybox_left.bmp",
+                                 "../Images/skybox/skybox_up.bmp",
+                                 "../Images/skybox/skybox_down.bmp",
+                                 "../Images/skybox/skybox_front.bmp",
+                                 "../Images/skybox/skybox_back.bmp", width, height);
 
     shaderID = loadShader::LoadShaders("/Shaders/ColoredCube.vertexshader", "/Shaders/ColoredCube.fragmentshader");
     glUseProgram(shaderID);
@@ -195,28 +202,29 @@ void App::gl_init() {
     directionalLightPowerID = glGetUniformLocation(shaderID, "DirectionalLightPower");
 
     specularPowerID = glGetUniformLocation(shaderID, "SpecularPower");
+
+    skybox->setupOpenGL();
 }
 
 void App::main_loop() {
+
+    glUseProgram(shaderID);
     mainCamera->update(deltaTime);
-
-    if(isDayCycleEnabled){
-        dayTime += deltaTime * 10;
-        while(dayTime >= dayTimeLength){
-            dayTime -= dayTimeLength;
-        }
-        float angle = (dayTime / (float)dayTimeLength) * 2 * pi<float>();
-        directionalLightDirection = vec3(-cos(angle), sin(angle), 0.1f);
-    }
-
-    for (int i = 0; i < getObjectsCount(); i++) {
-        if(getObject(i) != nullptr) {
-            getObject(i)->update(getDeltaTime());
-        }
-    }
 
     RenderingContext *renderingContext = new RenderingContext(this);
     renderingContext->render();
+
+    if (isDayCycleEnabled) {
+        dayTime += deltaTime * 10;
+        while (dayTime >= dayTimeLength) {
+            dayTime -= dayTimeLength;
+        }
+        float angle = (dayTime / (float) dayTimeLength) * 2 * pi<float>();
+        directionalLightDirection = vec3(-cos(angle), sin(angle), 0.1f);
+    }
+
+    skybox->setTime(dayTime / (float) dayTimeLength);
+    skybox->draw();
 
     drawImGUI();
 }
@@ -242,8 +250,10 @@ void App::handle_events() {
             case SDL_MOUSEMOTION:
                 if (!io.WantCaptureMouse) {
                     float epsilon = 0.01f;
+
                     if (isDragging) {
                         vec3 eulerAngles = mainCamera->transform->getEulerAngles();
+
                         if (abs(eulerAngles.z) < epsilon) {
                             eulerAngles.x -= curEvent.motion.yrel * mouseSensitivity * deltaTime;
                             eulerAngles.y -= curEvent.motion.xrel * mouseSensitivity * deltaTime;
@@ -376,13 +386,13 @@ void App::clean() {
     // TODO : Call desctructor ?
 }
 
-//Sp_Geometry App::getGeometry(int geometryID) {
-//    return Sp_Geometry(geometries[geometryID]);
-//}
-//
-//Sp_Texture App::getTexture(int textureID) {
-//    return Sp_Texture(textures[textureID]);
-//}
+Sp_Geometry App::getGeometry(int geometryID) {
+    return Sp_Geometry(geometries[geometryID]);
+}
+
+Sp_Texture App::getTexture(int textureID) {
+    return Sp_Texture(textures[textureID]);
+}
 
 Sp_Camera App::getMainCamera() {
     return Sp_Camera(mainCamera);
@@ -404,19 +414,19 @@ vector<Sp_EngineObject>::iterator App::getObjectsEnd() {
     return objects.end();
 }
 
-Sp_RenderedObject App::getObjectToRender(int i) {
-    return Sp_RenderedObject(objectsToRender[i]);
+Sp_GameObject App::getObjectToRender(int i) {
+    return Sp_GameObject(objectsToRender[i]);
 }
 
 int App::getObjectsToRenderCount() {
     return objectsToRender.size();
 }
 
-vector<Sp_RenderedObject>::iterator App::getObjectsToRenderBegin() {
+vector<Sp_GameObject>::iterator App::getObjectsToRenderBegin() {
     return objectsToRender.begin();
 }
 
-vector<Sp_RenderedObject>::iterator App::getObjectsToRenderEnd() {
+vector<Sp_GameObject>::iterator App::getObjectsToRenderEnd() {
     return objectsToRender.end();
 }
 
@@ -447,7 +457,7 @@ void App::setUpGlobalUniforms() {
     glUniform1f(specularPowerID, specularPower);
 }
 
-void App::drawImGUI(){
+void App::drawImGUI() {
     //Render Loop
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(win);
@@ -487,11 +497,11 @@ void App::drawImGUI(){
     ImGui::Text("Enable day cycle : ");
     ImGui::SameLine();
     ImGui::Checkbox("##12", &isDayCycleEnabled);
-    if(isDayCycleEnabled){
+    if (isDayCycleEnabled) {
         ImGui::Text("Day time : ");
         ImGui::SameLine();
         ImGui::SliderInt("##8", &dayTime, 0, dayTimeLength);
-    }else{
+    } else {
         ImGui::Text("Directional light direction : ");
         ImGui::SameLine();
         ImGui::InputFloat3("##9", &directionalLightDirection[0]);
