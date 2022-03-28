@@ -10,7 +10,7 @@
 #include "../App.h"
 #include "Transform.h"
 
-Camera::Camera(App *app) : Camera(app, 1024, 768, false, 45, 0.1f, 100.0f) {
+Camera::Camera(App *app) : Camera(app, 1024, 768, false, 45, 0.1f, 1000.0f) {
 
 }
 

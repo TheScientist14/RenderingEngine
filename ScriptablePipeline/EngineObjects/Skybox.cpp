@@ -37,6 +37,9 @@ Skybox::Skybox(App *app, const char *rightImage, const char *leftImage, const ch
     //3. Enable Depth Testing
     glEnable(GL_DEPTH_TEST);
 
+    transform->scale(1000);
+    transform->setRotation(vec3(0,0,angleOffset));
+
 }
 
 void Skybox::setupOpenGL() {
@@ -159,19 +162,33 @@ void Skybox::setupOpenGL() {
     update(0);
 }
 
-void Skybox::update(float dt) {
+void Skybox::update(int deltaTime) {
 
     Sp_Camera camera = app->getMainCamera();
+    glUseProgram(programObject);
 
-    transform->rotate(vec3(0, 0, dt));
+    float deltaRot = deltaTime / 360.0f;
+    transform->rotate(angleAxis(radians(deltaRot), vec3(0, 0, 1)));
     transform->setPosition(camera->transform->getPosition());
 
     modelWorldViewProjectionSpace = camera->getProjectionViewMatrix() * transform->getWorldModelMatrix();
 
     //5. Assign the model-world-view-projection matrix data to the uniform location:modelviewProjectionUniformLocation
-    glUniformMatrix4fv(modelViewProjectionUniformLocation, 1, 0, value_ptr(modelWorldViewProjectionSpace));
+    glUniformMatrix4fv(modelViewProjectionUniformLocation, 1, GL_FALSE, value_ptr(modelWorldViewProjectionSpace));
 
+}
 
+void Skybox::setTime(float dayTimePercent) {
+
+    Sp_Camera camera = app->getMainCamera();
+    glUseProgram(programObject);
+
+    transform->setRotation(vec3(0, 0, angleOffset + dayTimePercent * 360.0f));
+
+    modelWorldViewProjectionSpace = camera->getProjectionViewMatrix() * transform->getWorldModelMatrix();
+
+    //5. Assign the model-world-view-projection matrix data to the uniform location:modelviewProjectionUniformLocation
+    glUniformMatrix4fv(modelViewProjectionUniformLocation, 1, GL_FALSE, value_ptr(modelWorldViewProjectionSpace));
 }
 
 void Skybox::draw() {
@@ -179,7 +196,6 @@ void Skybox::draw() {
 
     //1. Set the shader program
     glUseProgram(programObject);
-    update(0);
 
     //2. Bind the VAO
     glBindVertexArray(vertexArrayObject);

@@ -163,7 +163,7 @@ void App::gl_init() {
     aiReleaseImport(loader->getAiScene());
 
     Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
-                                                          nullptr, 0);
+                                                 nullptr, 0);
     geometries.push_back(cubeMesh);
 
     Sp_GameObject cube = make_shared<GameObject>(this, 1, 0);
@@ -211,19 +211,19 @@ void App::main_loop() {
     glUseProgram(shaderID);
     mainCamera->update(deltaTime);
 
-    if(isDayCycleEnabled){
-        dayTime += deltaTime * 10;
-        while(dayTime >= dayTimeLength){
-            dayTime -= dayTimeLength;
-        }
-        float angle = (dayTime / (float)dayTimeLength) * 2 * pi<float>();
-        directionalLightDirection = vec3(-cos(angle), sin(angle), 0.1f);
-    }
-
-
     RenderingContext *renderingContext = new RenderingContext(this);
     renderingContext->render();
 
+    if (isDayCycleEnabled) {
+        dayTime += deltaTime * 10;
+        while (dayTime >= dayTimeLength) {
+            dayTime -= dayTimeLength;
+        }
+        float angle = (dayTime / (float) dayTimeLength) * 2 * pi<float>();
+        directionalLightDirection = vec3(-cos(angle), sin(angle), 0.1f);
+    }
+
+    skybox->setTime(dayTime / (float) dayTimeLength);
     skybox->draw();
 
     drawImGUI();
@@ -250,8 +250,10 @@ void App::handle_events() {
             case SDL_MOUSEMOTION:
                 if (!io.WantCaptureMouse) {
                     float epsilon = 0.01f;
+
                     if (isDragging) {
                         vec3 eulerAngles = mainCamera->transform->getEulerAngles();
+
                         if (abs(eulerAngles.z) < epsilon) {
                             eulerAngles.x -= curEvent.motion.yrel * mouseSensitivity * deltaTime;
                             eulerAngles.y -= curEvent.motion.xrel * mouseSensitivity * deltaTime;
@@ -455,7 +457,7 @@ void App::setUpGlobalUniforms() {
     glUniform1f(specularPowerID, specularPower);
 }
 
-void App::drawImGUI(){
+void App::drawImGUI() {
     //Render Loop
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(win);
@@ -495,11 +497,11 @@ void App::drawImGUI(){
     ImGui::Text("Enable day cycle : ");
     ImGui::SameLine();
     ImGui::Checkbox("##12", &isDayCycleEnabled);
-    if(isDayCycleEnabled){
+    if (isDayCycleEnabled) {
         ImGui::Text("Day time : ");
         ImGui::SameLine();
         ImGui::SliderInt("##8", &dayTime, 0, dayTimeLength);
-    }else{
+    } else {
         ImGui::Text("Directional light direction : ");
         ImGui::SameLine();
         ImGui::InputFloat3("##9", &directionalLightDirection[0]);
