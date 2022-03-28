@@ -29,7 +29,7 @@ Camera::Camera(App *app, int width, int height, bool isOrtho, float fieldOfView,
     // Enable depth buffer
     glEnable(GL_DEPTH_TEST);
     // Cull triangles which normal is not towards the camera
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     // Accept fragment if it closer to the camera than the former one
     glDepthFunc(GL_LESS);
 }

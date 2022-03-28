@@ -8,6 +8,7 @@
 #include "EngineObject.h"
 #include "GameObject.h"
 #include "Geometry.h"
+#include "../../Minecraft/Quad.h"
 
 RenderingContext::RenderingContext(App *app) {
     this->app = app;
@@ -20,16 +21,10 @@ RenderingContext::~RenderingContext() {
 void RenderingContext::render() {
     app->setUpGlobalUniforms();
 
-    for (int i = 0; i < app->getObjectsCount(); i++) {
-        if(app->getObject(i) != nullptr) {
-            app->getObject(i)->update(app->getDeltaTime());
-        }
-    }
-
-    vector<shared_ptr<GameObject>>::iterator iter;
+    vector<shared_ptr<RenderedObject>>::iterator iter;
     for(iter = app->getObjectsToRenderBegin(); iter != app->getObjectsToRenderEnd(); ++iter){
         if((*iter) != nullptr){
-            shared_ptr<Geometry> curGeometry = app->getGeometry((*iter)->getGeometryIndex());
+            shared_ptr<Geometry> curGeometry = (*iter)->getGeometryPtr();
             if(selectedGeometry != curGeometry){
                 if(selectedGeometry != nullptr){
                     selectedGeometry->unselect();

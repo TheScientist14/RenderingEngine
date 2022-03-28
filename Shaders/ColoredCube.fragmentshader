@@ -60,4 +60,5 @@ void main(){
     vec3 colorDirectionalLighted = rgb * DirectionalLightPower * DirectionalLightColor * cosDirectionalLight * cosUp;
     //color = DirectionalLightDirection_cameraspace;
     color = colorPointLighted + colorAmbientLighted + colorDirectionalLighted;
+
 }

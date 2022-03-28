@@ -1,0 +1,119 @@
+//
+// Created by avarnier-navarro on 28/03/2022.
+//
+
+#include "Quad.h"
+#include "../ScriptablePipeline/EngineObjects/Transform.h"
+#include "../ScriptablePipeline/EngineObjects/Geometry.h"
+#include "../ScriptablePipeline/EngineObjects/Texture.h"
+#include "../ScriptablePipeline/EngineObjects/Camera.h"
+#include "../ScriptablePipeline/App.h"
+#include "glm/ext.hpp"
+
+Quad::Quad(App *app, int height, int width, vec3 direction) : RenderedObject(app, nullptr, nullptr) {
+
+    shared_ptr<Texture> cube_texture = make_shared<Texture>("../Images/dirt.bmp");
+    this->direction = direction;
+    this->height = height;
+    this->width = width;
+    this->texturePtr = cube_texture;
+    triangles.insert(triangles.end(),{0,1,2,1,2,3});
+//    triangles.push_back(vec3(3,4,5));
+    int x = direction.x;
+    int y = direction.y;
+
+    if(x != 0){
+        createTrianglesX();
+    } else if (y != 0){
+        createTrianglesY();
+    } else {
+        createTrianglesZ();
+    }
+}
+
+vector<unsigned int> Quad::getTriangles() {
+    return triangles;
+}
+
+void Quad::createTrianglesX() {
+    float x = transform->getPosition().x;
+    float y = transform->getPosition().y;
+    float z = transform->getPosition().z;
+
+    trianglesPos.insert(trianglesPos.end(), {x, y, z,
+                                                        x+width, y, z,
+                                                        x, y-height, z,
+                                                        x+width, y-height, z});
+//    trianglesPos.push_back(vec3(x+width, y, z));
+//    trianglesPos.push_back(vec3(x+width, y - height, z));
+//    trianglesPos.push_back(transform->getPosition());
+//    trianglesPos.push_back(vec3(x, y - height, z));
+//    trianglesPos.push_back(vec3(x+width, y - height, z));
+
+    this->geometryPtr = make_shared<Geometry>(getTrianglesPos().data(), 4, getTriangles().data(), 2);
+    texturePtr->bind();
+    geometryPtr->bind();
+}
+
+void Quad::createTrianglesY() {
+
+    float x = transform->getPosition().x;
+    float y = transform->getPosition().y;
+    float z = transform->getPosition().z;
+
+    trianglesPos.insert(trianglesPos.end(), {x, y, z,
+                                                        x + height, y, z,
+                                                        x + height, y - width, z,
+                                                        x, y-width, z});
+//    trianglesPos.push_back(transform->getPosition());
+//    trianglesPos.push_back(vec3(x + height, y, z));
+//    trianglesPos.push_back(transform->getPosition());
+//    trianglesPos.push_back(vec3(x + height, y + width, z));
+//    trianglesPos.push_back(vec3(x, y+width, z));
+}
+
+void Quad::createTrianglesZ() {
+
+    float x = transform->getPosition().x;
+    float y = transform->getPosition().y;
+    float z = transform->getPosition().z;
+
+    trianglesPos.insert(trianglesPos.end(), {x, y, z,
+                                             x, y - height, z,
+                                             x, y - height, z + width,
+                                             x, y, z+width});
+
+//    trianglesPos.push_back(transform->getPosition());
+//    trianglesPos.push_back(vec3(x, y, z));
+//    trianglesPos.push_back(transform->getPosition());
+//    trianglesPos.push_back(vec3(x, y + height, z));
+//    trianglesPos.push_back(vec3(x, y + height, z + width));
+//    trianglesPos.push_back(vec3(x, y, z+width));
+}
+
+vector<float> Quad::getTrianglesPos() {
+    return trianglesPos;
+}
+
+shared_ptr<Geometry> Quad::getGeometryPtr() {
+    return geometryPtr;
+}
+
+void Quad::fastRender() const{
+    mat4 modelMatrix = transform->getWorldModelMatrix();
+
+    shared_ptr<Camera> mainCamera = app->getMainCamera();
+    mat4 mvp = mainCamera->getProjectionViewMatrix() * modelMatrix;
+
+    GLuint shaderID = app->getShaderID();
+
+    GLuint MvpID = glGetUniformLocation(shaderID, "MVP");
+    glUniformMatrix4fv(MvpID, 1, GL_FALSE, value_ptr(mvp));
+    GLuint MID = glGetUniformLocation(shaderID, "M");
+    glUniformMatrix4fv(MID, 1, GL_FALSE, value_ptr(modelMatrix));
+
+    texturePtr->select(shaderID);
+    geometryPtr->drawFast();
+
+
+}

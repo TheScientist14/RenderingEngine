@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "EngineObject.h"
 #include "GL/glew.h"
+#include "RenderedObject.h"
 
-class GameObject : public EngineObject{
+class GameObject : public RenderedObject{
 
 public:
     struct ModelShaderData {
@@ -17,21 +17,21 @@ public:
     bool visible=true;
 
 protected:
-    int geometryIndex;
-    int textureIndex;
+    shared_ptr<Geometry> geometryPtr;
+    shared_ptr<Texture> texturePtr;
     ModelShaderData shaderData;
 
 public:
-    GameObject(App* app, int geometryIndex, int textureIndex, bool visible);
-    GameObject(App* app, int geometryIndex, int textureIndex);
+    GameObject(App* app, shared_ptr<Geometry> geometryPtr, shared_ptr<Texture> texturePtr, bool visible);
+    GameObject(App* app, shared_ptr<Geometry> geometryPtr, shared_ptr<Texture> texturePtr);
 
-    void update(int deltaTime) override;
+    void update(int deltaTime);
 
-    void render() const;
+    //void render() const;
     void fastRender() const;
 
-    int getGeometryIndex() const;
-    int getTextureIndex() const;
+    shared_ptr<Geometry> getGeometryPtr() const override;
+    shared_ptr<Texture> getTexturePtr() const override;
 
     ModelShaderData* computeShaderData();
 

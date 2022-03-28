@@ -13,43 +13,43 @@
 
 using namespace glm;
 
-GameObject::GameObject(App* app, int geometryIndex, int textureIndex, bool visible) : EngineObject(app){
+GameObject::GameObject(App* app, shared_ptr<Geometry> geometryPtr, shared_ptr<Texture> texturePtr, bool visible) : RenderedObject(app, geometryPtr, texturePtr){
 
-    this->geometryIndex = geometryIndex;
-    this->textureIndex = textureIndex;
+    this->geometryPtr = geometryPtr;
+    this->texturePtr = texturePtr;
     this->visible = visible;
 
 }
-GameObject::GameObject(App* app, int geometryIndex, int textureIndex) : EngineObject(app){
+GameObject::GameObject(App* app, shared_ptr<Geometry> geometryPtr, shared_ptr<Texture> texturePtr) : RenderedObject(app, geometryPtr, texturePtr){
 
-    this->geometryIndex = geometryIndex;
-    this->textureIndex = textureIndex;
+    this->geometryPtr = geometryPtr;
+    this->texturePtr = texturePtr;
 
 }
 
 void GameObject::update(int deltaTime) {
-    EngineObject::update(deltaTime);
+    RenderedObject::update(deltaTime);
 
 }
 
-void GameObject::render() const {
-	if(visible) {
-		mat4 modelMatrix = transform->getWorldModelMatrix();
-
-		shared_ptr<Camera> mainCamera = app->getMainCamera();
-		mat4 mvp = mainCamera->getProjectionViewMatrix() * modelMatrix;
-
-		GLuint shaderID = app->getShaderID();
-
-		GLuint MvpID = glGetUniformLocation(shaderID, "MVP");
-		glUniformMatrix4fv(MvpID, 1, GL_FALSE, value_ptr(mvp));
-		GLuint MID = glGetUniformLocation(shaderID, "M");
-		glUniformMatrix4fv(MID, 1, GL_FALSE, value_ptr(modelMatrix));
-
-		app->getTexture(textureIndex)->select(shaderID);
-		app->getGeometry(geometryIndex)->draw();
-	}
-}
+//void GameObject::render() const {
+//	if(visible) {
+//		mat4 modelMatrix = transform->getWorldModelMatrix();
+//
+//		shared_ptr<Camera> mainCamera = app->getMainCamera();
+//		mat4 mvp = mainCamera->getProjectionViewMatrix() * modelMatrix;
+//
+//		GLuint shaderID = app->getShaderID();
+//
+//		GLuint MvpID = glGetUniformLocation(shaderID, "MVP");
+//		glUniformMatrix4fv(MvpID, 1, GL_FALSE, value_ptr(mvp));
+//		GLuint MID = glGetUniformLocation(shaderID, "M");
+//		glUniformMatrix4fv(MID, 1, GL_FALSE, value_ptr(modelMatrix));
+//
+//		app->getTexture(textureIndex)->select(shaderID);
+//		app->getGeometry(geometryIndex)->draw();
+//	}
+//}
 
 void GameObject::fastRender() const {
 	if(visible) {
@@ -65,18 +65,19 @@ void GameObject::fastRender() const {
 		GLuint MID = glGetUniformLocation(shaderID, "M");
 		glUniformMatrix4fv(MID, 1, GL_FALSE, value_ptr(modelMatrix));
 
-		app->getTexture(textureIndex)->select(shaderID);
-		app->getGeometry(geometryIndex)->drawFast();
+		texturePtr->select(shaderID);
+		geometryPtr->drawFast();
 	}
 }
 
-int GameObject::getGeometryIndex() const {
-    return geometryIndex;
+shared_ptr<Geometry> GameObject::getGeometryPtr() const{
+    return geometryPtr;
 }
 
-int GameObject::getTextureIndex() const {
-    return textureIndex;
+shared_ptr<Texture> GameObject::getTexturePtr() const{
+    return texturePtr;
 }
+
 
 GameObject::ModelShaderData* GameObject::computeShaderData() {
     shaderData.M = transform->getWorldModelMatrix();

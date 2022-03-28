@@ -10,11 +10,9 @@ class Cube : public GameObject{
 
 public:
 
-    Cube(App* app);
-    void DrawRightFace();
-    void DrawLeftFace();
-    void DrawTopFace();
-    void DrawDownFace();
-    void DrawFrontFace();
-    void DrawBackFace();
+    Cube(App* prmApp, shared_ptr<Geometry> prmGeometriePtr, shared_ptr<Texture> prmTexturePtr, bool prmVisibility, int prmSize);
+    vec3 getLeftTopBack();
+
+protected:
+    int size;
 };

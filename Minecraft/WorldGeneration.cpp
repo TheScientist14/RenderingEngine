@@ -11,14 +11,15 @@
 #include "../ScriptablePipeline/EngineObjects/GameObject.h"
 #include "../ScriptablePipeline/EngineObjects/Transform.h"
 #include "../helper/ModelLoader.h"
+#include "Quad.h"
+#include "Cube.h"
 
 
-WorldGeneration::WorldGeneration(int prmBockSize, float prmBlockScaleFactor) {
+WorldGeneration::WorldGeneration(App *prmApp, int prmBockSize, float prmBlockScaleFactor) {
 
+    this->app = prmApp;
     blockSize = prmBockSize;
     blockScaleFactor = prmBlockScaleFactor;
-
-
 }
 
 void WorldGeneration::generateWorld(App *prmApp) {
@@ -39,10 +40,11 @@ void WorldGeneration::generateWorld(App *prmApp) {
                     visible = false;
                 }
 
-                shared_ptr<GameObject> cube = make_shared<GameObject>(prmApp, 0, 0, visible);
+                shared_ptr<Cube> cube = make_shared<Cube>(prmApp, nullptr, nullptr, visible, blockSize);
                 cube->transform->setPosition(vec3(x * blockSize * blockScaleFactor,
                                                   y * blockSize * blockScaleFactor,
                                                   z * blockSize * blockScaleFactor));
+
 
 
                 //                cube->transform->scale = vec3(blockScaleFactor, blockScaleFactor, blockScaleFactor);
@@ -59,6 +61,7 @@ void WorldGeneration::generateWorld(App *prmApp) {
     }
 
     generateNoise();
+    combineVerticesByAxis();
 }
 
 void WorldGeneration::generateNoise() {
@@ -89,53 +92,185 @@ void WorldGeneration::generateNoise() {
 
 }
 
-VectorEngineObject1D WorldGeneration::getCubes() {
+VectorCubeObject1D WorldGeneration::getCubes() {
     return cubes;
 }
 
 void WorldGeneration::combineVerticesByAxis() {
-    //x = Left Right
-    //y = Top Down
+    //x = Top Down
+    //y = Left Right
     //z = Front Back
 
     bool isChanged = false;
+    bool beginQuad = false;
     bool isPreviousBlockEmpty = true;
     bool isNull = false;
 
-    for (int x = 0; x < size; x++) {
+    shared_ptr<Quad> quad = nullptr;
+    vec3 firstcoord;
+    int width = 0;
+
+    //all x
+    for (int y = 0; y < size; ++y) {
         for (int z = 0; z < size ; z++) {
-            for (int y = 0; y < size; ++y) {
+            for (int x = 0; x < size; x++) {
 
                 if (cubes[z * size * size + y * size + x] == nullptr){
 
                     isNull = true;
-                    if (isNull == isPreviousBlockEmpty){
-                        //DoNothing
+                    if(beginQuad) {
+                        quad = make_shared<Quad>(app, 1, width, vec3(1, 0, 0));
+                        quad->transform->setPosition(firstcoord);
+                        width = 0;
+                        quad->createTrianglesX();
+                        quads.push_back(quad);
+                        beginQuad = false;
                     }
-                    else{
-                        isPreviousBlockEmpty = true;
-                        //make block draw left face
-                    }
+                    isPreviousBlockEmpty = true;
+
 
                 }
                 else if (cubes[z * size * size + y * size + x] != nullptr){
 
                     isNull=false;
-                    if (isNull == isPreviousBlockEmpty){
-                        //DoNothing
-                    }
-                    else{
+                    width++;
+                    if (isPreviousBlockEmpty){
+                        firstcoord = cubes[z * size * size + y * size + x]->getLeftTopBack();
+                        beginQuad = true;
                         isPreviousBlockEmpty = false;
-                        //make previous block draw right face
                     }
 
                 }
 
-                cubes[z * size * size + 0 * size + x];
             }
-
-
+            if(beginQuad) {
+                quad = make_shared<Quad>(app, 1, width, vec3(1, 0, 0));
+                quad->transform->setPosition(firstcoord);
+                width = 0;
+                quad->createTrianglesX();
+                quads.push_back(quad);
+                beginQuad = false;
+            }
+        }
+        if(beginQuad) {
+            quad = make_shared<Quad>(app, 1, width, vec3(1, 0, 0));
+            quad->transform->setPosition(firstcoord);
+            width = 0;
+            quad->createTrianglesX();
+            quads.push_back(quad);
+            beginQuad = false;
         }
     }
 
+    beginQuad = false;
+    isPreviousBlockEmpty = true;
+    //all z
+    for (int y = 0; y < size; ++y) {
+        for (int x = 0; x < size ; x++) {
+            for (int z = 0; z < size; z++) {
+
+                if (cubes[z * size * size + y * size + x] == nullptr){
+
+                    isNull = true;
+                    if(beginQuad) {
+                        quad = make_shared<Quad>(app, 1, width, vec3(0, 0, 1));
+                        quad->transform->setPosition(firstcoord);
+                        width = 0;
+                        quad->createTrianglesX();
+                        quads.push_back(quad);
+                        beginQuad = false;
+                    }
+                    isPreviousBlockEmpty = true;
+
+
+                }
+                else if (cubes[z * size * size + y * size + x] != nullptr){
+
+                    isNull=false;
+                    width++;
+                    if (isPreviousBlockEmpty){
+                        firstcoord = cubes[z * size * size + y * size + x]->getLeftTopBack();
+                        beginQuad = true;
+                        isPreviousBlockEmpty = false;
+                    }
+
+                }
+
+            }
+            if(beginQuad) {
+                quad = make_shared<Quad>(app, 1, width, vec3(0, 0, 1));
+                quad->transform->setPosition(firstcoord);
+                width = 0;
+                quad->createTrianglesX();
+                quads.push_back(quad);
+                beginQuad = false;
+            }
+        }
+        if(beginQuad) {
+            quad = make_shared<Quad>(app, 1, width, vec3(0, 0, 1));
+            quad->transform->setPosition(firstcoord);
+            width = 0;
+            quad->createTrianglesX();
+            quads.push_back(quad);
+            beginQuad = false;
+        }
+    }
+    beginQuad = false;
+    isPreviousBlockEmpty = true;
+    //all y
+    for (int z = 0; z < size; ++z) {
+        for (int x = 0; x < size ; x++) {
+            for (int y = 0; y < size; y++) {
+
+                if (cubes[z * size * size + y * size + x] == nullptr){
+
+                    isNull = true;
+                    if(beginQuad) {
+                        quad = make_shared<Quad>(app, 1, width, vec3(0, 1, 0));
+                        quad->transform->setPosition(firstcoord);
+                        width = 0;
+                        quad->createTrianglesX();
+                        quads.push_back(quad);
+                        beginQuad = false;
+                    }
+                    isPreviousBlockEmpty = true;
+
+
+                }
+                else if (cubes[z * size * size + y * size + x] != nullptr){
+
+                    isNull=false;
+                    width++;
+                    if (isPreviousBlockEmpty){
+                        firstcoord = cubes[z * size * size + y * size + x]->getLeftTopBack();
+                        beginQuad = true;
+                        isPreviousBlockEmpty = false;
+                    }
+
+                }
+
+            }
+            if(beginQuad) {
+                quad = make_shared<Quad>(app, 1, width, vec3(0, 1, 0));
+                quad->transform->setPosition(firstcoord);
+                width = 0;
+                quad->createTrianglesX();
+                quads.push_back(quad);
+                beginQuad = false;
+            }
+        }
+        if(beginQuad) {
+            quad = make_shared<Quad>(app, 1, width, vec3(0, 1, 0));
+            quad->transform->setPosition(firstcoord);
+            width = 0;
+            quad->createTrianglesX();
+            quads.push_back(quad);
+            beginQuad = false;
+        }
+    }
+}
+
+VectorQuadObject1D WorldGeneration::getQuads() {
+
+    return quads;
 }
