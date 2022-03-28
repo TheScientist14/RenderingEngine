@@ -30,6 +30,7 @@
 #include "EngineObjects/EngineObject.h"
 #include "EngineObjects/GameObject.h"
 #include "EngineObjects/RenderingContext.h"
+#include "EngineObjects/Skybox.h"
 
 App::~App() {
 
@@ -179,6 +180,13 @@ void App::gl_init() {
     mainCamera = make_shared<Camera>(this);
     mainCamera->transform->move(vec3(0, 0, 10));
 
+    skybox = make_shared<Skybox>(this, "../Images/skybox/skybox_right.bmp",
+                                 "../Images/skybox/skybox_left.bmp",
+                                 "../Images/skybox/skybox_up.bmp",
+                                 "../Images/skybox/skybox_down.bmp",
+                                 "../Images/skybox/skybox_front.bmp",
+                                 "../Images/skybox/skybox_back.bmp", width, height);
+
     shaderID = loadShader::LoadShaders("/Shaders/ColoredCube.vertexshader", "/Shaders/ColoredCube.fragmentshader");
     glUseProgram(shaderID);
 
@@ -194,9 +202,13 @@ void App::gl_init() {
     directionalLightPowerID = glGetUniformLocation(shaderID, "DirectionalLightPower");
 
     specularPowerID = glGetUniformLocation(shaderID, "SpecularPower");
+
+    skybox->setupOpenGL();
 }
 
 void App::main_loop() {
+
+    glUseProgram(shaderID);
     mainCamera->update(deltaTime);
 
     if(isDayCycleEnabled){
@@ -208,8 +220,11 @@ void App::main_loop() {
         directionalLightDirection = vec3(-cos(angle), sin(angle), 0.1f);
     }
 
+
     RenderingContext *renderingContext = new RenderingContext(this);
     renderingContext->render();
+
+    skybox->draw();
 
     drawImGUI();
 }

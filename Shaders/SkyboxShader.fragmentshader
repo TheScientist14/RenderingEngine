@@ -1,0 +1,18 @@
+#version 330 core
+#extension GL_NV_shadow_samplers_cube : enable
+
+//1. declare a uniform sampler2d that contains the texture data
+uniform samplerCube SkyBoxTexture;
+
+//2. declare varying type which will transfer the texture coordinates from the vertex shader
+in vec3 vTexCoordinates;
+
+out vec3 color;
+
+void main()
+{
+
+    //3. set the final color to the output of the fragment shader
+    color = textureCube(SkyBoxTexture,vTexCoordinates).rgb;
+
+}

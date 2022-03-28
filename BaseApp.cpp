@@ -32,6 +32,14 @@ void BaseApp::run(){
     clean();
 }
 
+void GLAPIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id,
+GLenum severity, GLsizei length, const GLchar* message, const void* userParam)
+{
+    if(type == GL_DEBUG_TYPE_ERROR) {
+        printf(message);
+    }
+}
+
 SDL_Window* BaseApp::init_window() {
 
     SDL_Init(SDL_INIT_VIDEO);
@@ -47,6 +55,7 @@ SDL_Window* BaseApp::init_window() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 
     SDL_GLContext context = SDL_GL_CreateContext(win);
     SDL_GL_MakeCurrent(win, context);
@@ -75,6 +84,9 @@ SDL_Window* BaseApp::init_window() {
         fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
     }
 
+    glDebugMessageCallback(&glDebugOutput, nullptr);
+    glDebugMessageControl(
+            GL_DEBUG_SOURCE_API, GL_DEBUG_TYPE_ERROR, GL_DONT_CARE, 0, NULL, GL_TRUE);
     return win;
 }
 
