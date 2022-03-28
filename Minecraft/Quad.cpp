@@ -51,7 +51,7 @@ void Quad::createTrianglesX() {
 //    trianglesPos.push_back(vec3(x+width, y - height, z));
 
     this->geometryPtr = make_shared<Geometry>(getTrianglesPos().data(), 4, getTriangles().data(), 2);
-    texturePtr->bind();
+    //texturePtr->bind();
     geometryPtr->bind();
 }
 

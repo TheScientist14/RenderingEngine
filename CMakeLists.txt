@@ -43,7 +43,17 @@ add_executable(moteur
 		helper/ModelLoader.h
 		Minecraft/WorldGeneration.cpp
 		Minecraft/WorldGeneration.h
-		helper/FastNoiseLite.h ScriptablePipeline/EngineObjects/RenderingContext.cpp ScriptablePipeline/EngineObjects/RenderingContext.h Minecraft/Cube.cpp Minecraft/Cube.h ScriptablePipeline/EngineObjects/Skybox.cpp ScriptablePipeline/EngineObjects/Skybox.h)
+		helper/FastNoiseLite.h
+		ScriptablePipeline/EngineObjects/RenderingContext.cpp
+		ScriptablePipeline/EngineObjects/RenderingContext.h
+		Minecraft/Cube.cpp
+		Minecraft/Cube.h
+		Minecraft/Quad.cpp
+		Minecraft/Quad.h
+		ScriptablePipeline/EngineObjects/Skybox.cpp
+		ScriptablePipeline/EngineObjects/Skybox.h
+		ScriptablePipeline/EngineObjects/RenderedObject.cpp
+		ScriptablePipeline/EngineObjects/RenderedObject.h)
 
 set(IMGUI_USE_OGL3 true)
 include(cmake/imgui.cmake)

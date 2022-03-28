@@ -135,7 +135,7 @@ void App::gl_init() {
 
 // Draw some widgets
     Sp_Texture cube_texture = make_shared<Texture>("../Images/dirt.bmp");
-    textures.push_back(cube_texture);
+    //textures.push_back(cube_texture);
 
     //Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6*2*3, nullptr, 0);
     //geometries.push_back(cubeMesh);
@@ -144,19 +144,19 @@ void App::gl_init() {
     string str = getRootPath() + "/Models/untitled.obj";
 
     loader->import(&*str.begin());
-    loader->loadMeshes(geometries);
+    //loader->loadMeshes(geometries);
 
-    for (int i = 0; i < loader->getNumMesh(); ++i) {
+//    for (int i = 0; i < loader->getNumMesh(); ++i) {
+//
+//        Sp_GameObject grass = make_shared<GameObject>(this, i, 0);
+//        objects.push_back(grass);
+//        objectsToRender.push_back(grass);
+//    }
 
-        Sp_GameObject grass = make_shared<GameObject>(this, i, 0);
-        objects.push_back(grass);
-        objectsToRender.push_back(grass);
-    }
-
-    WorldGeneration *World = new WorldGeneration(2, 0.5);
+    WorldGeneration *World = new WorldGeneration(this, 2, 0.5);
 
     World->generateWorld(this);
-    VectorEngineObject1D generatedCubes = World->getCubes();
+    VectorQuadObject1D generatedCubes = World->getQuads();
 
     objects.insert(objects.end(), generatedCubes.begin(), generatedCubes.end());
     objectsToRender.insert(objectsToRender.end(), generatedCubes.begin(), generatedCubes.end());
@@ -164,18 +164,18 @@ void App::gl_init() {
 
     Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
                                                  nullptr, 0);
-    geometries.push_back(cubeMesh);
+    //geometries.push_back(cubeMesh);
 
-    Sp_GameObject cube = make_shared<GameObject>(this, 1, 0);
-    objects.push_back(cube);
-    objectsToRender.push_back(cube);
+//    Sp_GameObject cube = make_shared<GameObject>(this, 1, 0);
+//    objects.push_back(cube);
+//    objectsToRender.push_back(cube);
 
-    for (int i = 0; i < geometries.size(); i++) {
-        geometries[i]->bind();
-    }
-    for (int i = 0; i < textures.size(); i++) {
-        textures[i]->bind();
-    }
+//    for (int i = 0; i < geometries.size(); i++) {
+//        geometries[i]->bind();
+//    }
+//    for (int i = 0; i < textures.size(); i++) {
+//        textures[i]->bind();
+//    }
 
     mainCamera = make_shared<Camera>(this);
     mainCamera->transform->move(vec3(0, 0, 10));
@@ -386,13 +386,13 @@ void App::clean() {
     // TODO : Call desctructor ?
 }
 
-Sp_Geometry App::getGeometry(int geometryID) {
-    return Sp_Geometry(geometries[geometryID]);
-}
+//Sp_Geometry App::getGeometry(int geometryID) {
+//    return Sp_Geometry(geometries[geometryID]);
+//}
 
-Sp_Texture App::getTexture(int textureID) {
-    return Sp_Texture(textures[textureID]);
-}
+//Sp_Texture App::getTexture(int textureID) {
+//    return Sp_Texture(textures[textureID]);
+//}
 
 Sp_Camera App::getMainCamera() {
     return Sp_Camera(mainCamera);
@@ -414,19 +414,19 @@ vector<Sp_EngineObject>::iterator App::getObjectsEnd() {
     return objects.end();
 }
 
-Sp_GameObject App::getObjectToRender(int i) {
-    return Sp_GameObject(objectsToRender[i]);
+Sp_RenderedObject App::getObjectToRender(int i) {
+    return Sp_RenderedObject (objectsToRender[i]);
 }
 
 int App::getObjectsToRenderCount() {
     return objectsToRender.size();
 }
 
-vector<Sp_GameObject>::iterator App::getObjectsToRenderBegin() {
+vector<Sp_RenderedObject>::iterator App::getObjectsToRenderBegin() {
     return objectsToRender.begin();
 }
 
-vector<Sp_GameObject>::iterator App::getObjectsToRenderEnd() {
+vector<Sp_RenderedObject>::iterator App::getObjectsToRenderEnd() {
     return objectsToRender.end();
 }
 
