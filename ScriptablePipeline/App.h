@@ -22,6 +22,7 @@ class Camera;
 class EngineObject;
 class RenderedObject;
 class Quad;
+class Cube;
 class GameObject;
 class Skybox;
 
@@ -41,8 +42,8 @@ public:
     void clean() override;
     void handle_events() override;
 
-//    Sp_Geometry getGeometry(int geometryID);
-//    Sp_Texture getTexture(int textureID);
+    Sp_Geometry getGeometry(int geometryID);
+    Sp_Texture getTexture(int textureID);
     Sp_Camera getMainCamera();
     vector<Sp_EngineObject>::iterator getObjectsBegin();
     vector<Sp_EngineObject>::iterator getObjectsEnd();
@@ -54,6 +55,7 @@ public:
     int getObjectsToRenderCount();
     int getDeltaTime();
     GLuint getShaderID();
+    void updateObjects();
 
     void setUpGlobalUniforms();
 
@@ -61,12 +63,15 @@ public:
 
 protected:
     GLuint shaderID;
-//    vector<shared_ptr<Geometry>> geometries;
-//    vector<shared_ptr<Texture>> textures;
+    vector<shared_ptr<Geometry>> geometries;
+    vector<shared_ptr<Texture>> textures;
     vector<shared_ptr<EngineObject>> objects;
     vector<shared_ptr<RenderedObject>> objectsToRender;
     shared_ptr<Camera> mainCamera;
     bool isMouseCaptured = true;
+    vector<shared_ptr<Quad>> generatedQuads;
+    vector<shared_ptr<Cube>> generatedCubes;
+    bool isDragging;
 
     void drawImGUI();
     vec3 raycastFromCamera();
@@ -105,6 +110,7 @@ protected:
     float directionalLightPower = 1;
     vec3 directionalLightColor = vec3(0.953125f, 0.91015625f, 0.60546875f);
     vec3 directionalLightDirection = vec3(0, -1, 0.1f);
+    bool isOpti;
 };
 
 

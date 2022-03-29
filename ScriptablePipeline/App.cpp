@@ -135,16 +135,16 @@ void App::gl_init() {
 
 // Draw some widgets
     Sp_Texture cube_texture = make_shared<Texture>("../Images/dirt.bmp");
-    //textures.push_back(cube_texture);
+    textures.push_back(cube_texture);
 
-    //Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6*2*3, nullptr, 0);
-    //geometries.push_back(cubeMesh);
-
+//    Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6*2*3, nullptr, 0);
+//    geometries.push_back(cubeMesh);
+//
     ModelLoader *loader = new ModelLoader();
     string str = getRootPath() + "/Models/untitled.obj";
 
     loader->import(&*str.begin());
-    //loader->loadMeshes(geometries);
+    loader->loadMeshes(geometries);
 
 //    for (int i = 0; i < loader->getNumMesh(); ++i) {
 //
@@ -156,21 +156,30 @@ void App::gl_init() {
     WorldGeneration *World = new WorldGeneration(this, 2, 0.5);
 
     World->generateWorld(this);
-    // chunk coords : 0,0
-    VectorQuadObject1D generatedCubes = World->getQuads();
+
+    generatedCubes = World->getCubes();
+    generatedQuads = World->getQuads();
 
     objects.insert(objects.end(), generatedCubes.begin(), generatedCubes.end());
     objectsToRender.insert(objectsToRender.end(), generatedCubes.begin(), generatedCubes.end());
+    //aiReleaseImport(loader->getAiScene());
+
+    //Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
+    //                                             nullptr, 0);
+    //geometries.push_back(cubeMesh);
+
+    updateObjects();
     aiReleaseImport(loader->getAiScene());
 
-    Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
-                                                 nullptr, 0);
-    //geometries.push_back(cubeMesh);
+//    Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
+//                                                 nullptr, 0);
+//    geometries.push_back(cubeMesh);
+
 
 //    Sp_GameObject cube = make_shared<GameObject>(this, 1, 0);
 //    objects.push_back(cube);
 //    objectsToRender.push_back(cube);
-
+//
 //    for (int i = 0; i < geometries.size(); i++) {
 //        geometries[i]->bind();
 //    }
@@ -414,13 +423,13 @@ void App::clean() {
     // TODO : Call desctructor ?
 }
 
-//Sp_Geometry App::getGeometry(int geometryID) {
-//    return Sp_Geometry(geometries[geometryID]);
-//}
+Sp_Geometry App::getGeometry(int geometryID) {
+    return Sp_Geometry(geometries[geometryID]);
+}
 
-//Sp_Texture App::getTexture(int textureID) {
-//    return Sp_Texture(textures[textureID]);
-//}
+Sp_Texture App::getTexture(int textureID) {
+    return Sp_Texture(textures[textureID]);
+}
 
 Sp_Camera App::getMainCamera() {
     return Sp_Camera(mainCamera);
@@ -543,6 +552,18 @@ void App::drawImGUI() {
         ImGui::SameLine();
         ImGui::ColorEdit3("##11", &directionalLightColor[0]);
 
+		ImGui::Text("Opti : ");
+		ImGui::SameLine();
+		if(ImGui::Button("Opti")){
+			isOpti = true;
+			updateObjects();
+		}
+		ImGui::SameLine();
+		if(ImGui::Button("Brutus")){
+			isOpti = false;
+			updateObjects();
+		}
+
         ImGui::End();
     };
     {
@@ -553,11 +574,23 @@ void App::drawImGUI() {
 
         ImGui::End();
     }
-
+	
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 vec3 App::raycastFromCamera() {
     return mainCamera->transform->getPosition();
+}
+
+void App::updateObjects() {
+    objects.clear();
+    objectsToRender.clear();
+    if(isOpti){
+        objects.insert(objects.end(), generatedQuads.begin(), generatedQuads.end());
+        objectsToRender.insert(objectsToRender.end(), generatedQuads.begin(), generatedQuads.end());
+    } else {
+        objects.insert(objects.end(), generatedCubes.begin(), generatedCubes.end());
+        objectsToRender.insert(objectsToRender.end(), generatedCubes.begin(), generatedCubes.end());
+    }
 }
