@@ -16,7 +16,7 @@ class GameObject;
 class App;
 class Cube;
 
-typedef vector<shared_ptr<Cube>> VectorCubeObject1D;
+typedef vector<int> VectorCubeObject1D;
 typedef vector<shared_ptr<Quad>> VectorQuadObject1D;
 
 class WorldGeneration {

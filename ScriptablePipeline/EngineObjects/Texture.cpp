@@ -32,7 +32,7 @@ void Texture::bind(){
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, texels);
 
     glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(texels);
+    //stbi_image_free(texels);
 
 }
 

@@ -34,6 +34,9 @@ public:
     Geometry(const float* verticesPos, int verticesCount, const unsigned int* triangles, int trianglesCount);
     Geometry(const float* verticesPos, const float* verticesUV, int verticesCount, const unsigned int* triangles, int trianglesCount);
     Geometry(vector<float> verticesPos, int verticesCount, vector<unsigned int> triangles, int trianglesCount);
+    Geometry(vector<float> verticesPos, vector<float>verticesUV, int verticesCount, vector<unsigned int> triangles,
+                       int trianglesCount);
+    Geometry(vector<float> verticesPos, vector<float> verticesNormal, vector<float> verticesUV, int verticesCount, vector<unsigned int> triangles, int trianglesCount);
     Geometry(const float* verticesPos, const float* verticesNormal, const float* verticesUV, int verticesCount, const unsigned int* triangles, int trianglesCount);
     Geometry();
     virtual ~Geometry();

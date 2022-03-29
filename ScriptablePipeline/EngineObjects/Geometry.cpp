@@ -30,6 +30,14 @@ Geometry::Geometry(vector<float> verticesPos, int verticesCount, vector<unsigned
     this->trianglesCount = trianglesCount;
 }
 
+Geometry::Geometry(vector<float> verticesPos, vector<float> verticesUV, int verticesCount,
+                   vector<unsigned int> triangles,
+                   int trianglesCount) : Geometry(verticesPos, verticesCount, triangles, trianglesCount) {
+    for (int i = 0; i < verticesCount * 2; i++) {
+        this->verticesUV.push_back(verticesUV[i]);
+    }
+}
+
 Geometry::Geometry(const float *verticesPos, const float *verticesUV, int verticesCount, const unsigned int *triangles,
                    int trianglesCount) : Geometry(verticesPos, verticesCount, triangles, trianglesCount) {
     for (int i = 0; i < verticesCount * 2; i++) {
@@ -39,6 +47,16 @@ Geometry::Geometry(const float *verticesPos, const float *verticesUV, int vertic
 
 Geometry::Geometry() {
 }
+
+
+Geometry::Geometry(vector<float> verticesPos, vector<float> verticesNormal, vector<float> verticesUV, int verticesCount,
+                   vector<unsigned int> triangles, int trianglesCount) :
+        Geometry(verticesPos, verticesUV, verticesCount, triangles, trianglesCount) {
+    for (int i = 0; i < verticesCount * 3; i++) {
+        this->verticesNormal.push_back(verticesNormal[i]);
+    }
+}
+
 
 Geometry::Geometry(const float *verticesPos, const float *verticesNormal, const float *verticesUV, int verticesCount,
                    const unsigned int *triangles, int trianglesCount) :

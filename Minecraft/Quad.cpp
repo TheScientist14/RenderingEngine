@@ -17,41 +17,51 @@ Quad::Quad(App *app, int height, int width, vec3 direction) : RenderedObject(app
     this->height = height;
     this->width = width;
     this->texturePtr = cube_texture;
-    triangles.insert(triangles.end(),{0,1,2,1,2,3});
+    triangles.insert(triangles.end(), {0, 1, 2, 1, 2, 3});
 //    triangles.push_back(vec3(3,4,5));
     int x = direction.x;
     int y = direction.y;
 
-    if(x != 0){
+    if (x != 0) {
         createTrianglesX();
-    } else if (y != 0){
+    } else if (y != 0) {
         createTrianglesY();
     } else {
         createTrianglesZ();
     }
+
+    //printf("| %d ; %d | \n",height, width);
+
+
 }
 
 vector<unsigned int> Quad::getTriangles() {
     return triangles;
 }
 
-void Quad::createTrianglesX() {
+void Quad::createTrianglesZ() {
     float x = transform->getPosition().x;
     float y = transform->getPosition().y;
     float z = transform->getPosition().z;
 
     trianglesPos.insert(trianglesPos.end(), {x, y, z,
-                                                        x+width, y, z,
-                                                        x, y-height, z,
-                                                        x+width, y-height, z});
+                                             x + width, y, z,
+                                             x, y - height, z,
+                                             x + width, y - height, z});
 //    trianglesPos.push_back(vec3(x+width, y, z));
 //    trianglesPos.push_back(vec3(x+width, y - height, z));
 //    trianglesPos.push_back(transform->getPosition());
 //    trianglesPos.push_back(vec3(x, y - height, z));
 //    trianglesPos.push_back(vec3(x+width, y - height, z));
 
-    this->geometryPtr = make_shared<Geometry>(getTrianglesPos().data(), 4, getTriangles().data(), 2);
-    //texturePtr->bind();
+    uvVector.insert(uvVector.end(), {0, 0, 0, (float)height, (float)width, (float)height, (float)width, 0});
+
+    normalsVector.insert(normalsVector.end(), {1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0});
+
+
+    this->geometryPtr = make_shared<Geometry>(getTrianglesPos().data(), getNormalsVector().data(), getUVVector().data(),
+                                              4, getTriangles().data(), 2);
+    texturePtr->bind();
     geometryPtr->bind();
 }
 
@@ -62,26 +72,37 @@ void Quad::createTrianglesY() {
     float z = transform->getPosition().z;
 
     trianglesPos.insert(trianglesPos.end(), {x, y, z,
-                                                        x + height, y, z,
-                                                        x + height, y - width, z,
-                                                        x, y-width, z});
+                                             x + height, y, z,
+                                             x, y, z + width,
+                                             x + height, y, z + width});
 //    trianglesPos.push_back(transform->getPosition());
 //    trianglesPos.push_back(vec3(x + height, y, z));
 //    trianglesPos.push_back(transform->getPosition());
 //    trianglesPos.push_back(vec3(x + height, y + width, z));
 //    trianglesPos.push_back(vec3(x, y+width, z));
+
+
+    uvVector.insert(uvVector.end(), {0, 0, 0, (float)height, (float)width, (float)height, (float)width, 0});
+
+    normalsVector.insert(normalsVector.end(), {0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0});
+
+
+    this->geometryPtr = make_shared<Geometry>(getTrianglesPos().data(), getNormalsVector().data(), getUVVector().data(),
+                                              4, getTriangles().data(), 2);
+    texturePtr->bind();
+    geometryPtr->bind();
 }
 
-void Quad::createTrianglesZ() {
+void Quad::createTrianglesX() {
 
     float x = transform->getPosition().x;
     float y = transform->getPosition().y;
     float z = transform->getPosition().z;
 
-    trianglesPos.insert(trianglesPos.end(), {x, y, z,
-                                             x, y - height, z,
+    trianglesPos.insert(trianglesPos.end(), {x, y - height, z,
+                                             x, y, z,
                                              x, y - height, z + width,
-                                             x, y, z+width});
+                                             x, y, z + width});
 
 //    trianglesPos.push_back(transform->getPosition());
 //    trianglesPos.push_back(vec3(x, y, z));
@@ -89,6 +110,17 @@ void Quad::createTrianglesZ() {
 //    trianglesPos.push_back(vec3(x, y + height, z));
 //    trianglesPos.push_back(vec3(x, y + height, z + width));
 //    trianglesPos.push_back(vec3(x, y, z+width));
+
+
+    uvVector.insert(uvVector.end(), {0, 0, 0, (float)height, (float)width, (float)height, (float)width, 0});
+
+    normalsVector.insert(normalsVector.end(), {0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1});
+
+
+    this->geometryPtr = make_shared<Geometry>(getTrianglesPos().data(), getNormalsVector().data(), getUVVector().data(),
+                                              4, getTriangles().data(), 2);
+    texturePtr->bind();
+    geometryPtr->bind();
 }
 
 vector<float> Quad::getTrianglesPos() {
@@ -99,7 +131,15 @@ shared_ptr<Geometry> Quad::getGeometryPtr() {
     return geometryPtr;
 }
 
-void Quad::fastRender() const{
+vector<float> Quad::getUVVector() {
+    return uvVector;
+}
+
+vector<float> Quad::getNormalsVector() {
+    return normalsVector;
+}
+
+void Quad::fastRender() const {
     mat4 modelMatrix = transform->getWorldModelMatrix();
 
     shared_ptr<Camera> mainCamera = app->getMainCamera();
