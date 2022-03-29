@@ -16,7 +16,8 @@ class GameObject;
 class App;
 class Cube;
 
-typedef vector<int> VectorCubeObject1D;
+typedef vector<int> VectorIntObject1D;
+typedef vector<shared_ptr<Cube>> VectorCubeObject1D;
 typedef vector<shared_ptr<Quad>> VectorQuadObject1D;
 
 class WorldGeneration {
@@ -25,10 +26,11 @@ public:
 
     WorldGeneration(App *prmApp, int prmBockSize, float prmBlockScaleFactor);
 
-    const static int size = 32;
+    const static int size = 16;
     App *app;
     int blockSize;
     float blockScaleFactor;
+    VectorIntObject1D cubesInt;
     VectorCubeObject1D cubes;
     VectorQuadObject1D quads;
     vector<pair<vec3, vec2>> quadsToRender;
@@ -36,6 +38,7 @@ public:
     void generateWorld(App* prmApp);
     void generateNoise();
     void combineVerticesByAxis();
+    VectorIntObject1D getCubesInt();
     VectorCubeObject1D getCubes();
     VectorQuadObject1D getQuads();
 
