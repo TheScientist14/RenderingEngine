@@ -66,9 +66,10 @@ protected:
     vector<shared_ptr<EngineObject>> objects;
     vector<shared_ptr<RenderedObject>> objectsToRender;
     shared_ptr<Camera> mainCamera;
-    bool isDragging;
+    bool isMouseCaptured = true;
 
     void drawImGUI();
+    vec3 raycastFromCamera();
 
     float mouseSensitivity = 0.08f;
     float cameraSpeed = 0.01f;

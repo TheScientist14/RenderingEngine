@@ -60,8 +60,8 @@ SDL_Window* BaseApp::init_window() {
     SDL_GLContext context = SDL_GL_CreateContext(win);
     SDL_GL_MakeCurrent(win, context);
 
-    //SDL_ShowCursor(1);
-    //SDL_SetWindowGrab(win, SDL_TRUE);
+    SDL_ShowCursor(SDL_DISABLE);
+    SDL_SetWindowGrab(win, SDL_TRUE);
 
 
     curTime = SDL_GetTicks64();
@@ -69,7 +69,7 @@ SDL_Window* BaseApp::init_window() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
 
     ImGui_ImplSDL2_InitForOpenGL(win, context);
     ImGui_ImplOpenGL3_Init();

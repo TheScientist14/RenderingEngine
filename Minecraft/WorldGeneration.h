@@ -27,6 +27,7 @@ public:
 
     const static int size = 32;
     App *app;
+    vec3 chunkCoord;
     int blockSize;
     float blockScaleFactor;
     VectorCubeObject1D cubes;
@@ -37,6 +38,8 @@ public:
     void combineVerticesByAxis();
     VectorCubeObject1D getCubes();
     VectorQuadObject1D getQuads();
+
+    static vec3 worldToChunkCoords(vec3 worldCoord, vec3 chunkCoord, float blockSize);
 
 };
 

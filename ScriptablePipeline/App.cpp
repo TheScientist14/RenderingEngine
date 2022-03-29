@@ -156,6 +156,7 @@ void App::gl_init() {
     WorldGeneration *World = new WorldGeneration(this, 2, 0.5);
 
     World->generateWorld(this);
+    // chunk coords : 0,0
     VectorQuadObject1D generatedCubes = World->getQuads();
 
     objects.insert(objects.end(), generatedCubes.begin(), generatedCubes.end());
@@ -178,7 +179,7 @@ void App::gl_init() {
 //    }
 
     mainCamera = make_shared<Camera>(this);
-    mainCamera->transform->move(vec3(0, 0, 10));
+    mainCamera->transform->move(vec3(0, 0, 0));
 
     skybox = make_shared<Skybox>(this, "../Images/skybox/skybox_right.bmp",
                                  "../Images/skybox/skybox_left.bmp",
@@ -240,18 +241,30 @@ void App::handle_events() {
                 return;
             case SDL_MOUSEBUTTONDOWN:
                 if (!io.WantCaptureMouse) {
-                    isDragging = true;
+                    if (isMouseCaptured) {
+                        switch (curEvent.button.button) {
+                            case SDL_BUTTON_LEFT:
+                                vec3 blockHitPos = raycastFromCamera();
+                                vec3 blockChunkCoords = WorldGeneration::worldToChunkCoords(blockHitPos, vec3(0,0,0), 2);
+                                if(blockChunkCoords != vec3(-1)){
+                                    
+                                }
+                                break;
+                            case SDL_BUTTON_RIGHT:
+                                break;
+                        }
+                    } else {
+                        isMouseCaptured = true;
+                        SDL_ShowCursor(SDL_DISABLE);
+                        SDL_SetWindowGrab(win, SDL_TRUE);
+                        break;
+                    }
                 }
-                //... app processing other events;
-                break;
-            case SDL_MOUSEBUTTONUP:
-                isDragging = false; // cancelling dragging even if imgui captures mouse events
                 break;
             case SDL_MOUSEMOTION:
                 if (!io.WantCaptureMouse) {
                     float epsilon = 0.01f;
-
-                    if (isDragging) {
+                    if (isMouseCaptured) {
                         vec3 eulerAngles = mainCamera->transform->getEulerAngles();
 
                         if (abs(eulerAngles.z) < epsilon) {
@@ -283,6 +296,11 @@ void App::handle_events() {
                         quat quatYaw = angleAxis(radians(eulerAngles.y), vec3(0, 1, 0));
                         quat quatRoll = angleAxis(radians(eulerAngles.z), vec3(0, 0, 1));
                         mainCamera->transform->setRotation(mat4_cast(normalize(quatRoll * quatYaw * quatPitch)));
+
+                        // recentering cursor and avoiding reverse mouse motion
+                        SDL_EventState(SDL_MOUSEMOTION, SDL_IGNORE);
+                        SDL_WarpMouseInWindow(win, width / 2, height / 2);
+                        SDL_EventState(SDL_MOUSEMOTION, SDL_ENABLE);
                     }
                 }
                 break;
@@ -325,6 +343,11 @@ void App::handle_events() {
                             if (cameraVelocity[1] <= epsilon) {
                                 cameraVelocity[1] = cameraSpeed;
                             }
+                            break;
+                        case SDLK_ESCAPE:
+                            isMouseCaptured = false;
+                            SDL_ShowCursor(SDL_ENABLE);
+                            SDL_SetWindowGrab(win, SDL_FALSE);
                             break;
                     }
                 }
@@ -380,6 +403,11 @@ void App::handle_events() {
     vec3 tmpPos = mainCamera->transform->getPosition();
     tmpPos[1] += cameraVelocity[1] * deltaTime;
     mainCamera->transform->setPosition(tmpPos);
+    const char *error = SDL_GetError();
+    if (error != NULL && *error != '\0') {
+        printf("%s\n", error);
+        SDL_ClearError();
+    }
 }
 
 void App::clean() {
@@ -415,7 +443,7 @@ vector<Sp_EngineObject>::iterator App::getObjectsEnd() {
 }
 
 Sp_RenderedObject App::getObjectToRender(int i) {
-    return Sp_RenderedObject (objectsToRender[i]);
+    return Sp_RenderedObject(objectsToRender[i]);
 }
 
 int App::getObjectsToRenderCount() {
@@ -464,57 +492,72 @@ void App::drawImGUI() {
 
     ImGui::NewFrame();
 
-    ImGui::Begin("Perfs");
-    ImGui::Text("Frame Time (ms) new : %d", deltaTime);
-    ImGui::Text("FPS : %f", 1.0 / (float) deltaTime * 1000);
-    ImGui::End();
-
-    ImGui::Begin("Rendering");
-    ImGui::Text("Mouse sensitivity : ");
-    ImGui::SameLine();
-    ImGui::InputFloat("##1", &mouseSensitivity);
-    ImGui::Text("Wireframe : ");
-    ImGui::SameLine();
-    ImGui::Checkbox("##2", &mainCamera->isWireframe);
-
-    ImGui::Text("Point light power : ");
-    ImGui::SameLine();
-    ImGui::InputFloat("##3", &pointLightPower);
-    ImGui::Text("Point light color : ");
-    ImGui::SameLine();
-    ImGui::ColorEdit3("##4", &pointLightColor[0]);
-    ImGui::Text("Point light world pos : ");
-    ImGui::SameLine();
-    ImGui::InputFloat3("##5", &pointLightWorldPos[0]);
-
-    ImGui::Text("Ambient light power : ");
-    ImGui::SameLine();
-    ImGui::InputFloat("##6", &ambientLightPower);
-    ImGui::Text("Ambient light color : ");
-    ImGui::SameLine();
-    ImGui::ColorEdit3("##7", &ambientLightColor[0]);
-
-    ImGui::Text("Enable day cycle : ");
-    ImGui::SameLine();
-    ImGui::Checkbox("##12", &isDayCycleEnabled);
-    if (isDayCycleEnabled) {
-        ImGui::Text("Day time : ");
+    {
+        ImGui::Begin("Perfs");
+        ImGui::Text("Frame Time (ms) new : %d", deltaTime);
+        ImGui::Text("FPS : %f", 1.0 / (float) deltaTime * 1000);
+        ImGui::End();
+    };
+    {
+        ImGui::Begin("Rendering");
+        ImGui::Text("Mouse sensitivity : ");
         ImGui::SameLine();
-        ImGui::SliderInt("##8", &dayTime, 0, dayTimeLength);
-    } else {
-        ImGui::Text("Directional light direction : ");
+        ImGui::InputFloat("##1", &mouseSensitivity);
+        ImGui::Text("Wireframe : ");
         ImGui::SameLine();
-        ImGui::InputFloat3("##9", &directionalLightDirection[0]);
+        ImGui::Checkbox("##2", &mainCamera->isWireframe);
+
+        ImGui::Text("Point light power : ");
+        ImGui::SameLine();
+        ImGui::InputFloat("##3", &pointLightPower);
+        ImGui::Text("Point light color : ");
+        ImGui::SameLine();
+        ImGui::ColorEdit3("##4", &pointLightColor[0]);
+        ImGui::Text("Point light world pos : ");
+        ImGui::SameLine();
+        ImGui::InputFloat3("##5", &pointLightWorldPos[0]);
+
+        ImGui::Text("Ambient light power : ");
+        ImGui::SameLine();
+        ImGui::InputFloat("##6", &ambientLightPower);
+        ImGui::Text("Ambient light color : ");
+        ImGui::SameLine();
+        ImGui::ColorEdit3("##7", &ambientLightColor[0]);
+
+        ImGui::Text("Enable day cycle : ");
+        ImGui::SameLine();
+        ImGui::Checkbox("##12", &isDayCycleEnabled);
+        if (isDayCycleEnabled) {
+            ImGui::Text("Day time : ");
+            ImGui::SameLine();
+            ImGui::SliderInt("##8", &dayTime, 0, dayTimeLength);
+        } else {
+            ImGui::Text("Directional light direction : ");
+            ImGui::SameLine();
+            ImGui::InputFloat3("##9", &directionalLightDirection[0]);
+        }
+        ImGui::Text("Directional light power : ");
+        ImGui::SameLine();
+        ImGui::InputFloat("##10", &directionalLightPower);
+        ImGui::Text("Directional light color : ");
+        ImGui::SameLine();
+        ImGui::ColorEdit3("##11", &directionalLightColor[0]);
+
+        ImGui::End();
+    };
+    {
+        ImGui::Begin("Camera");
+
+        vec3 cameraEulerAngles = mainCamera->transform->getEulerAngles();
+        ImGui::Text("Camera euler angles : %f %f %f", cameraEulerAngles.x, cameraEulerAngles.y, cameraEulerAngles.z);
+
+        ImGui::End();
     }
-    ImGui::Text("Directional light power : ");
-    ImGui::SameLine();
-    ImGui::InputFloat("##10", &directionalLightPower);
-    ImGui::Text("Directional light color : ");
-    ImGui::SameLine();
-    ImGui::ColorEdit3("##11", &directionalLightColor[0]);
-
-    ImGui::End();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+vec3 App::raycastFromCamera() {
+    return mainCamera->transform->getPosition();
 }

@@ -20,6 +20,7 @@ WorldGeneration::WorldGeneration(App *prmApp, int prmBockSize, float prmBlockSca
     this->app = prmApp;
     blockSize = prmBockSize;
     blockScaleFactor = prmBlockScaleFactor;
+    chunkCoord = vec3(0,0,0);
 }
 
 void WorldGeneration::generateWorld(App *prmApp) {
@@ -114,7 +115,7 @@ void WorldGeneration::combineVerticesByAxis() {
 
     //Z Walls
     for (int y = 0; y < size; y++) {
-        for (int z = 0; z < size+1; z++) {
+        for (int z = 0; z < size + 1; z++) {
             previousState = false;
             for (int x = 0; x < size; x++) {
 
@@ -125,10 +126,10 @@ void WorldGeneration::combineVerticesByAxis() {
                         nowState = true;
                     }
                 } else {
-                    if(z == 0){
+                    if (z == 0) {
                         nowState = (cubes[z * size * size + y * size + x] == 1);
-                    }else{
-                        nowState = (cubes[(z-1) * size * size + y * size + x] == 1);
+                    } else {
+                        nowState = (cubes[(z - 1) * size * size + y * size + x] == 1);
                     }
                 }
 
@@ -142,10 +143,9 @@ void WorldGeneration::combineVerticesByAxis() {
                 } else {
                     if (nowState) {
                         //firstcoord = cubes[z * size * size + y * size + x]->getLeftTopBack();
-                        firstcoord = vec3(x-blockSize/2.0f, y+blockSize/2.0f, z-blockSize/2.0f);
+                        firstcoord = vec3(x - blockSize / 2.0f, y + blockSize / 2.0f, z - blockSize / 2.0f);
                         meshWidth = 1;
-                    }
-                    else{
+                    } else {
                         quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 0, 1));
                         quad->transform->setPosition(firstcoord);
                         quads.push_back(quad);
@@ -180,7 +180,7 @@ void WorldGeneration::combineVerticesByAxis() {
                     }
                 }*/
             }
-            if(previousState){
+            if (previousState) {
                 quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 0, 1));
                 quad->transform->setPosition(firstcoord);
                 quads.push_back(quad);
@@ -190,21 +190,21 @@ void WorldGeneration::combineVerticesByAxis() {
 
     //X Walls
     for (int y = 0; y < size; y++) {
-        for (int x = 0; x < size+1; x++) {
+        for (int x = 0; x < size + 1; x++) {
             previousState = false;
             for (int z = 0; z < size; z++) {
 
                 if (x < size && x > 0) {
-                    if (cubes[z * size * size + y * size + x] == cubes[z * size * size + y * size + (x-1)]) {
+                    if (cubes[z * size * size + y * size + x] == cubes[z * size * size + y * size + (x - 1)]) {
                         nowState = false;
                     } else {
                         nowState = true;
                     }
                 } else {
-                    if(x == 0){
+                    if (x == 0) {
                         nowState = (cubes[z * size * size + y * size + x] == 1);
-                    }else{
-                        nowState = (cubes[z * size * size + y * size + (x-1)] == 1);
+                    } else {
+                        nowState = (cubes[z * size * size + y * size + (x - 1)] == 1);
                     }
                 }
 
@@ -218,10 +218,9 @@ void WorldGeneration::combineVerticesByAxis() {
                 } else {
                     if (nowState) {
                         //firstcoord = cubes[z * size * size + y * size + x]->getLeftTopBack();
-                        firstcoord = vec3(x-blockSize/2.0f, y+blockSize/2.0f, z-blockSize/2.0f);
+                        firstcoord = vec3(x - blockSize / 2.0f, y + blockSize / 2.0f, z - blockSize / 2.0f);
                         meshWidth = 1;
-                    }
-                    else{
+                    } else {
                         quad = make_shared<Quad>(app, 1, meshWidth, vec3(1, 0, 0));
                         quad->transform->setPosition(firstcoord);
                         quads.push_back(quad);
@@ -230,7 +229,7 @@ void WorldGeneration::combineVerticesByAxis() {
 
                 }
             }
-            if(previousState){
+            if (previousState) {
                 quad = make_shared<Quad>(app, 1, meshWidth, vec3(1, 0, 0));
                 quad->transform->setPosition(firstcoord);
                 quads.push_back(quad);
@@ -244,16 +243,16 @@ void WorldGeneration::combineVerticesByAxis() {
             previousState = false;
             for (int z = 0; z < size; z++) {
 
-                if (y < size-1 && y >= 0) {
-                    if (cubes[z * size * size + y * size + x] == cubes[z * size * size + (y+1) * size + x]) {
+                if (y < size - 1 && y >= 0) {
+                    if (cubes[z * size * size + y * size + x] == cubes[z * size * size + (y + 1) * size + x]) {
                         nowState = false;
                     } else {
                         nowState = true;
                     }
                 } else {
-                    if(y < 0){
-                        nowState = (cubes[z * size * size + (y+1) * size + x] == 1);
-                    }else{
+                    if (y < 0) {
+                        nowState = (cubes[z * size * size + (y + 1) * size + x] == 1);
+                    } else {
                         nowState = (cubes[z * size * size + y * size + x] == 1);
                     }
                 }
@@ -268,10 +267,9 @@ void WorldGeneration::combineVerticesByAxis() {
                 } else {
                     if (nowState) {
                         //firstcoord = cubes[z * size * size + y * size + x]->getLeftTopBack();
-                        firstcoord = vec3(x-blockSize/2.0f, y+blockSize/2.0f, z-blockSize/2.0f);
+                        firstcoord = vec3(x - blockSize / 2.0f, y + blockSize / 2.0f, z - blockSize / 2.0f);
                         meshWidth = 1;
-                    }
-                    else{
+                    } else {
                         quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 1, 0));
                         quad->transform->setPosition(firstcoord);
                         quads.push_back(quad);
@@ -280,7 +278,7 @@ void WorldGeneration::combineVerticesByAxis() {
 
                 }
             }
-            if(previousState){
+            if (previousState) {
                 quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 1, 0));
                 quad->transform->setPosition(firstcoord);
                 quads.push_back(quad);
@@ -383,4 +381,17 @@ void WorldGeneration::combineVerticesByAxis() {
 VectorQuadObject1D WorldGeneration::getQuads() {
 
     return quads;
+}
+
+vec3 WorldGeneration::worldToChunkCoords(vec3 worldCoord, vec3 chunkCoord, float blockSize) {
+    vec3 chunkCoords = vec3(worldCoord.x / blockSize - 0.5f - (chunkCoord.x - 0.5f) * size,
+                            worldCoord.y / blockSize - 0.5f - chunkCoord.y,
+                            worldCoord.z);
+    if (worldCoord.x >= 0 && worldCoord.x < size
+            && worldCoord.y >= 0 && worldCoord.y < size
+            && worldCoord.z >= 0 && worldCoord.z < size) {
+        return chunkCoords;
+    } else {
+        return vec3(-1);
+    }
 }
