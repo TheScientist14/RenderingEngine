@@ -26,6 +26,13 @@ GameObject::GameObject(App* app, shared_ptr<Geometry> geometryPtr, shared_ptr<Te
     this->texturePtr = texturePtr;
 
 }
+GameObject::GameObject(App* app, int geometryIndex, int textureIndex, bool visible) : RenderedObject(app){
+
+    this->geometryIndex = geometryIndex;
+    this->textureIndex = textureIndex;
+    this->visible = visible;
+
+}
 
 void GameObject::update(int deltaTime) {
     RenderedObject::update(deltaTime);
@@ -84,4 +91,8 @@ GameObject::ModelShaderData* GameObject::computeShaderData() {
     shared_ptr<Camera> mainCamera = app->getMainCamera();
     shaderData.MVP = mainCamera->getProjectionViewMatrix() * shaderData.M;
     return &shaderData;
+}
+
+GameObject::GameObject(App *app) : RenderedObject(app) {
+    this->app = app;
 }

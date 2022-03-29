@@ -10,9 +10,11 @@ class Cube : public GameObject{
 
 public:
 
-    Cube(App* prmApp, shared_ptr<Geometry> prmGeometriePtr, shared_ptr<Texture> prmTexturePtr, bool prmVisibility, int prmSize);
+    Cube(App* prmApp, int prmGeometrieIndex, int prmTextureIndex, bool prmVisibility, int prmSize);
     vec3 getLeftTopBack();
 
 protected:
     int size;
+
+    void fastRender() const override;
 };

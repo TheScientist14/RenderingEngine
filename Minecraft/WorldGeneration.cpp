@@ -24,44 +24,27 @@ WorldGeneration::WorldGeneration(App *prmApp, int prmBockSize, float prmBlockSca
 
 void WorldGeneration::generateWorld(App *prmApp) {
 
-    // Create and configure FastNoise object
-//    FastNoiseLite noise;
-//    noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
-//    noise.SetFractalType(FastNoiseLite::FractalType_PingPong);
-//    noise.SetFractalPingPongStrength(1.6);
-
     for (int x = 0; x < size; ++x) {
         for (int y = 0; y < size; ++y) {
             for (int z = 0; z < size; ++z) {
                 bool visible = true;
 
-/*                // dont draw inside of cube
+                // dont draw inside of cube
                 if ((x != 0 && x != size - 1) && (y != 0 && y != size - 1) && (z != 0 && z != size - 1)) {
                     visible = false;
                 }
 
-                shared_ptr<Cube> cube = make_shared<Cube>(prmApp, nullptr, nullptr, visible, blockSize);
+                shared_ptr<Cube> cube = make_shared<Cube>(prmApp, 0, 0, visible, blockScaleFactor);
                 cube->transform->setPosition(vec3(x * blockSize * blockScaleFactor,
                                                   y * blockSize * blockScaleFactor,
                                                   z * blockSize * blockScaleFactor));
 
+                cubes.push_back(cube);
 
-
-                //                cube->transform->scale = vec3(blockScaleFactor, blockScaleFactor, blockScaleFactor);
-                //                cube->transform->position = vec3(x * blockSize * blockScaleFactor,
-                //                                                 trunc(noise.GetNoise((float) x, (float) y) * 2 + 50),
-                //                                                 y * blockSize * blockScaleFactor);
-                //
-                //
-                //                printf("%f ", trunc(noise.GetNoise((float) x, (float) y) * 2 + 50));
-
-                cubes.push_back(cube);*/
-                cubes.push_back(1);
+                cubesInt.push_back(1);
             }
         }
     }
-
-
     generateNoise();
     combineVerticesByAxis();
 }
@@ -78,12 +61,12 @@ void WorldGeneration::generateNoise() {
 
     for (int z = 0; z < size; z++) {
         for (int x = 0; x < size; x++) {
-
             y = trunc((noise.GetNoise((float) x, (float) z) + 1) * 3);
-            //cubes[z * size * size + y * size + x]->visible = true;
+            cubes[z * size * size + y * size + x]->visible = true;
             y++;
             for (y; y < size; y++) {
-                cubes[z * size * size + y * size + x] = 0;
+                cubes[z * size * size + y * size + x]->visible = false;
+                cubesInt[z * size * size + y * size + x] = 0;
             }
         }
     }
@@ -94,9 +77,6 @@ void WorldGeneration::generateNoise() {
 
 }
 
-VectorCubeObject1D WorldGeneration::getCubes() {
-    return cubes;
-}
 
 void WorldGeneration::combineVerticesByAxis() {
     //x = Top Down
@@ -119,16 +99,16 @@ void WorldGeneration::combineVerticesByAxis() {
             for (int x = 0; x < size; x++) {
 
                 if (z < size && z > 0) {
-                    if (cubes[z * size * size + y * size + x] == cubes[(z - 1) * size * size + y * size + x]) {
+                    if (cubesInt[z * size * size + y * size + x] == cubesInt[(z - 1) * size * size + y * size + x]) {
                         nowState = false;
                     } else {
                         nowState = true;
                     }
                 } else {
                     if(z == 0){
-                        nowState = (cubes[z * size * size + y * size + x] == 1);
+                        nowState = (cubesInt[z * size * size + y * size + x] == 1);
                     }else{
-                        nowState = (cubes[(z-1) * size * size + y * size + x] == 1);
+                        nowState = (cubesInt[(z-1) * size * size + y * size + x] == 1);
                     }
                 }
 
@@ -141,7 +121,7 @@ void WorldGeneration::combineVerticesByAxis() {
 
                 } else {
                     if (nowState) {
-                        //firstcoord = cubes[z * size * size + y * size + x]->getLeftTopBack();
+                        //firstcoord = cubesInt[z * size * size + y * size + x]->getLeftTopBack();
                         firstcoord = vec3(x-blockSize/2.0f, y+blockSize/2.0f, z-blockSize/2.0f);
                         meshWidth = 1;
                     }
@@ -154,7 +134,7 @@ void WorldGeneration::combineVerticesByAxis() {
 
                 }
 
-/*                if (cubes[z * size * size + y * size + x] == nullptr){
+/*                if (cubesInt[z * size * size + y * size + x] == nullptr){
 
                     isNull = true;
                     if(beginQuad) {
@@ -169,12 +149,12 @@ void WorldGeneration::combineVerticesByAxis() {
 
 
                 }
-                else if (cubes[z * size * size + y * size + x] != nullptr){
+                else if (cubesInt[z * size * size + y * size + x] != nullptr){
 
                     isNull=false;
                     width++;
                     if (isPreviousBlockEmpty){
-                        firstcoord = cubes[z * size * size + y * size + x]->getLeftTopBack();
+                        firstcoord = cubesInt[z * size * size + y * size + x]->getLeftTopBack();
                         beginQuad = true;
                         isPreviousBlockEmpty = false;
                     }
@@ -195,16 +175,16 @@ void WorldGeneration::combineVerticesByAxis() {
             for (int z = 0; z < size; z++) {
 
                 if (x < size && x > 0) {
-                    if (cubes[z * size * size + y * size + x] == cubes[z * size * size + y * size + (x-1)]) {
+                    if (cubesInt[z * size * size + y * size + x] == cubesInt[z * size * size + y * size + (x-1)]) {
                         nowState = false;
                     } else {
                         nowState = true;
                     }
                 } else {
                     if(x == 0){
-                        nowState = (cubes[z * size * size + y * size + x] == 1);
+                        nowState = (cubesInt[z * size * size + y * size + x] == 1);
                     }else{
-                        nowState = (cubes[z * size * size + y * size + (x-1)] == 1);
+                        nowState = (cubesInt[z * size * size + y * size + (x-1)] == 1);
                     }
                 }
 
@@ -217,7 +197,7 @@ void WorldGeneration::combineVerticesByAxis() {
 
                 } else {
                     if (nowState) {
-                        //firstcoord = cubes[z * size * size + y * size + x]->getLeftTopBack();
+                        //firstcoord = cubesInt[z * size * size + y * size + x]->getLeftTopBack();
                         firstcoord = vec3(x-blockSize/2.0f, y+blockSize/2.0f, z-blockSize/2.0f);
                         meshWidth = 1;
                     }
@@ -245,16 +225,16 @@ void WorldGeneration::combineVerticesByAxis() {
             for (int z = 0; z < size; z++) {
 
                 if (y < size-1 && y >= 0) {
-                    if (cubes[z * size * size + y * size + x] == cubes[z * size * size + (y+1) * size + x]) {
+                    if (cubesInt[z * size * size + y * size + x] == cubesInt[z * size * size + (y+1) * size + x]) {
                         nowState = false;
                     } else {
                         nowState = true;
                     }
                 } else {
                     if(y < 0){
-                        nowState = (cubes[z * size * size + (y+1) * size + x] == 1);
+                        nowState = (cubesInt[z * size * size + (y+1) * size + x] == 1);
                     }else{
-                        nowState = (cubes[z * size * size + y * size + x] == 1);
+                        nowState = (cubesInt[z * size * size + y * size + x] == 1);
                     }
                 }
 
@@ -267,7 +247,7 @@ void WorldGeneration::combineVerticesByAxis() {
 
                 } else {
                     if (nowState) {
-                        //firstcoord = cubes[z * size * size + y * size + x]->getLeftTopBack();
+                        //firstcoord = cubesInt[z * size * size + y * size + x]->getLeftTopBack();
                         firstcoord = vec3(x-blockSize/2.0f, y+blockSize/2.0f, z-blockSize/2.0f);
                         meshWidth = 1;
                     }
@@ -295,7 +275,7 @@ void WorldGeneration::combineVerticesByAxis() {
 //        for (int x = 0; x < size ; x++) {
 //            for (int z = 0; z < size; z++) {
 //
-//                if (cubes[z * size * size + y * size + x] == nullptr){
+//                if (cubesInt[z * size * size + y * size + x] == nullptr){
 //
 //                    isNull = true;
 //                    if(beginQuad) {
@@ -310,12 +290,12 @@ void WorldGeneration::combineVerticesByAxis() {
 //
 //
 //                }
-//                else if (cubes[z * size * size + y * size + x] != nullptr){
+//                else if (cubesInt[z * size * size + y * size + x] != nullptr){
 //
 //                    isNull=false;
 //                    width++;
 //                    if (isPreviousBlockEmpty){
-//                        firstcoord = cubes[z * size * size + y * size + x]->getLeftTopBack();
+//                        firstcoord = cubesInt[z * size * size + y * size + x]->getLeftTopBack();
 //                        beginQuad = true;
 //                        isPreviousBlockEmpty = false;
 //                    }
@@ -348,7 +328,7 @@ void WorldGeneration::combineVerticesByAxis() {
 //        for (int x = 0; x < size ; x++) {
 //            for (int y = 0; y < size; y++) {
 //
-//                if (cubes[z * size * size + y * size + x] == nullptr){
+//                if (cubesInt[z * size * size + y * size + x] == nullptr){
 //
 //                    isNull = true;
 //                    if(beginQuad) {
@@ -363,12 +343,12 @@ void WorldGeneration::combineVerticesByAxis() {
 //
 //
 //                }
-//                else if (cubes[z * size * size + y * size + x] != nullptr){
+//                else if (cubesInt[z * size * size + y * size + x] != nullptr){
 //
 //                    isNull=false;
 //                    width++;
 //                    if (isPreviousBlockEmpty){
-//                        firstcoord = cubes[z * size * size + y * size + x]->getLeftTopBack();
+//                        firstcoord = cubesInt[z * size * size + y * size + x]->getLeftTopBack();
 //                        beginQuad = true;
 //                        isPreviousBlockEmpty = false;
 //                    }
@@ -383,4 +363,12 @@ void WorldGeneration::combineVerticesByAxis() {
 VectorQuadObject1D WorldGeneration::getQuads() {
 
     return quads;
+}
+
+VectorCubeObject1D WorldGeneration::getCubes() {
+    return cubes;
+}
+
+VectorIntObject1D WorldGeneration::getCubesInt() {
+    return cubesInt;
 }
