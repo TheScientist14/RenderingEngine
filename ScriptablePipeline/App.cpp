@@ -160,10 +160,10 @@ void App::gl_init() {
 
     objects.insert(objects.end(), generatedCubes.begin(), generatedCubes.end());
     objectsToRender.insert(objectsToRender.end(), generatedCubes.begin(), generatedCubes.end());
-    aiReleaseImport(loader->getAiScene());
+    //aiReleaseImport(loader->getAiScene());
 
-    Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
-                                                 nullptr, 0);
+    //Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
+    //                                             nullptr, 0);
     //geometries.push_back(cubeMesh);
 
 //    Sp_GameObject cube = make_shared<GameObject>(this, 1, 0);

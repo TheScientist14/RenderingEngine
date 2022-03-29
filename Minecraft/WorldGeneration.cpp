@@ -3,6 +3,7 @@
 //
 
 #include <vector>
+#include <set>
 #include <string>
 #include "WorldGeneration.h"
 #include "../helper/FastNoiseLite.h"
@@ -110,10 +111,11 @@ void WorldGeneration::combineVerticesByAxis() {
 
     shared_ptr<Quad> quad = nullptr;
     vec3 firstcoord;
+    int height = 1;
     int meshWidth = 1;
 
     //Z Walls
-    for (int y = 0; y < size; y++) {
+    /*for (int y = 0; y < size; y++) {
         for (int z = 0; z < size+1; z++) {
             previousState = false;
             for (int x = 0; x < size; x++) {
@@ -146,15 +148,19 @@ void WorldGeneration::combineVerticesByAxis() {
                         meshWidth = 1;
                     }
                     else{
-                        quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 0, 1));
-                        quad->transform->setPosition(firstcoord);
-                        quads.push_back(quad);
+
+                         pair<vec3, vec2> quad = make_pair(firstcoord, vec2(meshWidth, height));
+                         quadsToRender.push_back(quad);
+
+//                        quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 0, 1));
+//                        quad->transform->setPosition(firstcoord);
+//                        quads.push_back(quad);
                     }
                     previousState = nowState;
 
                 }
 
-/*                if (cubes[z * size * size + y * size + x] == nullptr){
+*//*                if (cubes[z * size * size + y * size + x] == nullptr){
 
                     isNull = true;
                     if(beginQuad) {
@@ -178,17 +184,23 @@ void WorldGeneration::combineVerticesByAxis() {
                         beginQuad = true;
                         isPreviousBlockEmpty = false;
                     }
-                }*/
+                }*//*
             }
             if(previousState){
-                quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 0, 1));
-                quad->transform->setPosition(firstcoord);
-                quads.push_back(quad);
+                pair<vec3, vec2> quad = make_pair(firstcoord, vec2(meshWidth, height));
+                quadsToRender.push_back(quad);
+
+//                quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 0, 1));
+//                quad->transform->setPosition(firstcoord);
+//                quads.push_back(quad);
             }
         }
-    }
+    }*/
 
-    //X Walls
+
+
+
+    /*//X Walls
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size+1; x++) {
             previousState = false;
@@ -236,7 +248,7 @@ void WorldGeneration::combineVerticesByAxis() {
                 quads.push_back(quad);
             }
         }
-    }
+    }*/
 
     //Y Walls
     for (int x = 0; x < size; x++) {
@@ -244,16 +256,16 @@ void WorldGeneration::combineVerticesByAxis() {
             previousState = false;
             for (int z = 0; z < size; z++) {
 
-                if (y < size-1 && y >= 0) {
-                    if (cubes[z * size * size + y * size + x] == cubes[z * size * size + (y+1) * size + x]) {
+                if (y < size - 1 && y >= 0) {
+                    if (cubes[z * size * size + y * size + x] == cubes[z * size * size + (y + 1) * size + x]) {
                         nowState = false;
                     } else {
                         nowState = true;
                     }
                 } else {
-                    if(y < 0){
-                        nowState = (cubes[z * size * size + (y+1) * size + x] == 1);
-                    }else{
+                    if (y < 0) {
+                        nowState = (cubes[z * size * size + (y + 1) * size + x] == 1);
+                    } else {
                         nowState = (cubes[z * size * size + y * size + x] == 1);
                     }
                 }
@@ -268,25 +280,37 @@ void WorldGeneration::combineVerticesByAxis() {
                 } else {
                     if (nowState) {
                         //firstcoord = cubes[z * size * size + y * size + x]->getLeftTopBack();
-                        firstcoord = vec3(x-blockSize/2.0f, y+blockSize/2.0f, z-blockSize/2.0f);
+                        firstcoord = vec3(x - blockSize / 2.0f, y + blockSize / 2.0f, z - blockSize / 2.0f);
                         meshWidth = 1;
-                    }
-                    else{
-                        quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 1, 0));
+                    } else {
+
+                        pair<vec3, vec2> quad = make_pair(firstcoord, vec2(meshWidth, height));
+                        quadsToRender.push_back(quad);
+
+                        /*quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 1, 0));
                         quad->transform->setPosition(firstcoord);
-                        quads.push_back(quad);
+                        quads.push_back(quad);*/
                     }
                     previousState = nowState;
 
                 }
             }
-            if(previousState){
-                quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 1, 0));
+            if (previousState) {
+
+                pair<vec3, vec2> quadPair = make_pair(firstcoord, vec2(meshWidth, height));
+                quadsToRender.push_back(quadPair);
+
+
+
+                /*quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 1, 0));
                 quad->transform->setPosition(firstcoord);
-                quads.push_back(quad);
+                quads.push_back(quad);*/
             }
         }
     }
+    VectorQuadObject1D sortedQuads = sortQuadsWithSameSize();
+
+    quads.insert(quads.end(), sortedQuads.begin(), sortedQuads.end());
 
 //    beginQuad = false;
 //    isPreviousBlockEmpty = true;
@@ -379,6 +403,63 @@ void WorldGeneration::combineVerticesByAxis() {
 //        }
 //    }
 }
+
+
+VectorQuadObject1D WorldGeneration::sortQuadsWithSameSize() {
+
+    VectorQuadObject1D quadsSorted;
+
+//    vector<pair<vec3, vec2>> drawnQuads;
+
+    for (int i = 0; i < quadsToRender.size(); ++i) {
+        pair<vec3, vec2> quadToMerge = quadsToRender[i];
+//
+//        bool hasBeenDrawn = false;
+//        for (int i = 0; i < drawnQuads.size(); i++) {
+//            if (drawnQuads[i] == quadToMerge) {
+//                hasBeenDrawn = true;
+//            }
+//        }
+
+//        if (!hasBeenDrawn) {
+        bool doNext;
+        do {
+            doNext = false;
+            vec3 coord = vec3(quadToMerge.first.x + quadToMerge.second.y, quadToMerge.first.y, quadToMerge.first.z);
+//            drawnQuads.push_back(quadToMerge);
+
+            for (int j = 0; j < quadsToRender.size(); ++j) {
+
+                if (quadsToRender[j].first == coord) {
+
+                    if (quadsToRender[j].second.x == quadToMerge.second.x) {
+                        quadToMerge.second.y++;
+
+                        quadsToRender.erase(quadsToRender.cbegin() + j); // doesn't work ?
+                        doNext = true;
+//                        drawnQuads.push_back(quadsToRender[j]);
+                        break;
+
+                    }
+
+                }
+
+            }
+
+        }while(doNext);
+
+            shared_ptr<Quad> quad = make_shared<Quad>(app, quadToMerge.second.y, quadToMerge.second.x, vec3(0, 1, 0));
+            quad->transform->setPosition(quadToMerge.first);
+
+            quadsSorted.push_back(quad);
+
+//        }
+
+    }
+
+    return quadsSorted;
+}
+
 
 VectorQuadObject1D WorldGeneration::getQuads() {
 

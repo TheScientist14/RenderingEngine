@@ -31,12 +31,15 @@ public:
     float blockScaleFactor;
     VectorCubeObject1D cubes;
     VectorQuadObject1D quads;
+    vector<pair<vec3, vec2>> quadsToRender;
 
     void generateWorld(App* prmApp);
     void generateNoise();
     void combineVerticesByAxis();
     VectorCubeObject1D getCubes();
     VectorQuadObject1D getQuads();
+
+    VectorQuadObject1D sortQuadsWithSameSize();
 
 };
 

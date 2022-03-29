@@ -69,7 +69,7 @@ mat4 Camera::getProjectionViewMatrix() {
 void Camera::update(int deltaTime) {
     EngineObject::update(deltaTime);
 
-    glClearColor(0, 0, 0.4, 0);
+    glClearColor(0.5, 0.5, 0.5, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     GLuint VID = glGetUniformLocation(app->getShaderID(), "V");
