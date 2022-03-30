@@ -33,7 +33,6 @@
 #include "EngineObjects/Skybox.h"
 
 App::~App() {
-
 }
 
 void App::gl_init() {
@@ -153,11 +152,11 @@ void App::gl_init() {
 //        objectsToRender.push_back(grass);
 //    }
     shared_ptr<ChunkGeneration> Chunk;
-    for (int x = 0; x < 3; x++) {
-        for (int z = 0; z < 3; z++){
+    for (int x = 0; x < 4; x++) {
+        for (int z = 0; z < 4; z++){
             Chunk = make_shared<ChunkGeneration>(this, 2, 0.5, x, z);
 
-            Chunk->generateWorld(this);
+            Chunk->generateWorld();
             Map.push_back(Chunk);
 
         }
@@ -251,15 +250,30 @@ void App::handle_events() {
             case SDL_MOUSEBUTTONDOWN:
                 if (!io.WantCaptureMouse) {
                     if (isMouseCaptured) {
+                        vec3 blockHitPos = raycastFromCamera();
+                        vec3 blockChunkCoords = Map[0]->worldToChunkCoords(blockHitPos);
                         switch (curEvent.button.button) {
                             case SDL_BUTTON_LEFT:
-                                vec3 blockHitPos = raycastFromCamera();
-                                vec3 blockChunkCoords = ChunkGeneration::worldToChunkCoords(blockHitPos, vec3(0, 0, 0), 2);
-                                if(blockChunkCoords != vec3(-1)){
-                                    
+                                if (blockChunkCoords != vec3(-1)) {
+                                    /*printf("deleted %d %d %d\n", (int) blockChunkCoords.x, (int) blockChunkCoords.y,
+                                           (int) blockChunkCoords.z);*/
+                                    Map[0]->setCube(0, blockChunkCoords.x, blockChunkCoords.y, blockChunkCoords.z);
+                                    if(isOpti){
+                                        objects.insert(objects.end(), generatedQuads.begin(), generatedQuads.end());
+                                        objectsToRender.insert(objectsToRender.end(), generatedQuads.begin(), generatedQuads.end());
+                                    }
                                 }
                                 break;
                             case SDL_BUTTON_RIGHT:
+                                if (blockChunkCoords != vec3(-1)) {
+                                    /*printf("placed %d %d %d\n", (int) blockChunkCoords.x, (int) blockChunkCoords.y,
+                                           (int) blockChunkCoords.z);*/
+                                    Map[0]->setCube(1, blockChunkCoords.x, blockChunkCoords.y, blockChunkCoords.z);
+                                    if(isOpti){
+                                        objects.insert(objects.end(), generatedQuads.begin(), generatedQuads.end());
+                                        objectsToRender.insert(objectsToRender.end(), generatedQuads.begin(), generatedQuads.end());
+                                    }
+                                }
                                 break;
                         }
                     } else {
@@ -272,11 +286,10 @@ void App::handle_events() {
                 break;
             case SDL_MOUSEMOTION:
                 if (!io.WantCaptureMouse) {
-                    float epsilon = 0.01f;
                     if (isMouseCaptured) {
                         vec3 eulerAngles = mainCamera->transform->getEulerAngles();
 
-                        if (abs(eulerAngles.z) < epsilon) {
+                        if (abs(eulerAngles.z) < 90) {
                             eulerAngles.x -= curEvent.motion.yrel * mouseSensitivity * deltaTime;
                             eulerAngles.y -= curEvent.motion.xrel * mouseSensitivity * deltaTime;
                             if (eulerAngles.y < -90) {
@@ -552,29 +565,31 @@ void App::drawImGUI() {
         ImGui::SameLine();
         ImGui::ColorEdit3("##11", &directionalLightColor[0]);
 
-		ImGui::Text("Opti : ");
-		ImGui::SameLine();
-		if(ImGui::Button("Opti")){
-			isOpti = true;
-			updateObjects();
-		}
-		ImGui::SameLine();
-		if(ImGui::Button("Brutus")){
-			isOpti = false;
-			updateObjects();
-		}
+        ImGui::Text("Opti : ");
+        ImGui::SameLine();
+        if (ImGui::Button("Opti")) {
+            isOpti = true;
+            updateObjects();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Brutus")) {
+            isOpti = false;
+            updateObjects();
+        }
 
         ImGui::End();
     };
     {
-        ImGui::Begin("Camera");
+        ImGui::Begin("Info");
 
         vec3 cameraEulerAngles = mainCamera->transform->getEulerAngles();
         ImGui::Text("Camera euler angles : %f %f %f", cameraEulerAngles.x, cameraEulerAngles.y, cameraEulerAngles.z);
+        vec3 cameraChunkPos = Map[0]->worldToChunkCoords(mainCamera->transform->getPosition());
+        ImGui::Text("Camera chunk position : %f %f %f", cameraChunkPos.x, cameraChunkPos.y, cameraChunkPos.z);
 
         ImGui::End();
     }
-	
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
@@ -586,7 +601,6 @@ vec3 App::raycastFromCamera() {
 void App::updateObjects() {
     objects.clear();
     objectsToRender.clear();
-
     for (int i = 0; i < Map.size(); ++i) {
         generatedQuads = Map[i]->getQuads();
         generatedCubes = Map[i]->getCubes();

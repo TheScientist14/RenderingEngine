@@ -33,19 +33,28 @@ public:
     float blockScaleFactor;
     VectorIntObject1D cubesInt;
     VectorCubeObject1D cubes;
+    VectorCubeObject1D cubesSemiOpti;
     VectorQuadObject1D quads;
     vector<pair<vec3, vec2>> quadsToRender;
 
-    void generateWorld(App* prmApp);
+    void generateWorld();
+    void generateCubes();
+    void generateCubesSemiOpti();
     void generateNoise();
     void combineVerticesByAxis();
     VectorIntObject1D getCubesInt();
     VectorCubeObject1D getCubes();
+    VectorCubeObject1D getCubesSemiOpti();
     VectorQuadObject1D getQuads();
+
+    void setCube(int cubeId, int x, int y, int z);
 
     VectorQuadObject1D sortQuadsWithSameSize(vec3 prmDirection);
 
-    static vec3 worldToChunkCoords(vec3 worldCoord, vec3 chunkCoord, float blockSize);
+    vec3 worldToChunkCoords(vec3 worldCoord);
+    int getBlockIndex(int x, int y, int z);
+
+    bool shouldFilledCubeBeDrawnSemiOpti(int x, int y, int z);
 
 };
 
