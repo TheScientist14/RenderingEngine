@@ -11,17 +11,17 @@
 #include "../ScriptablePipeline/EngineObjects/Camera.h"
 #include "glm/ext.hpp"
 
-Cube::Cube(App* prmApp, int prmGeometrieIndex, int prmTextureInt, bool prmVisibility, int prmSize) : GameObject(prmApp) {
+Cube::Cube(App* prmApp, int prmGeometrieIndex, int prmTextureInt, bool prmVisibility, float prmSize) : GameObject(prmApp) {
     this->texturePtr = prmApp->getTexture(prmTextureInt);
     this->geometryPtr = prmApp->getGeometry(prmGeometrieIndex);
     this->visible = prmVisibility;
-    size = prmSize;
+    transform->setScale(prmSize);
     texturePtr->bind();
     geometryPtr->bind();
 }
 
 vec3 Cube::getLeftTopBack() {
-    return vec3(transform->getPosition().x-size/2, transform->getPosition().y+size/2, transform->getPosition().z-size/2);
+    return vec3(transform->getPosition().x-transform->getScale()/2, transform->getPosition().y+transform->getScale()/2, transform->getPosition().z-transform->getScale()/2);
 }
 
 void Cube::fastRender() const {

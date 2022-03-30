@@ -25,6 +25,7 @@ class Quad;
 class Cube;
 class GameObject;
 class Skybox;
+class WorldGeneration;
 
 typedef shared_ptr<Geometry> Sp_Geometry;
 typedef shared_ptr<Texture> Sp_Texture;
@@ -69,6 +70,7 @@ protected:
     vector<shared_ptr<RenderedObject>> objectsToRender;
     shared_ptr<Camera> mainCamera;
     bool isMouseCaptured = true;
+    WorldGeneration* world;
     vector<shared_ptr<Quad>> generatedQuads;
     vector<shared_ptr<Cube>> generatedCubes;
     bool isDragging;
