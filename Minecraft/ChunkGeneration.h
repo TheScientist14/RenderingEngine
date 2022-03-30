@@ -20,13 +20,13 @@ typedef vector<int> VectorIntObject1D;
 typedef vector<shared_ptr<Cube>> VectorCubeObject1D;
 typedef vector<shared_ptr<Quad>> VectorQuadObject1D;
 
-class WorldGeneration {
+class ChunkGeneration {
 
 public:
 
-    WorldGeneration(App *prmApp, int prmBockSize, float prmBlockScaleFactor);
+    ChunkGeneration(App *prmApp, int prmBockSize, float prmBlockScaleFactor);
 
-    const static int size = 64;
+    const static int size = 16;
     App *app;
     vec3 chunkCoord;
     int blockSize;

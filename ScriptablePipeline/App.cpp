@@ -21,7 +21,7 @@
 #include "../helper/stb_image.h"
 #include "../helper/find_exe_path.h"
 #include "../Shaders/loadShader.h"
-#include "../../Minecraft/WorldGeneration.h"
+#include "../../Minecraft/ChunkGeneration.h"
 
 #include "EngineObjects/Transform.h"
 #include "EngineObjects/Geometry.h"
@@ -153,7 +153,7 @@ void App::gl_init() {
 //        objectsToRender.push_back(grass);
 //    }
 
-    WorldGeneration *World = new WorldGeneration(this, 2, 0.5);
+    ChunkGeneration *World = new ChunkGeneration(this, 2, 0.5);
 
     World->generateWorld(this);
 
@@ -254,7 +254,7 @@ void App::handle_events() {
                         switch (curEvent.button.button) {
                             case SDL_BUTTON_LEFT:
                                 vec3 blockHitPos = raycastFromCamera();
-                                vec3 blockChunkCoords = WorldGeneration::worldToChunkCoords(blockHitPos, vec3(0,0,0), 2);
+                                vec3 blockChunkCoords = ChunkGeneration::worldToChunkCoords(blockHitPos, vec3(0, 0, 0), 2);
                                 if(blockChunkCoords != vec3(-1)){
                                     
                                 }

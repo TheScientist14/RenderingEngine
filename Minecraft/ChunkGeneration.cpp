@@ -5,7 +5,7 @@
 #include <vector>
 #include <set>
 #include <string>
-#include "WorldGeneration.h"
+#include "ChunkGeneration.h"
 #include "../helper/FastNoiseLite.h"
 #include "../helper/find_exe_path.h"
 #include "../ScriptablePipeline/EngineObjects/EngineObject.h"
@@ -16,7 +16,7 @@
 #include "Cube.h"
 
 
-WorldGeneration::WorldGeneration(App *prmApp, int prmBockSize, float prmBlockScaleFactor) {
+ChunkGeneration::ChunkGeneration(App *prmApp, int prmBockSize, float prmBlockScaleFactor) {
 
     this->app = prmApp;
     blockSize = prmBockSize;
@@ -24,7 +24,7 @@ WorldGeneration::WorldGeneration(App *prmApp, int prmBockSize, float prmBlockSca
     chunkCoord = vec3(0,0,0);
 }
 
-void WorldGeneration::generateWorld(App *prmApp) {
+void ChunkGeneration::generateWorld(App *prmApp) {
 
     for (int x = 0; x < size; ++x) {
         for (int y = 0; y < size; ++y) {
@@ -51,7 +51,7 @@ void WorldGeneration::generateWorld(App *prmApp) {
     combineVerticesByAxis();
 }
 
-void WorldGeneration::generateNoise() {
+void ChunkGeneration::generateNoise() {
 // Create and configure FastNoise object
     FastNoiseLite noise;
     noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
@@ -80,7 +80,7 @@ void WorldGeneration::generateNoise() {
 }
 
 
-void WorldGeneration::combineVerticesByAxis() {
+void ChunkGeneration::combineVerticesByAxis() {
     //x = Top Down
     //y = Left Right
     //z = Front Back
@@ -407,7 +407,7 @@ void WorldGeneration::combineVerticesByAxis() {
 }
 
 
-VectorQuadObject1D WorldGeneration::sortQuadsWithSameSize(vec3 prmDirection) {
+VectorQuadObject1D ChunkGeneration::sortQuadsWithSameSize(vec3 prmDirection) {
 
     VectorQuadObject1D quadsMerged;
     int x = prmDirection.x;
@@ -486,12 +486,12 @@ VectorQuadObject1D WorldGeneration::sortQuadsWithSameSize(vec3 prmDirection) {
 }
 
 
-VectorQuadObject1D WorldGeneration::getQuads() {
+VectorQuadObject1D ChunkGeneration::getQuads() {
 
     return quads;
 }
 
-vec3 WorldGeneration::worldToChunkCoords(vec3 worldCoord, vec3 chunkCoord, float blockSize) {
+vec3 ChunkGeneration::worldToChunkCoords(vec3 worldCoord, vec3 chunkCoord, float blockSize) {
     vec3 chunkCoords = vec3(worldCoord.x / blockSize - 0.5f - (chunkCoord.x - 0.5f) * size,
                             worldCoord.y / blockSize - 0.5f - chunkCoord.y,
                             worldCoord.z);
@@ -504,10 +504,10 @@ vec3 WorldGeneration::worldToChunkCoords(vec3 worldCoord, vec3 chunkCoord, float
     }
 }
 
-VectorCubeObject1D WorldGeneration::getCubes() {
+VectorCubeObject1D ChunkGeneration::getCubes() {
     return cubes;
 }
 
-VectorIntObject1D WorldGeneration::getCubesInt() {
+VectorIntObject1D ChunkGeneration::getCubesInt() {
     return cubesInt;
 }
