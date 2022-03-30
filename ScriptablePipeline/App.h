@@ -74,9 +74,11 @@ protected:
     vector<shared_ptr<Cube>> generatedCubes;
     vector<shared_ptr<ChunkGeneration>> Map;
     bool isDragging;
+    int nbChunk = 16;
 
     void drawImGUI();
     vec3 raycastFromCamera();
+    void loadChunk();
 
     float mouseSensitivity = 0.08f;
     float cameraSpeed = 0.01f;

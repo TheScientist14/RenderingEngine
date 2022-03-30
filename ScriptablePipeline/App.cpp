@@ -151,23 +151,15 @@ void App::gl_init() {
 //        objects.push_back(grass);
 //        objectsToRender.push_back(grass);
 //    }
-    shared_ptr<ChunkGeneration> Chunk;
-    for (int x = 0; x < 4; x++) {
-        for (int z = 0; z < 4; z++){
-            Chunk = make_shared<ChunkGeneration>(this, 2, 0.5, x, z);
 
-            Chunk->generateWorld();
-            Map.push_back(Chunk);
-
-        }
-    }
     //aiReleaseImport(loader->getAiScene());
 
     //Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
     //                                             nullptr, 0);
     //geometries.push_back(cubeMesh);
 
-    updateObjects();
+    loadChunk();
+
     aiReleaseImport(loader->getAiScene());
 
 //    Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
@@ -565,6 +557,12 @@ void App::drawImGUI() {
         ImGui::SameLine();
         ImGui::ColorEdit3("##11", &directionalLightColor[0]);
 
+        ImGui::InputInt("Nb chunk : ", &nbChunk);
+        ImGui::SameLine();
+        if (ImGui::Button("Reload")) {
+            loadChunk();
+        }
+
         ImGui::Text("Opti : ");
         ImGui::SameLine();
         if (ImGui::Button("Opti")) {
@@ -612,4 +610,18 @@ void App::updateObjects() {
             objectsToRender.insert(objectsToRender.end(), generatedCubes.begin(), generatedCubes.end());
         }
     }
+}
+
+void App::loadChunk() {
+    shared_ptr<ChunkGeneration> Chunk;
+    for (int x = 0; x < trunc(sqrt(nbChunk)); x++) {
+        for (int z = 0; z < trunc(sqrt(nbChunk)); z++){
+            Chunk = make_shared<ChunkGeneration>(this, 2, 0.5, x, z);
+
+            Chunk->generateWorld();
+            Map.push_back(Chunk);
+        }
+    }
+
+    updateObjects();
 }
