@@ -5,7 +5,7 @@
 #include <vector>
 #include <set>
 #include <string>
-#include "WorldGeneration.h"
+#include "ChunkGeneration.h"
 #include "../helper/FastNoiseLite.h"
 #include "../helper/find_exe_path.h"
 #include "../ScriptablePipeline/EngineObjects/EngineObject.h"
@@ -16,7 +16,7 @@
 #include "Cube.h"
 
 
-WorldGeneration::WorldGeneration(App *prmApp, int prmBockSize, float prmBlockScaleFactor) {
+ChunkGeneration::ChunkGeneration(App *prmApp, int prmBockSize, float prmBlockScaleFactor) {
 
     this->app = prmApp;
     blockSize = prmBockSize;
@@ -24,7 +24,7 @@ WorldGeneration::WorldGeneration(App *prmApp, int prmBockSize, float prmBlockSca
     chunkCoord = vec3(0, 0, 0);
 }
 
-void WorldGeneration::generateWorld() {
+void ChunkGeneration::generateWorld() {
 
     for (int x = 0; x < size; ++x) {
         for (int y = 0; y < size; ++y) {
@@ -39,7 +39,7 @@ void WorldGeneration::generateWorld() {
     combineVerticesByAxis();
 }
 
-void WorldGeneration::generateCubes() {
+void ChunkGeneration::generateCubes() {
     cubes.clear();
     for (int i = 0; i < size * size * size; i++) {
         shared_ptr<Cube> cube = make_shared<Cube>(app, 0, 0, (cubesInt[i] != 0), blockScaleFactor);
@@ -53,7 +53,7 @@ void WorldGeneration::generateCubes() {
     }
 }
 
-void WorldGeneration::generateCubesSemiOpti() {
+void ChunkGeneration::generateCubesSemiOpti() {
     cubesSemiOpti.clear();
     for (int i = 0; i < size * size * size; i++) {
         int x = i % size;
@@ -69,7 +69,7 @@ void WorldGeneration::generateCubesSemiOpti() {
     }
 }
 
-void WorldGeneration::generateNoise() {
+void ChunkGeneration::generateNoise() {
 // Create and configure FastNoise object
     FastNoiseLite noise;
     noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
@@ -96,7 +96,7 @@ void WorldGeneration::generateNoise() {
 }
 
 
-void WorldGeneration::combineVerticesByAxis() {
+void ChunkGeneration::combineVerticesByAxis() {
     //x = Top Down
     //y = Left Right
     //z = Front Back
@@ -111,8 +111,10 @@ void WorldGeneration::combineVerticesByAxis() {
     int height = 1;
     int meshWidth = 1;
 
+
+
     //Z Walls
-    /*for (int y = 0; y < size; y++) {
+    for (int y = 0; y < size; y++) {
         for (int z = 0; z < size+1; z++) {
             previousState = false;
             for (int x = 0; x < size; x++) {
@@ -183,7 +185,8 @@ void WorldGeneration::combineVerticesByAxis() {
                         beginQuad = true;
                         isPreviousBlockEmpty = false;
                     }
-                }*//*
+                }*/
+
             }
             if(previousState){
                 pair<vec3, vec2> quad = make_pair(firstcoord, vec2(meshWidth, height));
@@ -194,14 +197,17 @@ void WorldGeneration::combineVerticesByAxis() {
 //                quads.push_back(quad);
             }
         }
-    }*/
+    }
+
+    VectorQuadObject1D mergedQuadsZ = sortQuadsWithSameSize(vec3(0,0,1));
+
+    quads.insert(quads.end(), mergedQuadsZ.begin(), mergedQuadsZ.end());
+    quadsToRender.clear();
 
 
-
-
-    /*//X Walls
+    //X Walls
     for (int y = 0; y < size; y++) {
-        for (int x = 0; x < size + 1; x++) {
+        for (int x = 0; x < size+1; x++) {
             previousState = false;
             for (int z = 0; z < size; z++) {
 
@@ -232,21 +238,34 @@ void WorldGeneration::combineVerticesByAxis() {
                         firstcoord = vec3(x-blockSize * blockScaleFactor/2.0f, y+blockSize * blockScaleFactor/2.0f, z-blockSize * blockScaleFactor/2.0f);
                         meshWidth = 1;
                     } else {
-                        quad = make_shared<Quad>(app, 1, meshWidth, vec3(1, 0, 0));
+
+                        pair<vec3, vec2> quadPairX = make_pair(firstcoord, vec2(meshWidth, height));
+                        quadsToRender.push_back(quadPairX);
+
+                        /*quad = make_shared<Quad>(app, 1, meshWidth, vec3(1, 0, 0));
                         quad->transform->setPosition(firstcoord);
-                        quads.push_back(quad);
+                        quads.push_back(quad);*/
                     }
                     previousState = nowState;
 
                 }
             }
             if (previousState) {
-                quad = make_shared<Quad>(app, 1, meshWidth, vec3(1, 0, 0));
+
+                pair<vec3, vec2> quadPairX = make_pair(firstcoord, vec2(meshWidth, height));
+                quadsToRender.push_back(quadPairX);
+
+                /*quad = make_shared<Quad>(app, 1, meshWidth, vec3(1, 0, 0));
                 quad->transform->setPosition(firstcoord);
-                quads.push_back(quad);
+                quads.push_back(quad);*/
             }
         }
-    }*/
+    }
+
+    VectorQuadObject1D mergedQuadsX = sortQuadsWithSameSize(vec3(1,0,0));
+
+    quads.insert(quads.end(), mergedQuadsX.begin(), mergedQuadsX.end());
+    quadsToRender.clear();
 
     //Y Walls
     for (int x = 0; x < size; x++) {
@@ -285,12 +304,12 @@ void WorldGeneration::combineVerticesByAxis() {
                         meshWidth = 1;
                     } else {
 
-                        pair<vec3, vec2> quad = make_pair(firstcoord, vec2(meshWidth, height));
-                        quadsToRender.push_back(quad);
+                        pair<vec3, vec2> quadPairY = make_pair(firstcoord, vec2(meshWidth, height));
+                        quadsToRender.push_back(quadPairY);
 
-                        /*quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 1, 0));
-                        quad->transform->setPosition(firstcoord);
-                        quads.push_back(quad);*/
+//                        quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 1, 0));
+//                        quad->transform->setPosition(firstcoord);
+//                        quads.push_back(quad);
                     }
                     previousState = nowState;
 
@@ -298,22 +317,22 @@ void WorldGeneration::combineVerticesByAxis() {
             }
             if (previousState) {
 
-                pair<vec3, vec2> quadPair = make_pair(firstcoord, vec2(meshWidth, height));
-                quadsToRender.push_back(quadPair);
+                pair<vec3, vec2> quadPairY = make_pair(firstcoord, vec2(meshWidth, height));
+                quadsToRender.push_back(quadPairY);
 
 
 
-                /*quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 1, 0));
-                quad->transform->setPosition(firstcoord);
-                quads.push_back(quad);*/
+//                quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 1, 0));
+//                quad->transform->setPosition(firstcoord);
+//                quads.push_back(quad);
             }
         }
     }
-    VectorQuadObject1D sortedQuads = sortQuadsWithSameSize();
+    VectorQuadObject1D mergedQuadsY = sortQuadsWithSameSize(vec3(0,1,0));
 
-    quads.insert(quads.end(), sortedQuads.begin(), sortedQuads.end());
+    quads.insert(quads.end(), mergedQuadsY.begin(), mergedQuadsY.end());
 
-//    beginQuad = false;
+/*//    beginQuad = false;
 //    isPreviousBlockEmpty = true;
 //    //all z
 //    for (int y = 0; y < size; ++y) {
@@ -402,13 +421,15 @@ void WorldGeneration::combineVerticesByAxis() {
 //
 //            }
 //        }
-//    }
+//    }*/
 }
 
 
-VectorQuadObject1D WorldGeneration::sortQuadsWithSameSize() {
+VectorQuadObject1D ChunkGeneration::sortQuadsWithSameSize(vec3 prmDirection) {
 
-    VectorQuadObject1D quadsSorted;
+    VectorQuadObject1D quadsMerged;
+    int x = prmDirection.x;
+    int y = prmDirection.y;
 
 //    vector<pair<vec3, vec2>> drawnQuads;
 
@@ -426,22 +447,35 @@ VectorQuadObject1D WorldGeneration::sortQuadsWithSameSize() {
         bool doNext;
         do {
             doNext = false;
-            vec3 coord = vec3(quadToMerge.first.x + quadToMerge.second.y, quadToMerge.first.y, quadToMerge.first.z);
+
+
+            vec3 coord;
+
+            if (x != 0) {
+                coord = vec3(quadToMerge.first.x , quadToMerge.first.y + quadToMerge.second.y, quadToMerge.first.z);
+            } else if (y != 0) {
+                coord = vec3(quadToMerge.first.x + quadToMerge.second.y, quadToMerge.first.y, quadToMerge.first.z);
+            } else {
+                coord = vec3(quadToMerge.first.x , quadToMerge.first.y + quadToMerge.second.y, quadToMerge.first.z);
+            }
+
+
 //            drawnQuads.push_back(quadToMerge);
 
             for (int j = 0; j < quadsToRender.size(); ++j) {
 
                 if (quadsToRender[j].first == coord) {
 
-                    if (quadsToRender[j].second.x == quadToMerge.second.x) {
-                        quadToMerge.second.y++;
+                        if (quadsToRender[j].second.x == quadToMerge.second.x) {
+                            quadToMerge.second.y++;
 
-                        quadsToRender.erase(quadsToRender.cbegin() + j); // doesn't work ?
-                        doNext = true;
+                            quadsToRender.erase(quadsToRender.cbegin() + j); // doesn't work ?
+                            doNext = true;
 //                        drawnQuads.push_back(quadsToRender[j]);
-                        break;
+                            break;
 
-                    }
+                        }
+
 
                 }
 
@@ -449,25 +483,33 @@ VectorQuadObject1D WorldGeneration::sortQuadsWithSameSize() {
 
         } while (doNext);
 
-        shared_ptr<Quad> quad = make_shared<Quad>(app, quadToMerge.second.y, quadToMerge.second.x, vec3(0, 1, 0));
-        quad->transform->setPosition(quadToMerge.first);
+            shared_ptr<Quad> quad = make_shared<Quad>(app, quadToMerge.second.y, quadToMerge.second.x, prmDirection);
+            if (x != 0) {
+                //quad->transform->setPosition(quadToMerge.first);
+                quad->transform->setPosition(vec3(quadToMerge.first.x,quadToMerge.first.y + quadToMerge.second.y -1 ,quadToMerge.first.z));
+            } else if (y != 0) {
+                quad->transform->setPosition(quadToMerge.first);
+            } else {
+                quad->transform->setPosition(vec3(quadToMerge.first.x,quadToMerge.first.y + quadToMerge.second.y -1 ,quadToMerge.first.z));
+            }
+            //quad->transform->setPosition(quadToMerge.first);
 
-        quadsSorted.push_back(quad);
+            quadsMerged.push_back(quad);
 
 //        }
 
     }
 
-    return quadsSorted;
+    return quadsMerged;
 }
 
 
-VectorQuadObject1D WorldGeneration::getQuads() {
+VectorQuadObject1D ChunkGeneration::getQuads() {
 
     return quads;
 }
 
-void WorldGeneration::setCube(int cubeId, int x, int y, int z) {
+void ChunkGeneration::setCube(int cubeId, int x, int y, int z) {
     if ((cubeId == 0) != (cubesInt[getBlockIndex(x, y, z)] == 0)) {
         if (cubeId == 0) {
             cubesInt[getBlockIndex(x, y, z)] = 0;
@@ -527,11 +569,11 @@ void WorldGeneration::setCube(int cubeId, int x, int y, int z) {
     }
 }
 
-int WorldGeneration::getBlockIndex(int x, int y, int z) {
+int ChunkGeneration::getBlockIndex(int x, int y, int z) {
     return z * size * size + y * size + x;
 }
 
-vec3 WorldGeneration::worldToChunkCoords(vec3 worldCoord) {
+vec3 ChunkGeneration::worldToChunkCoords(vec3 worldCoord) {
     vec3 chunkCoords = vec3(worldCoord.x / (blockSize * blockScaleFactor) -
                             (chunkCoord.x - 0.5f) * (blockSize * blockScaleFactor),
                             worldCoord.y / (blockSize * blockScaleFactor) + 0.5f - chunkCoord.y,
@@ -539,26 +581,27 @@ vec3 WorldGeneration::worldToChunkCoords(vec3 worldCoord) {
     if (chunkCoords.x >= 0 && chunkCoords.x < size
         && chunkCoords.y >= 0 && chunkCoords.y < size
         && chunkCoords.z >= 0 && chunkCoords.z < size) {
+
         return chunkCoords;
     } else {
         return vec3(-1);
     }
 }
 
-VectorCubeObject1D WorldGeneration::getCubes() {
+VectorCubeObject1D ChunkGeneration::getCubes() {
     return cubes;
 }
 
-VectorCubeObject1D WorldGeneration::getCubesSemiOpti() {
+VectorCubeObject1D ChunkGeneration::getCubesSemiOpti() {
     return cubesSemiOpti;
 }
 
-VectorIntObject1D WorldGeneration::getCubesInt() {
+VectorIntObject1D ChunkGeneration::getCubesInt() {
     return cubesInt;
 }
 
 // should be drawn if next to an empty block or on the border of the chunk
-bool WorldGeneration::shouldFilledCubeBeDrawnSemiOpti(int x, int y, int z) {
+bool ChunkGeneration::shouldFilledCubeBeDrawnSemiOpti(int x, int y, int z) {
     return (x == 0 || x == size - 1 || y == 0 || y == size - 1 || z == 0 || z == size - 1 ||
             cubesInt[getBlockIndex(x - 1, y, z)] == 0 || cubesInt[getBlockIndex(x + 1, y, z)] == 0 ||
             cubesInt[getBlockIndex(x, y - 1, z)] == 0 || cubesInt[getBlockIndex(x, y + 1, z)] == 0 ||

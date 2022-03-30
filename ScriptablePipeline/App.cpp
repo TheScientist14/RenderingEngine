@@ -21,7 +21,7 @@
 #include "../helper/stb_image.h"
 #include "../helper/find_exe_path.h"
 #include "../Shaders/loadShader.h"
-#include "../../Minecraft/WorldGeneration.h"
+#include "../../Minecraft/ChunkGeneration.h"
 
 #include "EngineObjects/Transform.h"
 #include "EngineObjects/Geometry.h"
@@ -153,7 +153,7 @@ void App::gl_init() {
 //        objectsToRender.push_back(grass);
 //    }
 
-    world = new WorldGeneration(this, 2, 0.5);
+    world = new ChunkGeneration(this, 2, 0.5);
 
     world->generateWorld();
 

@@ -41,8 +41,8 @@ add_executable(moteur
 		ScriptablePipeline/EngineObjects/GameObject.h
 		helper/ModelLoader.cpp
 		helper/ModelLoader.h
-		Minecraft/WorldGeneration.cpp
-		Minecraft/WorldGeneration.h
+        Minecraft/ChunkGeneration.cpp
+        Minecraft/ChunkGeneration.h
 		helper/FastNoiseLite.h
 		ScriptablePipeline/EngineObjects/RenderingContext.cpp
 		ScriptablePipeline/EngineObjects/RenderingContext.h
