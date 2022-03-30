@@ -26,7 +26,7 @@ public:
 
     WorldGeneration(App *prmApp, int prmBockSize, float prmBlockScaleFactor);
 
-    const static int size = 16;
+    const static int size = 64;
     App *app;
     vec3 chunkCoord;
     int blockSize;
@@ -43,7 +43,7 @@ public:
     VectorCubeObject1D getCubes();
     VectorQuadObject1D getQuads();
 
-    VectorQuadObject1D sortQuadsWithSameSize();
+    VectorQuadObject1D sortQuadsWithSameSize(vec3 prmDirection);
 
     static vec3 worldToChunkCoords(vec3 worldCoord, vec3 chunkCoord, float blockSize);
 
