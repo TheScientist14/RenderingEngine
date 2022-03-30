@@ -25,6 +25,7 @@ class Quad;
 class Cube;
 class GameObject;
 class Skybox;
+class ChunkGeneration;
 
 typedef shared_ptr<Geometry> Sp_Geometry;
 typedef shared_ptr<Texture> Sp_Texture;
@@ -71,6 +72,7 @@ protected:
     bool isMouseCaptured = true;
     vector<shared_ptr<Quad>> generatedQuads;
     vector<shared_ptr<Cube>> generatedCubes;
+    vector<shared_ptr<ChunkGeneration>> Map;
     bool isDragging;
 
     void drawImGUI();
@@ -110,7 +112,7 @@ protected:
     float directionalLightPower = 1;
     vec3 directionalLightColor = vec3(0.953125f, 0.91015625f, 0.60546875f);
     vec3 directionalLightDirection = vec3(0, -1, 0.1f);
-    bool isOpti;
+    bool isOpti = false;
 };
 
 

@@ -20,11 +20,11 @@ typedef vector<int> VectorIntObject1D;
 typedef vector<shared_ptr<Cube>> VectorCubeObject1D;
 typedef vector<shared_ptr<Quad>> VectorQuadObject1D;
 
-class ChunkGeneration {
+class ChunkGeneration : public enable_shared_from_this<ChunkGeneration>{
 
 public:
 
-    ChunkGeneration(App *prmApp, int prmBockSize, float prmBlockScaleFactor);
+    ChunkGeneration(App *prmApp, int prmBockSize, float prmBlockScaleFactor, int x, int z);
 
     const static int size = 16;
     App *app;

@@ -16,23 +16,23 @@
 #include "Cube.h"
 
 
-ChunkGeneration::ChunkGeneration(App *prmApp, int prmBockSize, float prmBlockScaleFactor) {
+ChunkGeneration::ChunkGeneration(App *prmApp, int prmBockSize, float prmBlockScaleFactor, int x, int z) {
 
     this->app = prmApp;
     blockSize = prmBockSize;
     blockScaleFactor = prmBlockScaleFactor;
-    chunkCoord = vec3(0,0,0);
+    chunkCoord = vec3(x*size,0,z*size);
 }
 
 void ChunkGeneration::generateWorld(App *prmApp) {
 
-    for (int x = 0; x < size; ++x) {
-        for (int y = 0; y < size; ++y) {
-            for (int z = 0; z < size; ++z) {
+    for (int x = chunkCoord.x; x < size + chunkCoord.x; ++x) {
+        for (int y = chunkCoord.y; y < size + chunkCoord.y; ++y) {
+            for (int z = chunkCoord.z; z < size + chunkCoord.z; ++z) {
                 bool visible = true;
 
                 // dont draw inside of cube
-                if ((x != 0 && x != size - 1) && (y != 0 && y != size - 1) && (z != 0 && z != size - 1)) {
+                if ((x != chunkCoord.x && x != size + chunkCoord.x - 1) && (y != chunkCoord.y && y != size + chunkCoord.y - 1) && (z != chunkCoord.z && z != size+ chunkCoord.z  - 1)) {
                     visible = false;
                 }
 
@@ -63,7 +63,7 @@ void ChunkGeneration::generateNoise() {
 
     for (int z = 0; z < size; z++) {
         for (int x = 0; x < size; x++) {
-            y = trunc((noise.GetNoise((float) x, (float) z) + 1) * 3);
+            y = trunc((noise.GetNoise((float) x + chunkCoord.x, (float) z + chunkCoord.z) + 1) * 3);
             cubes[z * size * size + y * size + x]->visible = true;
             y++;
             for (y; y < size; y++) {
@@ -127,7 +127,7 @@ void ChunkGeneration::combineVerticesByAxis() {
                 } else {
                     if (nowState) {
                         //firstcoord = cubesInt[z * size * size + y * size + x]->getLeftTopBack();
-                        firstcoord = vec3(x-blockSize/2.0f, y+blockSize/2.0f, z-blockSize/2.0f);
+                        firstcoord = vec3((chunkCoord.x + x) -blockSize/2.0f, y+blockSize/2.0f, (chunkCoord.z + z)-blockSize/2.0f);
                         meshWidth = 1;
                     }
                     else{
@@ -219,7 +219,7 @@ void ChunkGeneration::combineVerticesByAxis() {
                 } else {
                     if (nowState) {
                         //firstcoord = cubesInt[z * size * size + y * size + x]->getLeftTopBack();
-                        firstcoord = vec3(x-blockSize/2.0f, y+blockSize/2.0f, z-blockSize/2.0f);
+                        firstcoord = vec3((chunkCoord.x + x) -blockSize/2.0f, y+blockSize/2.0f, (chunkCoord.z + z)-blockSize/2.0f);
                         meshWidth = 1;
                     } else {
 
@@ -281,7 +281,7 @@ void ChunkGeneration::combineVerticesByAxis() {
                 } else {
                     if (nowState) {
                         //firstcoord = cubesInt[z * size * size + y * size + x]->getLeftTopBack();
-                        firstcoord = vec3(x-blockSize/2.0f, y+blockSize/2.0f, z-blockSize/2.0f);
+                        firstcoord = vec3((chunkCoord.x + x) -blockSize/2.0f, y+blockSize/2.0f, (chunkCoord.z + z)-blockSize/2.0f);
 
                         meshWidth = 1;
                     } else {

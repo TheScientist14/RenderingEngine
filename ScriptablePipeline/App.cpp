@@ -152,16 +152,16 @@ void App::gl_init() {
 //        objects.push_back(grass);
 //        objectsToRender.push_back(grass);
 //    }
+    shared_ptr<ChunkGeneration> Chunk;
+    for (int x = 0; x < 3; x++) {
+        for (int z = 0; z < 3; z++){
+            Chunk = make_shared<ChunkGeneration>(this, 2, 0.5, x, z);
 
-    ChunkGeneration *World = new ChunkGeneration(this, 2, 0.5);
+            Chunk->generateWorld(this);
+            Map.push_back(Chunk);
 
-    World->generateWorld(this);
-
-    generatedCubes = World->getCubes();
-    generatedQuads = World->getQuads();
-
-    objects.insert(objects.end(), generatedCubes.begin(), generatedCubes.end());
-    objectsToRender.insert(objectsToRender.end(), generatedCubes.begin(), generatedCubes.end());
+        }
+    }
     //aiReleaseImport(loader->getAiScene());
 
     //Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
@@ -586,11 +586,16 @@ vec3 App::raycastFromCamera() {
 void App::updateObjects() {
     objects.clear();
     objectsToRender.clear();
-    if(isOpti){
-        objects.insert(objects.end(), generatedQuads.begin(), generatedQuads.end());
-        objectsToRender.insert(objectsToRender.end(), generatedQuads.begin(), generatedQuads.end());
-    } else {
-        objects.insert(objects.end(), generatedCubes.begin(), generatedCubes.end());
-        objectsToRender.insert(objectsToRender.end(), generatedCubes.begin(), generatedCubes.end());
+
+    for (int i = 0; i < Map.size(); ++i) {
+        generatedQuads = Map[i]->getQuads();
+        generatedCubes = Map[i]->getCubes();
+        if (isOpti) {
+            objects.insert(objects.end(), generatedQuads.begin(), generatedQuads.end());
+            objectsToRender.insert(objectsToRender.end(), generatedQuads.begin(), generatedQuads.end());
+        } else {
+            objects.insert(objects.end(), generatedCubes.begin(), generatedCubes.end());
+            objectsToRender.insert(objectsToRender.end(), generatedCubes.begin(), generatedCubes.end());
+        }
     }
 }
