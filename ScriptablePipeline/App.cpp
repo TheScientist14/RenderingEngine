@@ -248,20 +248,20 @@ void App::handle_events() {
                             vec3 chunkCoords = vec3((int) hitInfo.blockHitPos.x / ChunkGeneration::size,
                                                     (int) hitInfo.blockHitPos.y / ChunkGeneration::size,
                                                     (int) hitInfo.blockHitPos.z / ChunkGeneration::size);
-                            vec3 blockChunkCoords = map[0]->worldToChunkCoords(hitInfo.blockHitPos);
+                            vec3 blockChunkCoords = map[0*trunc(sqrt(nbChunk) + 0)]->worldToChunkCoords(hitInfo.blockHitPos);
                             switch (curEvent.button.button) {
                                 case SDL_BUTTON_LEFT:
                                     if (blockChunkCoords != vec3(-1)) {
                                         /*printf("deleted %d %d %d\n", (int) blockChunkCoords.x, (int) blockChunkCoords.y,
                                                (int) blockChunkCoords.z);*/
-                                        map[0]->setCube(0, blockChunkCoords.x, blockChunkCoords.y, blockChunkCoords.z);
+                                        map[0*trunc(sqrt(nbChunk) + 0)]->setCube(0, blockChunkCoords.x, blockChunkCoords.y, blockChunkCoords.z);
                                     }
                                     break;
                                 case SDL_BUTTON_RIGHT:
                                     if (blockChunkCoords != vec3(-1)) {
                                         /*printf("placed %d %d %d\n", (int) blockChunkCoords.x, (int) blockChunkCoords.y,
                                                (int) blockChunkCoords.z);*/
-                                        map[0]->setCube(1, blockChunkCoords.x, blockChunkCoords.y, blockChunkCoords.z);
+                                        map[0*trunc(sqrt(nbChunk) + 0)]->setCube(1, blockChunkCoords.x, blockChunkCoords.y, blockChunkCoords.z);
                                     }
                                     break;
                             }
@@ -582,7 +582,7 @@ void App::drawImGUI() {
 
         vec3 cameraEulerAngles = mainCamera->transform->getEulerAngles();
         ImGui::Text("Camera euler angles : %f %f %f", cameraEulerAngles.x, cameraEulerAngles.y, cameraEulerAngles.z);
-        vec3 cameraChunkPos = map[0]->worldToChunkCoords(mainCamera->transform->getPosition());
+        vec3 cameraChunkPos = map[0*trunc(sqrt(nbChunk) + 0)]->worldToChunkCoords(mainCamera->transform->getPosition());
         ImGui::Text("Camera chunk position : %f %f %f", cameraChunkPos.x, cameraChunkPos.y, cameraChunkPos.z);
 
         ImGui::End();
