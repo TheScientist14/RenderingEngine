@@ -594,9 +594,96 @@ void App::drawImGUI() {
 
 App::HitInfo App::raycastFromCamera() {
     HitInfo hitInfo;
-    hitInfo.hasHit = true;
-    hitInfo.blockHitPos = mainCamera->transform->getPosition();
-    hitInfo.faceHit = vec3(0);
+    hitInfo.hasHit = false;
+    vec3 rayDirection = mainCamera->transform->getForward();
+    vec3 origin = mainCamera->transform->getPosition() - vec3(0.5f, 0.5f, 0.5f);
+    int xDirection = ((rayDirection.x == 0) ? 0 : -rayDirection.x / abs(rayDirection.x));
+    int yDirection = ((rayDirection.y == 0) ? 0 : -rayDirection.y / abs(rayDirection.y));
+    int zDirection = ((rayDirection.z == 0) ? 0 : -rayDirection.z / abs(rayDirection.z));
+    vec3 nextIntersectionX = (xDirection != 0) ? (origin + rayDirection *
+                                                           ((xDirection == -1) ? (1 - (origin.x - trunc(origin.x))) : (
+                                                                   origin.x - trunc(origin.x))) / rayDirection.x)
+                                               : vec3(0);
+    vec3 nextIntersectionY = (yDirection != 0) ? (origin + rayDirection *
+                                                           ((yDirection == -1) ? (1 - (origin.y - trunc(origin.y))) : (
+                                                                   origin.y - trunc(origin.y))) / rayDirection.y)
+                                               : vec3(0);
+    vec3 nextIntersectionZ = (zDirection != 0) ? (origin + rayDirection *
+                                                           ((zDirection == -1) ? (1 - (origin.z - trunc(origin.y))) : (
+                                                                   origin.z - trunc(origin.z))) / rayDirection.z)
+                                               : vec3(0);
+    vector<vec3 *> intersections;
+    if (xDirection != 0) {
+        intersections.push_back(&nextIntersectionX);
+    } else {
+        intersections.push_back(nullptr);
+    }
+    if (yDirection != 0) {
+        intersections.push_back(&nextIntersectionY);
+    } else {
+        intersections.push_back(nullptr);
+    }
+    if (zDirection != 0) {
+        intersections.push_back(&nextIntersectionZ);
+    } else {
+        intersections.push_back(nullptr);
+    }
+    vec3 *closestIntersection = nullptr;
+    float closestDistance;
+    float maxDistance = 6;
+    do {
+        closestIntersection = nullptr;
+        closestDistance = maxDistance;
+        int closestIntersectionIndex = -1;
+        for (int i = 0; i < intersections.size(); i++) {
+            vec3 *intersection = intersections[i];
+            if (intersection != nullptr) {
+                float distance = (origin - *intersection).length();
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestIntersection = intersection;
+                    closestIntersectionIndex = i;
+                }
+            }
+        }
+        if (closestIntersection == nullptr) {
+            closestDistance = -1;
+        } else {
+            if (true /*test if block*/) {
+                hitInfo.hasHit = true;
+                hitInfo.blockHitPos = *closestIntersection;
+                switch (closestIntersectionIndex) {
+                    case 0:
+                        hitInfo.faceHit = vec3(-xDirection, 0, 0);
+                        break;
+                    case 1:
+                        hitInfo.faceHit = vec3(0, -yDirection, 0);
+                        break;
+                    case 2:
+                        hitInfo.faceHit = vec3(0, 0, -zDirection);
+                        break;
+                    default:
+                        printf("shouldn't happen, the heck ?\n");
+                        break;
+                }
+            } else {
+                switch (closestIntersectionIndex) {
+                    case 0:
+                        *closestIntersection += rayDirection * (xDirection / rayDirection.x);
+                        break;
+                    case 1:
+                        *closestIntersection += rayDirection * (yDirection / rayDirection.y);
+                        break;
+                    case 2:
+                        *closestIntersection += rayDirection * (zDirection / rayDirection.z);
+                        break;
+                    default:
+                        printf("shouldn't happen, the heck ?\n");
+                        break;
+                }
+            }
+        }
+    } while (!hitInfo.hasHit && closestDistance <= maxDistance && closestDistance >= 0);
     return hitInfo;
 }
 
