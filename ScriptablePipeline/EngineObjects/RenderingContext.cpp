@@ -44,7 +44,7 @@ void RenderingContext::renderTerrain(Terrain &terrain, TerrainRenderMode renderM
             terrain[0]->getCubes().front()->getGeometryPtr()->select();
         }
     }
-    for(Terrain::const_iterator chunkIter = terrain.cbegin(); chunkIter != terrain.cend(); chunkIter++){
+    for(Terrain::const_iterator chunkIter = terrain.cbegin(); chunkIter != terrain.cend(); chunkIter++) {
         // need to declare pointers before switch otherwise, for loop crashes
         VectorQuadObject1D quads = (*chunkIter)->getQuads();
         VectorCubeObject1D cubesSemiOpti = (*chunkIter)->getCubesSemiOpti();
@@ -75,9 +75,35 @@ void RenderingContext::renderTerrain(Terrain &terrain, TerrainRenderMode renderM
                 break;
         }
     }
-    if(renderMode == SemiOpti || renderMode == Brut){
-        if(terrain.size() > 0){
-            terrain[0]->getCubes().front()->getGeometryPtr()->unselect();
-        }
+}
+
+void RenderingContext::renderChunk(shared_ptr<ChunkGeneration> chunk, TerrainRenderMode renderMode) {
+    VectorQuadObject1D quads = chunk->getQuads();
+    VectorCubeObject1D cubesSemiOpti = chunk->getCubesSemiOpti();
+    VectorCubeObject1D cubes = chunk->getCubes();
+    switch (renderMode) {
+        case Opti:
+            for(VectorQuadObject1D::const_iterator quadIter = quads.cbegin(); quadIter != quads.cend(); quadIter++){
+                if((*quadIter) != nullptr){
+                    (*quadIter)->getGeometryPtr()->select();
+                    (*quadIter)->fastRender();
+                    (*quadIter)->getGeometryPtr()->unselect();
+                }
+            }
+            break;
+        case SemiOpti:
+            for(VectorCubeObject1D::const_iterator cubeIter = cubesSemiOpti.cbegin(); cubeIter != cubesSemiOpti.cend(); cubeIter++){
+                if((*cubeIter) != nullptr){
+                    (*cubeIter)->fastRender();
+                }
+            }
+            break;
+        case Brut:
+            for(VectorCubeObject1D::const_iterator cubeIter = cubes.cbegin(); cubeIter != cubes.cend(); cubeIter++){
+                if((*cubeIter) != nullptr){
+                    (*cubeIter)->fastRender();
+                }
+            }
+            break;
     }
 }

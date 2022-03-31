@@ -37,4 +37,5 @@ public:
     };
 
     void renderTerrain(Terrain &terrain, TerrainRenderMode renderMode);
+    void renderChunk(shared_ptr<ChunkGeneration> chunk, TerrainRenderMode renderMode);
 };

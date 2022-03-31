@@ -59,6 +59,7 @@ public:
     int getObjectsToRenderCount();
     int getDeltaTime();
     GLuint getShaderID();
+    RenderingContext *renderingContext;
 
     void setUpGlobalUniforms();
 
@@ -86,6 +87,7 @@ protected:
     void drawImGUI();
     HitInfo raycastFromCamera();
     void loadChunk();
+    shared_ptr<ChunkGeneration> getChunk(int prmX, int prmY);
 
     float mouseSensitivity = 0.08f;
     float cameraSpeed = 0.01f;

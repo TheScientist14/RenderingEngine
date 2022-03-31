@@ -132,6 +132,8 @@ void App::gl_init() {
     };
 #pragma endregion cube_vertex_elements
 
+    mainCamera = make_shared<Camera>(this);
+    mainCamera->transform->move(vec3(0, 0, 0));
 // Draw some widgets
     Sp_Texture cube_texture = make_shared<Texture>("../Images/dirt.bmp");
     textures.push_back(cube_texture);
@@ -158,7 +160,14 @@ void App::gl_init() {
     //                                             nullptr, 0);
     //geometries.push_back(cubeMesh);
 
+    renderingContext = new RenderingContext(this);
     loadChunk();
+//
+//    shared_ptr<ChunkGeneration> chunk0 = make_shared<ChunkGeneration>(this, 2, 0.5, 0, 0);
+//
+//    chunk0->generateWorld();
+//    map.push_back(chunk0);
+//    renderingContext->renderChunk(chunk0, renderMode);
 
     aiReleaseImport(loader->getAiScene());
 
@@ -178,8 +187,6 @@ void App::gl_init() {
 //        textures[i]->bind();
 //    }
 
-    mainCamera = make_shared<Camera>(this);
-    mainCamera->transform->move(vec3(0, 0, 0));
 
     skybox = make_shared<Skybox>(this, "../Images/skybox/skybox_right.bmp",
                                  "../Images/skybox/skybox_left.bmp",
@@ -212,7 +219,6 @@ void App::main_loop() {
     glUseProgram(shaderID);
     mainCamera->update(deltaTime);
 
-    RenderingContext *renderingContext = new RenderingContext(this);
     renderingContext->renderEntities();
     renderingContext->renderTerrain(map, renderMode);
 
@@ -248,20 +254,20 @@ void App::handle_events() {
                             vec3 chunkCoords = vec3((int) hitInfo.blockHitPos.x / ChunkGeneration::size,
                                                     (int) hitInfo.blockHitPos.y / ChunkGeneration::size,
                                                     (int) hitInfo.blockHitPos.z / ChunkGeneration::size);
-                            vec3 blockChunkCoords = map[0*trunc(sqrt(nbChunk) + 0)]->worldToChunkCoords(hitInfo.blockHitPos);
+                            vec3 blockChunkCoords = getChunk(0,1)->worldToChunkCoords(hitInfo.blockHitPos);
                             switch (curEvent.button.button) {
                                 case SDL_BUTTON_LEFT:
                                     if (blockChunkCoords != vec3(-1)) {
                                         /*printf("deleted %d %d %d\n", (int) blockChunkCoords.x, (int) blockChunkCoords.y,
                                                (int) blockChunkCoords.z);*/
-                                        map[0*trunc(sqrt(nbChunk) + 0)]->setCube(0, blockChunkCoords.x, blockChunkCoords.y, blockChunkCoords.z);
+                                        getChunk(0,1)->setCube(0, blockChunkCoords.x, blockChunkCoords.y, blockChunkCoords.z);
                                     }
                                     break;
                                 case SDL_BUTTON_RIGHT:
                                     if (blockChunkCoords != vec3(-1)) {
                                         /*printf("placed %d %d %d\n", (int) blockChunkCoords.x, (int) blockChunkCoords.y,
                                                (int) blockChunkCoords.z);*/
-                                        map[0*trunc(sqrt(nbChunk) + 0)]->setCube(1, blockChunkCoords.x, blockChunkCoords.y, blockChunkCoords.z);
+                                        getChunk(0,1)->setCube(1, blockChunkCoords.x, blockChunkCoords.y, blockChunkCoords.z);
                                     }
                                     break;
                             }
@@ -555,7 +561,7 @@ void App::drawImGUI() {
         ImGui::SameLine();
         ImGui::ColorEdit3("##11", &directionalLightColor[0]);
 
-        ImGui::InputInt("Nb chunk : ", &nbChunk);
+        ImGui::InputInt("nb chunk : ", &nbChunk);
         ImGui::SameLine();
         if (ImGui::Button("Reload")) {
             loadChunk();
@@ -582,8 +588,11 @@ void App::drawImGUI() {
 
         vec3 cameraEulerAngles = mainCamera->transform->getEulerAngles();
         ImGui::Text("Camera euler angles : %f %f %f", cameraEulerAngles.x, cameraEulerAngles.y, cameraEulerAngles.z);
-        vec3 cameraChunkPos = map[0*trunc(sqrt(nbChunk) + 0)]->worldToChunkCoords(mainCamera->transform->getPosition());
-        ImGui::Text("Camera chunk position : %f %f %f", cameraChunkPos.x, cameraChunkPos.y, cameraChunkPos.z);
+        if(getChunk(0,0) != nullptr){
+            vec3 cameraChunkPos = getChunk(0,0)->worldToChunkCoords(mainCamera->transform->getPosition());
+            ImGui::Text("Camera chunk position : %f %f %f", cameraChunkPos.x, cameraChunkPos.y, cameraChunkPos.z);
+        }
+
 
         ImGui::End();
     }
@@ -609,7 +618,15 @@ void App::loadChunk() {
 
             Chunk->generateWorld();
             map.push_back(Chunk);
+
             printf("chunk %d %d\n", x, z);
         }
     }
+}
+
+shared_ptr<ChunkGeneration> App::getChunk(int prmX, int prmY){
+    if(!map.empty()) {
+        return map[prmY * trunc(sqrt(nbChunk))];
+    }
+    return nullptr;
 }

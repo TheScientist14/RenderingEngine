@@ -503,7 +503,6 @@ VectorQuadObject1D ChunkGeneration::sortQuadsWithSameSize(vec3 prmDirection) {
 
 
 VectorQuadObject1D ChunkGeneration::getQuads() {
-
     return quads;
 }
 
