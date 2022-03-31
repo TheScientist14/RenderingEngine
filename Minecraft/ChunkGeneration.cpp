@@ -328,6 +328,7 @@ void ChunkGeneration::combineVerticesByAxis() {
     VectorQuadObject1D mergedQuadsY = sortQuadsWithSameSize(vec3(0,1,0));
 
     quads.insert(quads.end(), mergedQuadsY.begin(), mergedQuadsY.end());
+    quadsToRender.clear();
 
 /*//    beginQuad = false;
 //    isPreviousBlockEmpty = true;
