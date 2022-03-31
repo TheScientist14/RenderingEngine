@@ -39,24 +39,6 @@ void GameObject::update(int deltaTime) {
 
 }
 
-//void GameObject::render() const {
-//	if(visible) {
-//		mat4 modelMatrix = transform->getWorldModelMatrix();
-//
-//		shared_ptr<Camera> mainCamera = app->getMainCamera();
-//		mat4 mvp = mainCamera->getProjectionViewMatrix() * modelMatrix;
-//
-//		GLuint shaderID = app->getShaderID();
-//
-//		GLuint MvpID = glGetUniformLocation(shaderID, "MVP");
-//		glUniformMatrix4fv(MvpID, 1, GL_FALSE, value_ptr(mvp));
-//		GLuint MID = glGetUniformLocation(shaderID, "M");
-//		glUniformMatrix4fv(MID, 1, GL_FALSE, value_ptr(modelMatrix));
-//
-//		app->getTexture(textureIndex)->select(shaderID);
-//		app->getGeometry(geometryIndex)->draw();
-//	}
-//}
 
 void GameObject::fastRender() const {
 	if(visible) {

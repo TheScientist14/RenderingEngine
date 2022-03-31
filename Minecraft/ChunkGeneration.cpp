@@ -7,7 +7,6 @@
 #include <string>
 #include "ChunkGeneration.h"
 #include "../helper/FastNoiseLite.h"
-#include "../helper/find_exe_path.h"
 #include "../ScriptablePipeline/App.h"
 #include "../ScriptablePipeline/EngineObjects/EngineObject.h"
 #include "../ScriptablePipeline/EngineObjects/GameObject.h"
@@ -90,9 +89,6 @@ void ChunkGeneration::generateNoise() {
         }
     }
 
-// Do something with this data...
-
-// Free data later
 
 }
 
@@ -143,7 +139,6 @@ void ChunkGeneration::combineVerticesByAxis() {
 
                 } else {
                     if (nowState) {
-                        //firstcoord = cubesInt[z * size * size + y * size + x]->getLeftTopBack();
                         firstcoord = vec3((chunkCoord.x + x) -blockSize * blockScaleFactor/2.0f, y+blockSize * blockScaleFactor/2.0f, (chunkCoord.z + z)-blockSize * blockScaleFactor/2.0f);
                         meshWidth = 1;
                     }
@@ -152,50 +147,16 @@ void ChunkGeneration::combineVerticesByAxis() {
                          pair<vec3, vec2> quad = make_pair(firstcoord, vec2(meshWidth, height));
                          quadsToRender.push_back(quad);
 
-//                        quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 0, 1));
-//                        quad->transform->setPosition(firstcoord);
-//                        quads.push_back(quad);
                     }
                     previousState = nowState;
 
                 }
-
-
-/*                if (cubesInt[getBlockIndex(x, y, z)] == nullptr){
-
-
-                    isNull = true;
-                    if(beginQuad) {
-                        quad = make_shared<Quad>(app, 1, width, vec3(1, 0, 0));
-                        quad->transform->setPosition(firstcoord);
-                        width = 0;
-                        quad->createTrianglesX();
-                        quads.push_back(quad);
-                        beginQuad = false;
-                    }
-                    isPreviousBlockEmpty = true;
-
-
-                }
-                else if (cubesInt[getBlockIndex(x, y, z)] != nullptr){
-
-                    isNull=false;
-                    width++;
-                    if (isPreviousBlockEmpty){
-                        firstcoord = cubesInt[getBlockIndex(x, y, z)]->getLeftTopBack();
-                        beginQuad = true;
-                        isPreviousBlockEmpty = false;
-                    }
-                }*/
 
             }
             if(previousState){
                 pair<vec3, vec2> quad = make_pair(firstcoord, vec2(meshWidth, height));
                 quadsToRender.push_back(quad);
 
-//                quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 0, 1));
-//                quad->transform->setPosition(firstcoord);
-//                quads.push_back(quad);
             }
         }
     }
@@ -243,9 +204,6 @@ void ChunkGeneration::combineVerticesByAxis() {
                         pair<vec3, vec2> quadPairX = make_pair(firstcoord, vec2(meshWidth, height));
                         quadsToRender.push_back(quadPairX);
 
-                        /*quad = make_shared<Quad>(app, 1, meshWidth, vec3(1, 0, 0));
-                        quad->transform->setPosition(firstcoord);
-                        quads.push_back(quad);*/
                     }
                     previousState = nowState;
 
@@ -256,9 +214,6 @@ void ChunkGeneration::combineVerticesByAxis() {
                 pair<vec3, vec2> quadPairX = make_pair(firstcoord, vec2(meshWidth, height));
                 quadsToRender.push_back(quadPairX);
 
-                /*quad = make_shared<Quad>(app, 1, meshWidth, vec3(1, 0, 0));
-                quad->transform->setPosition(firstcoord);
-                quads.push_back(quad);*/
             }
         }
     }
@@ -305,9 +260,6 @@ void ChunkGeneration::combineVerticesByAxis() {
                         pair<vec3, vec2> quadPairY = make_pair(firstcoord, vec2(meshWidth, height));
                         quadsToRender.push_back(quadPairY);
 
-//                        quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 1, 0));
-//                        quad->transform->setPosition(firstcoord);
-//                        quads.push_back(quad);
                     }
                     previousState = nowState;
 
@@ -320,9 +272,6 @@ void ChunkGeneration::combineVerticesByAxis() {
 
 
 
-//                quad = make_shared<Quad>(app, 1, meshWidth, vec3(0, 1, 0));
-//                quad->transform->setPosition(firstcoord);
-//                quads.push_back(quad);
             }
         }
     }
@@ -330,97 +279,6 @@ void ChunkGeneration::combineVerticesByAxis() {
 
     quads.insert(quads.end(), mergedQuadsY.begin(), mergedQuadsY.end());
     quadsToRender.clear();
-
-/*//    beginQuad = false;
-//    isPreviousBlockEmpty = true;
-//    //all z
-//    for (int y = 0; y < size; ++y) {
-//        for (int x = 0; x < size ; x++) {
-//            for (int z = 0; z < size; z++) {
-//
-//                if (cubesInt[getBlockIndex(x, y, z)] == nullptr){
-//
-//                    isNull = true;
-//                    if(beginQuad) {
-//                        quad = make_shared<Quad>(app, 1, width, vec3(0, 0, 1));
-//                        quad->transform->setPosition(firstcoord);
-//                        width = 0;
-//                        quad->createTrianglesX();
-//                        quads.push_back(quad);
-//                        beginQuad = false;
-//                    }
-//                    isPreviousBlockEmpty = true;
-//
-//
-//                }
-//                else if (cubesInt[getBlockIndex(x, y, z)] != nullptr){
-//
-//                    isNull=false;
-//                    width++;
-//                    if (isPreviousBlockEmpty){
-//                        firstcoord = cubesInt[getBlockIndex(x, y, z)]->getLeftTopBack();
-//                        beginQuad = true;
-//                        isPreviousBlockEmpty = false;
-//                    }
-//
-//                }
-//
-//            }
-//            if(beginQuad) {
-//                quad = make_shared<Quad>(app, 1, width, vec3(0, 0, 1));
-//                quad->transform->setPosition(firstcoord);
-//                width = 0;
-//                quad->createTrianglesX();
-//                quads.push_back(quad);
-//                beginQuad = false;
-//            }
-//        }
-//        if(beginQuad) {
-//            quad = make_shared<Quad>(app, 1, width, vec3(0, 0, 1));
-//            quad->transform->setPosition(firstcoord);
-//            width = 0;
-//            quad->createTrianglesX();
-//            quads.push_back(quad);
-//            beginQuad = false;
-//        }
-//    }
-//    beginQuad = false;
-//    isPreviousBlockEmpty = true;
-//    //all y
-//    for (int z = 0; z < size; ++z) {
-//        for (int x = 0; x < size ; x++) {
-//            for (int y = 0; y < size; y++) {
-//
-//                if (cubesInt[getBlockIndex(x, y, z)] == nullptr){
-//
-//                    isNull = true;
-//                    if(beginQuad) {
-//                        quad = make_shared<Quad>(app, 1, width, vec3(0, 1, 0));
-//                        quad->transform->setPosition(firstcoord);
-//                        width = 0;
-//                        quad->createTrianglesX();
-//                        quads.push_back(quad);
-//                        beginQuad = false;
-//                    }
-//                    isPreviousBlockEmpty = true;
-//
-//
-//                }
-//                else if (cubesInt[getBlockIndex(x, y, z)] != nullptr){
-//
-//                    isNull=false;
-//                    width++;
-//                    if (isPreviousBlockEmpty){
-//                        firstcoord = cubesInt[getBlockIndex(x, y, z)]->getLeftTopBack();
-//                        beginQuad = true;
-//                        isPreviousBlockEmpty = false;
-//                    }
-//
-//                }
-//
-//            }
-//        }
-//    }*/
 }
 
 
@@ -430,19 +288,10 @@ VectorQuadObject1D ChunkGeneration::sortQuadsWithSameSize(vec3 prmDirection) {
     int x = prmDirection.x;
     int y = prmDirection.y;
 
-//    vector<pair<vec3, vec2>> drawnQuads;
 
     for (int i = 0; i < quadsToRender.size(); ++i) {
         pair<vec3, vec2> quadToMerge = quadsToRender[i];
-//
-//        bool hasBeenDrawn = false;
-//        for (int i = 0; i < drawnQuads.size(); i++) {
-//            if (drawnQuads[i] == quadToMerge) {
-//                hasBeenDrawn = true;
-//            }
-//        }
 
-//        if (!hasBeenDrawn) {
         bool doNext;
         do {
             doNext = false;
@@ -459,7 +308,6 @@ VectorQuadObject1D ChunkGeneration::sortQuadsWithSameSize(vec3 prmDirection) {
             }
 
 
-//            drawnQuads.push_back(quadToMerge);
 
             for (int j = 0; j < quadsToRender.size(); ++j) {
 
@@ -470,7 +318,6 @@ VectorQuadObject1D ChunkGeneration::sortQuadsWithSameSize(vec3 prmDirection) {
 
                             quadsToRender.erase(quadsToRender.cbegin() + j); // doesn't work ?
                             doNext = true;
-//                        drawnQuads.push_back(quadsToRender[j]);
                             break;
 
                         }
@@ -484,18 +331,15 @@ VectorQuadObject1D ChunkGeneration::sortQuadsWithSameSize(vec3 prmDirection) {
 
             shared_ptr<Quad> quad = make_shared<Quad>(app, quadToMerge.second.y, quadToMerge.second.x, prmDirection);
             if (x != 0) {
-                //quad->transform->setPosition(quadToMerge.first);
                 quad->transform->setPosition(vec3(quadToMerge.first.x,quadToMerge.first.y + quadToMerge.second.y -1 ,quadToMerge.first.z));
             } else if (y != 0) {
                 quad->transform->setPosition(quadToMerge.first);
             } else {
                 quad->transform->setPosition(vec3(quadToMerge.first.x,quadToMerge.first.y + quadToMerge.second.y -1 ,quadToMerge.first.z));
             }
-            //quad->transform->setPosition(quadToMerge.first);
 
             quadsMerged.push_back(quad);
 
-//        }
 
     }
 

@@ -28,8 +28,6 @@ Camera::Camera(App *app, int width, int height, bool isOrtho, float fieldOfView,
 
     // Enable depth buffer
     glEnable(GL_DEPTH_TEST);
-    // Cull triangles which normal is not towards the camera
-    //glEnable(GL_CULL_FACE);
     // Accept fragment if it closer to the camera than the former one
     glDepthFunc(GL_LESS);
 }
@@ -42,7 +40,6 @@ mat4 Camera::getViewMatrix() {
 
     mat4 view = inverse(transform->getModelMatrix());
 
-    //mat4 view = lookAt(transform.position, vec3(0,0,0), vec3(0,1,0));
 
     return view;
 }

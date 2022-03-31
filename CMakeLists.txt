@@ -16,13 +16,9 @@ add_executable(moteur
 		main.cpp
 		BaseApp.cpp
 		BaseApp.h
-		ScriptablePipeline/AppTriangle.cpp
-		ScriptablePipeline/AppTriangle.h
 		Shaders/loadShader.cpp Shaders/loadShader.h
 		helper/find_exe_path.cpp
 		helper/find_exe_path.h
-		ScriptablePipeline/AppCube.cpp
-		ScriptablePipeline/AppCube.h
 		helper/stb_image.h
 		#helper/stb_image.cpp
 		ScriptablePipeline/App.cpp

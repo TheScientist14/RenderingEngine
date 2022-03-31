@@ -37,100 +37,6 @@ App::~App() {
 
 void App::gl_init() {
 
-#pragma region cube_vertex
-    static const float cubeVertexPos[] = {
-            -1.0f, -1.0f, -1.0f, // triangle 1 : begin
-            -1.0f, -1.0f, 1.0f,
-            -1.0f, 1.0f, 1.0f, // triangle 1 : end
-            1.0f, 1.0f, -1.0f, // triangle 2 : begin
-            -1.0f, -1.0f, -1.0f,
-            -1.0f, 1.0f, -1.0f, // triangle 2 : end
-            1.0f, -1.0f, 1.0f,
-            -1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, 1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f, -1.0f,
-            -1.0f, 1.0f, 1.0f,
-            -1.0f, 1.0f, -1.0f,
-            1.0f, -1.0f, 1.0f,
-            -1.0f, -1.0f, 1.0f,
-            -1.0f, -1.0f, -1.0f,
-            -1.0f, 1.0f, 1.0f,
-            -1.0f, -1.0f, 1.0f,
-            1.0f, -1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, 1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f, -1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, -1.0f,
-            -1.0f, 1.0f, -1.0f,
-            1.0f, 1.0f, 1.0f,
-            -1.0f, 1.0f, -1.0f,
-            -1.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-            -1.0f, 1.0f, 1.0f,
-            1.0f, -1.0f, 1.0f
-    };
-#pragma endregion cube_vertex
-
-#pragma region UV_buffer
-    // Two UV coordinatesfor each vertex. They were created with Blender. You'll learn shortly how to do this yourself.
-    static const GLfloat cubeVertexUv[] = {
-            0.000059f, 1.0f - 0.000004f,
-            0.000103f, 1.0f - 0.336048f,
-            0.335973f, 1.0f - 0.335903f,
-            1.000023f, 1.0f - 0.000013f,
-            0.667979f, 1.0f - 0.335851f,
-            0.999958f, 1.0f - 0.336064f,
-            0.667979f, 1.0f - 0.335851f,
-            0.336024f, 1.0f - 0.671877f,
-            0.667969f, 1.0f - 0.671889f,
-            1.000023f, 1.0f - 0.000013f,
-            0.668104f, 1.0f - 0.000013f,
-            0.667979f, 1.0f - 0.335851f,
-            0.000059f, 1.0f - 0.000004f,
-            0.335973f, 1.0f - 0.335903f,
-            0.336098f, 1.0f - 0.000071f,
-            0.667979f, 1.0f - 0.335851f,
-            0.335973f, 1.0f - 0.335903f,
-            0.336024f, 1.0f - 0.671877f,
-            1.000004f, 1.0f - 0.671847f,
-            0.999958f, 1.0f - 0.336064f,
-            0.667979f, 1.0f - 0.335851f,
-            0.668104f, 1.0f - 0.000013f,
-            0.335973f, 1.0f - 0.335903f,
-            0.667979f, 1.0f - 0.335851f,
-            0.335973f, 1.0f - 0.335903f,
-            0.668104f, 1.0f - 0.000013f,
-            0.336098f, 1.0f - 0.000071f,
-            0.000103f, 1.0f - 0.336048f,
-            0.000004f, 1.0f - 0.671870f,
-            0.336024f, 1.0f - 0.671877f,
-            0.000103f, 1.0f - 0.336048f,
-            0.336024f, 1.0f - 0.671877f,
-            0.335973f, 1.0f - 0.335903f,
-            0.667969f, 1.0f - 0.671889f,
-            1.000004f, 1.0f - 0.671847f,
-            0.667979f, 1.0f - 0.335851f
-    };
-
-#pragma endregion UV_buffer
-
-#pragma region cube_vertex_elements
-    float cube_vertices[] = {
-            1, 1, 1, 1, -1, 1, -1, -1, 1, -1, 1, 1,
-            1, 1, 1, 1, -1, 1, 1, -1, -1, 1, 1, -1,
-            1, 1, 1, 1, 1, -1, -1, 1, -1, -1, 1, 1,
-            1, 1, -1, 1, -1, -1, -1, -1, -1, -1, 1, -1,
-            -1, 1, 1, -1, -1, 1, -1, -1, -1, -1, 1, -1,
-            1, -1, 1, 1, -1, -1, -1, -1, -1, -1, -1, 1
-    };
-#pragma endregion cube_vertex_elements
 
     mainCamera = make_shared<Camera>(this);
     mainCamera->transform->move(vec3(0, 0, 0));
@@ -138,54 +44,16 @@ void App::gl_init() {
     Sp_Texture cube_texture = make_shared<Texture>("../Images/dirt.bmp");
     textures.push_back(cube_texture);
 
-//    Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6*2*3, nullptr, 0);
-//    geometries.push_back(cubeMesh);
-//
     ModelLoader *loader = new ModelLoader();
     string str = getRootPath() + "/Models/untitled.obj";
 
     loader->import(&*str.begin());
     loader->loadMeshes(geometries);
 
-//    for (int i = 0; i < loader->getNumMesh(); ++i) {
-//
-//        Sp_GameObject grass = make_shared<GameObject>(this, i, 0);
-//        objects.push_back(grass);
-//        objectsToRender.push_back(grass);
-//    }
-
-    //aiReleaseImport(loader->getAiScene());
-
-    //Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
-    //                                             nullptr, 0);
-    //geometries.push_back(cubeMesh);
-
     renderingContext = new RenderingContext(this);
     loadChunk();
-//
-//    shared_ptr<ChunkGeneration> chunk0 = make_shared<ChunkGeneration>(this, 2, 0.5, 0, 0);
-//
-//    chunk0->generateWorld();
-//    map.push_back(chunk0);
-//    renderingContext->renderChunk(chunk0, renderMode);
 
     aiReleaseImport(loader->getAiScene());
-
-//    Sp_Geometry cubeMesh = make_shared<Geometry>(cubeVertexPos, cubeVertexPos, cubeVertexUv, 6 * 2 * 3,
-//                                                 nullptr, 0);
-//    geometries.push_back(cubeMesh);
-
-
-//    Sp_GameObject cube = make_shared<GameObject>(this, 1, 0);
-//    objects.push_back(cube);
-//    objectsToRender.push_back(cube);
-//
-//    for (int i = 0; i < geometries.size(); i++) {
-//        geometries[i]->bind();
-//    }
-//    for (int i = 0; i < textures.size(); i++) {
-//        textures[i]->bind();
-//    }
 
 
     skybox = make_shared<Skybox>(this, "../Images/skybox/skybox_right.bmp",
@@ -263,8 +131,6 @@ void App::handle_events() {
                                     blockChunkCoords = map[0 * trunc(sqrt(nbChunk) + 0)]->worldToChunkCoords(
                                             hitInfo.blockHitPos - hitInfo.faceHit * 0.5f);
                                     if (blockChunkCoords != vec3(-1)) {
-                                        /*printf("deleted %d %d %d\n", (int) blockChunkCoords.x, (int) blockChunkCoords.y,
-                                               (int) blockChunkCoords.z);*/
                                         getChunk(0,0)->setCube(0, blockChunkCoords.x, blockChunkCoords.y, blockChunkCoords.z);
 
                                     }
@@ -277,8 +143,6 @@ void App::handle_events() {
                                     blockChunkCoords = map[0 * trunc(sqrt(nbChunk) + 0)]->worldToChunkCoords(
                                             hitInfo.blockHitPos + hitInfo.faceHit * 0.5f);
                                     if (blockChunkCoords != vec3(-1)) {
-                                        /*printf("placed %d %d %d\n", (int) blockChunkCoords.x, (int) blockChunkCoords.y,
-                                               (int) blockChunkCoords.z);*/
 
                                         getChunk(0,0)->setCube(1, blockChunkCoords.x, blockChunkCoords.y, blockChunkCoords.z);
 
@@ -575,13 +439,13 @@ void App::drawImGUI() {
         ImGui::SameLine();
         ImGui::ColorEdit3("##11", &directionalLightColor[0]);
 
-        ImGui::InputInt("nb chunk : ", &nbChunk);
+        ImGui::InputInt("Nb chunk : ", &nbChunk);
         ImGui::SameLine();
         if (ImGui::Button("Reload")) {
             loadChunk();
         }
 
-        ImGui::Text("Opti : ");
+        ImGui::Text("Mode : ");
         ImGui::SameLine();
         if (ImGui::Button("Opti")) {
             renderMode = RenderingContext::TerrainRenderMode::Opti;
@@ -695,7 +559,6 @@ App::HitInfo App::raycastFromCamera() {
                             hitInfo.faceHit = vec3(0, 0, -zDirection);
                             break;
                         default:
-                            printf("shouldn't happen, the heck ?\n");
                             break;
                     }
                 }
@@ -725,20 +588,14 @@ void App::loadChunk() {
     if (map.empty()) {
         for (int x = 0; x < sqrNbChunk; x++) {
             for (int z = 0; z < sqrNbChunk; z++) {
-                printf("new chunk \n");
                 Chunk = make_shared<ChunkGeneration>(this, 2, 0.5, x, z);
 
                 Chunk->generateWorld();
                 map.push_back(Chunk);
-
-                printf("chunk %d %d\n", x, z);
             }
         }
     } else if (map.size() > nbChunk){
-        map.clear();
-        for(int x = 0; x < nbChunk; x++){
-            map.push_back(mapReload[x]);
-        }
+        map.resize(nbChunk);
     } else {
 
 
@@ -748,8 +605,6 @@ void App::loadChunk() {
 
                 Chunk->generateWorld();
                 map.push_back(Chunk);
-
-                printf("chunk %d %d\n", x, 0);
             }
         }
         for (int x = mapReload.size()/2; x < sqrNbChunk; ++x) {
@@ -758,8 +613,6 @@ void App::loadChunk() {
 
                 Chunk->generateWorld();
                 map.push_back(Chunk);
-
-                printf("chunk %d %d\n", 0, z);
             }
         }
     }

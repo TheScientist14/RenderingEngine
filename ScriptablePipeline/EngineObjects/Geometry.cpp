@@ -94,29 +94,6 @@ void Geometry::bind() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 3 * trianglesCount, triangles.data(), GL_STATIC_DRAW);
 }
 
-void Geometry::bindWithVec3() {
-
-    // This will identify our vertex buffer
-    glGenVertexArrays(1, &verticesID);
-    glBindVertexArray(verticesID);
-
-    // Generate 3 buffers, put the resulting identifiers in buffersID
-    buffersID.resize(4);
-    glGenBuffers(4, buffersID.data());
-
-    // The following commands will talk about our 'buffersID' buffer
-    glBindBuffer(GL_ARRAY_BUFFER, buffersID[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * verticesCount, verticesPosVec3.data(), GL_STATIC_DRAW);
-    //normal
-    glBindBuffer(GL_ARRAY_BUFFER, buffersID[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * verticesCount, verticesNormal.data(), GL_STATIC_DRAW);
-    //uv
-    glBindBuffer(GL_ARRAY_BUFFER, buffersID[2]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 2 * verticesCount, verticesUV.data(), GL_STATIC_DRAW);
-    //vertices index
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffersID[3]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(float) * 3 * trianglesCount, trianglesVec3.data(), GL_STATIC_DRAW);
-}
 
 void Geometry::draw() const {
     select();
@@ -175,8 +152,3 @@ void Geometry::unselect() const {
     glDisableVertexAttribArray(1);
     glDisableVertexAttribArray(2);
 }
-
-// calculate mvp then render
-// optimize rotations
-// caching mvp
-// rendering context

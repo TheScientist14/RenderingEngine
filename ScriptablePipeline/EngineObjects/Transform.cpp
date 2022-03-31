@@ -16,7 +16,6 @@ Transform::Transform(const EngineObject *object) {
     orientation = quat(1,0,0,0);
     this->scaleFactor = 1;
 
-    // TODO : should we init caches ?
 }
 
 void Transform::updateModelMatrix() {
@@ -88,18 +87,6 @@ void Transform::scale(float scaleFactor) {
     this->scaleFactor *= scaleFactor;
     isModelMatrixDirty = true;
     isWorldMatrixDirty = true;
-}
-
-void Transform::setWorldPosition(vec3 worldPosition) {
-    // TODO
-}
-
-void Transform::setWorldRotation(vec3 worldRotation) {
-    // TODO
-}
-
-void Transform::setWorldScale(float worldScale) {
-    // TODO
 }
 
 void Transform::setWorldMatrixIsDirty(bool isDirty) {

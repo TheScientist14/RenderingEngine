@@ -18,7 +18,6 @@ Quad::Quad(App *app, int height, int width, vec3 direction) : RenderedObject(app
     this->width = width;
     this->texturePtr = cube_texture;
     triangles.insert(triangles.end(), {0, 1, 2, 1, 2, 3});
-//    triangles.push_back(vec3(3,4,5));
     int x = direction.x;
     int y = direction.y;
 
@@ -29,10 +28,6 @@ Quad::Quad(App *app, int height, int width, vec3 direction) : RenderedObject(app
     } else {
         createTrianglesZ();
     }
-
-    //printf("| %d ; %d | \n",height, width);
-
-
 }
 
 vector<unsigned int> Quad::getTriangles() {
@@ -48,11 +43,6 @@ void Quad::createTrianglesZ() {
                                              x + width, y, z,
                                              x, y - height, z,
                                              x + width, y - height, z});
-//    trianglesPos.push_back(vec3(x+width, y, z));
-//    trianglesPos.push_back(vec3(x+width, y - height, z));
-//    trianglesPos.push_back(transform->getPosition());
-//    trianglesPos.push_back(vec3(x, y - height, z));
-//    trianglesPos.push_back(vec3(x+width, y - height, z));
 
     uvVector.insert(uvVector.end(), {0, 0, 0, (float)height, (float)width, (float)height, (float)width, 0});
 
@@ -75,11 +65,6 @@ void Quad::createTrianglesY() {
                                              x + height, y, z,
                                              x, y, z + width,
                                              x + height, y, z + width});
-//    trianglesPos.push_back(transform->getPosition());
-//    trianglesPos.push_back(vec3(x + height, y, z));
-//    trianglesPos.push_back(transform->getPosition());
-//    trianglesPos.push_back(vec3(x + height, y + width, z));
-//    trianglesPos.push_back(vec3(x, y+width, z));
 
 
     uvVector.insert(uvVector.end(), {0, 0, 0, (float)height, (float)width, (float)height, (float)width, 0});
@@ -104,12 +89,6 @@ void Quad::createTrianglesX() {
                                              x, y - height, z + width,
                                              x, y, z + width});
 
-//    trianglesPos.push_back(transform->getPosition());
-//    trianglesPos.push_back(vec3(x, y, z));
-//    trianglesPos.push_back(transform->getPosition());
-//    trianglesPos.push_back(vec3(x, y + height, z));
-//    trianglesPos.push_back(vec3(x, y + height, z + width));
-//    trianglesPos.push_back(vec3(x, y, z+width));
 
 
     uvVector.insert(uvVector.end(), {0, 0, 0, (float)height, (float)width, (float)height, (float)width, 0});

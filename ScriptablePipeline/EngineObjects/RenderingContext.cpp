@@ -5,7 +5,6 @@
 #include "RenderingContext.h"
 
 #include "../App.h"
-#include "EngineObject.h"
 #include "GameObject.h"
 #include "Geometry.h"
 #include "../../Minecraft/Cube.h"
