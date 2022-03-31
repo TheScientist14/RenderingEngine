@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 #include <map>
+#include "../App.h"
 
 class Geometry;
 class GameObject;
@@ -26,5 +27,11 @@ public:
     RenderingContext(App* app);
     virtual ~RenderingContext();
 
-    void render();
+    void renderEntities();
+
+    enum TerrainRenderMode {
+        Opti, SemiOpti, Brut
+    };
+
+    void renderTerrain(Terrain &terrain, TerrainRenderMode renderMode);
 };

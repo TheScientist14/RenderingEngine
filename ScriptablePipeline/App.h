@@ -12,6 +12,7 @@
 #include <glm/vec3.hpp>
 
 #include "../BaseApp.h"
+#include "EngineObjects/RenderingContext.h"
 
 using namespace std;
 using namespace glm;
@@ -34,6 +35,7 @@ typedef shared_ptr<EngineObject> Sp_EngineObject;
 typedef shared_ptr<RenderedObject> Sp_RenderedObject;
 typedef shared_ptr<Quad> Sp_QuadObject;
 typedef shared_ptr<GameObject> Sp_GameObject;
+typedef vector<shared_ptr<ChunkGeneration>> Terrain;
 
 class App : public BaseApp {
 
@@ -56,13 +58,19 @@ public:
     int getObjectsToRenderCount();
     int getDeltaTime();
     GLuint getShaderID();
-    void updateObjects();
 
     void setUpGlobalUniforms();
 
     virtual ~App();
 
 protected:
+
+    struct HitInfo {
+        bool hasHit;
+        vec3 blockHitPos;
+        vec3 faceHit; // unit vector of the normal of the plane hit
+    };
+
     GLuint shaderID;
     vector<shared_ptr<Geometry>> geometries;
     vector<shared_ptr<Texture>> textures;
@@ -70,14 +78,12 @@ protected:
     vector<shared_ptr<RenderedObject>> objectsToRender;
     shared_ptr<Camera> mainCamera;
     bool isMouseCaptured = true;
-    vector<shared_ptr<Quad>> generatedQuads;
-    vector<shared_ptr<Cube>> generatedCubes;
-    vector<shared_ptr<ChunkGeneration>> Map;
+    Terrain map;
     bool isDragging;
     int nbChunk = 16;
 
     void drawImGUI();
-    vec3 raycastFromCamera();
+    HitInfo raycastFromCamera();
     void loadChunk();
 
     float mouseSensitivity = 0.08f;
@@ -114,7 +120,7 @@ protected:
     float directionalLightPower = 1;
     vec3 directionalLightColor = vec3(0.953125f, 0.91015625f, 0.60546875f);
     vec3 directionalLightDirection = vec3(0, -1, 0.1f);
-    bool isOpti = false;
+    RenderingContext::TerrainRenderMode renderMode = RenderingContext::Opti;
 };
 
 

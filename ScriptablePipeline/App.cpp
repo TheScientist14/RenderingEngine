@@ -213,7 +213,8 @@ void App::main_loop() {
     mainCamera->update(deltaTime);
 
     RenderingContext *renderingContext = new RenderingContext(this);
-    renderingContext->render();
+    renderingContext->renderEntities();
+    renderingContext->renderTerrain(map, renderMode);
 
     if (isDayCycleEnabled) {
         dayTime += deltaTime * 10;
@@ -242,31 +243,28 @@ void App::handle_events() {
             case SDL_MOUSEBUTTONDOWN:
                 if (!io.WantCaptureMouse) {
                     if (isMouseCaptured) {
-                        vec3 blockHitPos = raycastFromCamera();
-                        vec3 blockChunkCoords = Map[0]->worldToChunkCoords(blockHitPos);
-                        switch (curEvent.button.button) {
-                            case SDL_BUTTON_LEFT:
-                                if (blockChunkCoords != vec3(-1)) {
-                                    /*printf("deleted %d %d %d\n", (int) blockChunkCoords.x, (int) blockChunkCoords.y,
-                                           (int) blockChunkCoords.z);*/
-                                    Map[0]->setCube(0, blockChunkCoords.x, blockChunkCoords.y, blockChunkCoords.z);
-                                    if(isOpti){
-                                        objects.insert(objects.end(), generatedQuads.begin(), generatedQuads.end());
-                                        objectsToRender.insert(objectsToRender.end(), generatedQuads.begin(), generatedQuads.end());
+                        HitInfo hitInfo = raycastFromCamera();
+                        if (hitInfo.hasHit) {
+                            vec3 chunkCoords = vec3((int) hitInfo.blockHitPos.x / ChunkGeneration::size,
+                                                    (int) hitInfo.blockHitPos.y / ChunkGeneration::size,
+                                                    (int) hitInfo.blockHitPos.z / ChunkGeneration::size);
+                            vec3 blockChunkCoords = map[0]->worldToChunkCoords(hitInfo.blockHitPos);
+                            switch (curEvent.button.button) {
+                                case SDL_BUTTON_LEFT:
+                                    if (blockChunkCoords != vec3(-1)) {
+                                        /*printf("deleted %d %d %d\n", (int) blockChunkCoords.x, (int) blockChunkCoords.y,
+                                               (int) blockChunkCoords.z);*/
+                                        map[0]->setCube(0, blockChunkCoords.x, blockChunkCoords.y, blockChunkCoords.z);
                                     }
-                                }
-                                break;
-                            case SDL_BUTTON_RIGHT:
-                                if (blockChunkCoords != vec3(-1)) {
-                                    /*printf("placed %d %d %d\n", (int) blockChunkCoords.x, (int) blockChunkCoords.y,
-                                           (int) blockChunkCoords.z);*/
-                                    Map[0]->setCube(1, blockChunkCoords.x, blockChunkCoords.y, blockChunkCoords.z);
-                                    if(isOpti){
-                                        objects.insert(objects.end(), generatedQuads.begin(), generatedQuads.end());
-                                        objectsToRender.insert(objectsToRender.end(), generatedQuads.begin(), generatedQuads.end());
+                                    break;
+                                case SDL_BUTTON_RIGHT:
+                                    if (blockChunkCoords != vec3(-1)) {
+                                        /*printf("placed %d %d %d\n", (int) blockChunkCoords.x, (int) blockChunkCoords.y,
+                                               (int) blockChunkCoords.z);*/
+                                        map[0]->setCube(1, blockChunkCoords.x, blockChunkCoords.y, blockChunkCoords.z);
                                     }
-                                }
-                                break;
+                                    break;
+                            }
                         }
                     } else {
                         isMouseCaptured = true;
@@ -566,13 +564,15 @@ void App::drawImGUI() {
         ImGui::Text("Opti : ");
         ImGui::SameLine();
         if (ImGui::Button("Opti")) {
-            isOpti = true;
-            updateObjects();
+            renderMode = RenderingContext::Opti;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("SemiOpti")) {
+            renderMode = RenderingContext::SemiOpti;
         }
         ImGui::SameLine();
         if (ImGui::Button("Brutus")) {
-            isOpti = false;
-            updateObjects();
+            renderMode = RenderingContext::Brut;
         }
 
         ImGui::End();
@@ -582,7 +582,7 @@ void App::drawImGUI() {
 
         vec3 cameraEulerAngles = mainCamera->transform->getEulerAngles();
         ImGui::Text("Camera euler angles : %f %f %f", cameraEulerAngles.x, cameraEulerAngles.y, cameraEulerAngles.z);
-        vec3 cameraChunkPos = Map[0]->worldToChunkCoords(mainCamera->transform->getPosition());
+        vec3 cameraChunkPos = map[0]->worldToChunkCoords(mainCamera->transform->getPosition());
         ImGui::Text("Camera chunk position : %f %f %f", cameraChunkPos.x, cameraChunkPos.y, cameraChunkPos.z);
 
         ImGui::End();
@@ -592,36 +592,22 @@ void App::drawImGUI() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-vec3 App::raycastFromCamera() {
-    return mainCamera->transform->getPosition();
-}
-
-void App::updateObjects() {
-    objects.clear();
-    objectsToRender.clear();
-    for (int i = 0; i < Map.size(); ++i) {
-        generatedQuads = Map[i]->getQuads();
-        generatedCubes = Map[i]->getCubes();
-        if (isOpti) {
-            objects.insert(objects.end(), generatedQuads.begin(), generatedQuads.end());
-            objectsToRender.insert(objectsToRender.end(), generatedQuads.begin(), generatedQuads.end());
-        } else {
-            objects.insert(objects.end(), generatedCubes.begin(), generatedCubes.end());
-            objectsToRender.insert(objectsToRender.end(), generatedCubes.begin(), generatedCubes.end());
-        }
-    }
+App::HitInfo App::raycastFromCamera() {
+    HitInfo hitInfo;
+    hitInfo.hasHit = true;
+    hitInfo.blockHitPos = mainCamera->transform->getPosition();
+    hitInfo.faceHit = vec3(0);
+    return hitInfo;
 }
 
 void App::loadChunk() {
     shared_ptr<ChunkGeneration> Chunk;
     for (int x = 0; x < trunc(sqrt(nbChunk)); x++) {
-        for (int z = 0; z < trunc(sqrt(nbChunk)); z++){
+        for (int z = 0; z < trunc(sqrt(nbChunk)); z++) {
             Chunk = make_shared<ChunkGeneration>(this, 2, 0.5, x, z);
 
             Chunk->generateWorld();
-            Map.push_back(Chunk);
+            map.push_back(Chunk);
         }
     }
-
-    updateObjects();
 }

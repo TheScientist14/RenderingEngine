@@ -13,7 +13,6 @@ public:
     Cube(App* prmApp, int prmGeometrieIndex, int prmTextureIndex, bool prmVisibility, float prmSize);
     vec3 getLeftTopBack();
 
-protected:
-
     void fastRender() const override;
+
 };
