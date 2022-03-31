@@ -4,21 +4,23 @@ project(moteur)
 
 include(cmake/glew.cmake)
 
-
 add_subdirectory(dep/SDL dep/SDL)
 
 set(SDL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dep/SDL/include)
 set(GLM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dep/glm)
-#set_property(TARGET moteur PROPERTY CXX_STANDARD 17)
 
 
 add_executable(moteur
 		main.cpp
 		BaseApp.cpp
 		BaseApp.h
+#		ScriptablePipeline/AppTriangle.cpp
+#		ScriptablePipeline/AppTriangle.h
 		Shaders/loadShader.cpp Shaders/loadShader.h
 		helper/find_exe_path.cpp
 		helper/find_exe_path.h
+#		ScriptablePipeline/AppCube.cpp
+#		ScriptablePipeline/AppCube.h
 		helper/stb_image.h
 		#helper/stb_image.cpp
 		ScriptablePipeline/App.cpp
@@ -54,6 +56,18 @@ add_executable(moteur
 set(IMGUI_USE_OGL3 true)
 include(cmake/imgui.cmake)
 include(cmake/assimp.cmake)
+
+add_custom_target(copy_shaders COMMAND ${CMAKE_COMMAND}
+		-E copy_directory ${CMAKE_SOURCE_DIR}/Shaders $<TARGET_FILE_DIR:moteur>/Shaders)
+add_custom_target(copy_images COMMAND ${CMAKE_COMMAND}
+		-E copy_directory ${CMAKE_SOURCE_DIR}/Images $<TARGET_FILE_DIR:moteur>/Images)
+add_custom_target(copy_models COMMAND ${CMAKE_COMMAND}
+		-E copy_directory ${CMAKE_SOURCE_DIR}/Models $<TARGET_FILE_DIR:moteur>/Models)
+
+add_dependencies(moteur copy_shaders)
+add_dependencies(moteur copy_images)
+add_dependencies(moteur copy_models)
+set_property(TARGET moteur PROPERTY CXX_STANDARD 17)
 
 target_include_directories(moteur PRIVATE
 		${SDL_INCLUDE_DIR}

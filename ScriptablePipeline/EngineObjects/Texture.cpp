@@ -4,10 +4,19 @@
 
 #include "Texture.h"
 #include "../../helper/stb_image.h"
+#include <filesystem>
+#include "../../helper/find_exe_path.h"
 
 Texture::Texture(const char* filepath) {
 
-    texels = stbi_load(filepath, &width, &height, &channels, 0);
+    filesystem::path appPath(GetAppPath());
+    filesystem::path appDir = appPath.parent_path();
+    filesystem::path imgPath = appDir / "Images";
+    filesystem::path modelPath = imgPath / filepath;
+    texels = stbi_load(modelPath.string().c_str(), &width, &height, &channels, 0);
+    if(!texels){
+        printf("Couldn't load %s\n", filepath);
+    }
 }
 
 Texture::Texture() {

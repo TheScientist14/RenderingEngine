@@ -4,6 +4,7 @@
 
 #include "loadShader.h"
 #include "GL/glew.h"
+#include <filesystem>
 #include "gl/GL.h"
 #include <iostream>
 #include <vector>
@@ -33,41 +34,40 @@ size_t replace_all(std::string& inout, string what, string with)
 
 GLuint loadShader::LoadShaders(const char * vertex_file_path, const char * fragment_file_path){
 
-    string path = getRootPath();
-    string vertexPath = path + vertex_file_path;
-    string fragmentPath = path + fragment_file_path;
-#ifdef _WIN32
-    replace_all(vertexPath, "/", "\\");
-    replace_all(fragmentPath, "/", "\\");
-#endif
+    filesystem::path appPath(GetAppPath());
+    filesystem::path appDir = appPath.parent_path();
+    filesystem::path shaderPath = appDir / "Shaders";
+    filesystem::path vShaderPath = shaderPath / vertex_file_path;
+    filesystem::path fShaderPath = shaderPath / fragment_file_path;
+
     // Create the shaders
     GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
     GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
     // Read the Vertex Shader code from the file
     string VertexShaderCode;
-    ifstream VertexShaderStream(vertexPath, std::ios::in);
+    ifstream VertexShaderStream(vShaderPath.string(), std::ios::in);
     if(VertexShaderStream.is_open()){
         stringstream sstr;
         sstr << VertexShaderStream.rdbuf();
         VertexShaderCode = sstr.str();
         VertexShaderStream.close();
     }else{
-        printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", vertexPath.c_str());
+        printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", vShaderPath.string().c_str());
         getchar();
         return 0;
     }
 
     // Read the Fragment Shader code from the file
     string FragmentShaderCode;
-    ifstream FragmentShaderStream(fragmentPath, std::ios::in);
+    ifstream FragmentShaderStream(fShaderPath.string(), std::ios::in);
     if(FragmentShaderStream.is_open()){
         stringstream sstr;
         sstr << FragmentShaderStream.rdbuf();
         FragmentShaderCode = sstr.str();
         FragmentShaderStream.close();
     }else{
-        printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", fragmentPath.c_str());
+        printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", fShaderPath.string().c_str());
         getchar();
         return 0;
     }
@@ -76,7 +76,7 @@ GLuint loadShader::LoadShaders(const char * vertex_file_path, const char * fragm
     int InfoLogLength;
 
     // Compile Vertex Shader
-    printf("Compiling shader : %s\n", vertexPath.c_str());
+    printf("Compiling shader : %s\n", vShaderPath.string().c_str());
     char const * VertexSourcePointer = VertexShaderCode.c_str();
     glShaderSource(VertexShaderID, 1, &VertexSourcePointer , NULL);
     glCompileShader(VertexShaderID);
@@ -91,7 +91,7 @@ GLuint loadShader::LoadShaders(const char * vertex_file_path, const char * fragm
     }
 
     // Compile Fragment Shader
-    printf("Compiling shader : %s\n", fragmentPath.c_str());
+    printf("Compiling shader : %s\n", fShaderPath.string().c_str());
     char const * FragmentSourcePointer = FragmentShaderCode.c_str();
     glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer , NULL);
     glCompileShader(FragmentShaderID);

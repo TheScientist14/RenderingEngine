@@ -1,6 +1,4 @@
 #include <iostream>
-#include "ScriptablePipeline/AppTriangle.h"
-#include "ScriptablePipeline/AppCube.h"
 
 #include "SDL.h"
 #include <GL/glew.h>

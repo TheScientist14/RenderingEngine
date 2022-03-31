@@ -5,6 +5,7 @@
 #include "App.h"
 
 #include <string>
+#include <filesystem>
 
 #include "SDL.h"
 
@@ -41,13 +42,16 @@ void App::gl_init() {
     mainCamera = make_shared<Camera>(this);
     mainCamera->transform->move(vec3(0, 0, 0));
 // Draw some widgets
-    Sp_Texture cube_texture = make_shared<Texture>("../Images/dirt.bmp");
+    Sp_Texture cube_texture = make_shared<Texture>("dirt.bmp");
     textures.push_back(cube_texture);
 
     ModelLoader *loader = new ModelLoader();
-    string str = getRootPath() + "/Models/untitled.obj";
 
-    loader->import(&*str.begin());
+    filesystem::path appPath(GetAppPath());
+    filesystem::path appDir = appPath.parent_path();
+    filesystem::path modelPath = appDir / "Models/untitled.obj";
+
+    loader->import(&*modelPath.string().begin());
     loader->loadMeshes(geometries);
 
     renderingContext = new RenderingContext(this);
@@ -56,14 +60,14 @@ void App::gl_init() {
     aiReleaseImport(loader->getAiScene());
 
 
-    skybox = make_shared<Skybox>(this, "../Images/skybox/skybox_right.bmp",
-                                 "../Images/skybox/skybox_left.bmp",
-                                 "../Images/skybox/skybox_up.bmp",
-                                 "../Images/skybox/skybox_down.bmp",
-                                 "../Images/skybox/skybox_front.bmp",
-                                 "../Images/skybox/skybox_back.bmp", width, height);
+    skybox = make_shared<Skybox>(this, "skybox/skybox_right.bmp",
+                                 "skybox/skybox_left.bmp",
+                                 "skybox/skybox_up.bmp",
+                                 "skybox/skybox_down.bmp",
+                                 "skybox/skybox_front.bmp",
+                                 "skybox/skybox_back.bmp", width, height);
 
-    shaderID = loadShader::LoadShaders("/Shaders/ColoredCube.vertexshader", "/Shaders/ColoredCube.fragmentshader");
+    shaderID = loadShader::LoadShaders("ColoredCube.vertexshader", "ColoredCube.fragmentshader");
     glUseProgram(shaderID);
 
     pointLightWorldPosID = glGetUniformLocation(shaderID, "PointLightWorldPos");

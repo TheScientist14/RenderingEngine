@@ -8,9 +8,11 @@
 
 #include "Skybox.h"
 #include <vector>
+#include <filesystem>
 #include <GL/glew.h>
 #include <glm/ext.hpp>
 #include <../../helper/stb_image.h>
+#include <../../helper/find_exe_path.h>
 #include <../../Shaders/loadShader.h>
 #include "Transform.h"
 #include "../App.h"
@@ -47,8 +49,8 @@ void Skybox::setupOpenGL() {
     //load the shaders, compile them and link them
 
     //loadShaders("SkyShader.vsh", "SkyShader.fsh");
-    programObject = loadShader::LoadShaders("/Shaders/SkyboxShader.vertexshader",
-                                            "/Shaders/SkyboxShader.fragmentshader");
+    programObject = loadShader::LoadShaders("SkyboxShader.vertexshader",
+                                            "SkyboxShader.fragmentshader");
 
     glUseProgram(programObject);
 
@@ -131,7 +133,11 @@ void Skybox::setupOpenGL() {
         //17a.Decode each cube map image into its raw image data.
         //if(convertImageToRawImage(cubeMapTextures.at(i))){
 
-        image = stbi_load(cubeMapTextures.at(i), &imageWidth, &imageHeight, nullptr, 0);
+        filesystem::path appPath(GetAppPath());
+        filesystem::path appDir = appPath.parent_path();
+        filesystem::path imgPath = appDir / "Images";
+        filesystem::path modelPath = imgPath / cubeMapTextures.at(i);
+        image = stbi_load(modelPath.string().c_str(), &imageWidth, &imageHeight, nullptr, 0);
 
         //17b. if decompression was successful, set the texture parameters
 

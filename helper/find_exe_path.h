@@ -1,6 +1,8 @@
 #pragma once
 
-#include <string>
-std::string GetAppPath();
-std::string getRootPath();
+#include <string_view>
+#include <iostream>
+
+std::string_view GetAppPath();
+std::string_view getRootPath();
 
