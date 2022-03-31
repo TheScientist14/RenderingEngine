@@ -59,6 +59,7 @@ public:
     int getObjectsToRenderCount();
     int getDeltaTime();
     GLuint getShaderID();
+    RenderingContext::TerrainRenderMode getRenderMode();
     RenderingContext *renderingContext;
 
     void setUpGlobalUniforms();
@@ -81,8 +82,9 @@ protected:
     shared_ptr<Camera> mainCamera;
     bool isMouseCaptured = true;
     Terrain map;
+    Terrain mapReload;
     bool isDragging;
-    int nbChunk = 16;
+    int nbChunk = 4;
 
     void drawImGUI();
     HitInfo raycastFromCamera();

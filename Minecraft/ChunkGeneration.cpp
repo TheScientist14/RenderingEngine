@@ -8,6 +8,7 @@
 #include "ChunkGeneration.h"
 #include "../helper/FastNoiseLite.h"
 #include "../helper/find_exe_path.h"
+#include "../ScriptablePipeline/App.h"
 #include "../ScriptablePipeline/EngineObjects/EngineObject.h"
 #include "../ScriptablePipeline/EngineObjects/GameObject.h"
 #include "../ScriptablePipeline/EngineObjects/Transform.h"

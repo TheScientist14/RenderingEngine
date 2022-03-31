@@ -584,15 +584,15 @@ void App::drawImGUI() {
         ImGui::Text("Opti : ");
         ImGui::SameLine();
         if (ImGui::Button("Opti")) {
-            renderMode = RenderingContext::Opti;
+            renderMode = RenderingContext::TerrainRenderMode::Opti;
         }
         ImGui::SameLine();
         if (ImGui::Button("SemiOpti")) {
-            renderMode = RenderingContext::SemiOpti;
+            renderMode = RenderingContext::TerrainRenderMode::SemiOpti;
         }
         ImGui::SameLine();
         if (ImGui::Button("Brutus")) {
-            renderMode = RenderingContext::Brut;
+            renderMode = RenderingContext::TerrainRenderMode::Brut;
         }
 
         ImGui::End();
@@ -719,18 +719,54 @@ App::HitInfo App::raycastFromCamera() {
 }
 
 void App::loadChunk() {
-    map.clear();
+    mapReload = map;
+    int sqrNbChunk = trunc(sqrt(nbChunk));
     shared_ptr<ChunkGeneration> Chunk;
-    for (int x = 0; x < trunc(sqrt(nbChunk)); x++) {
-        for (int z = 0; z < trunc(sqrt(nbChunk)); z++) {
-            Chunk = make_shared<ChunkGeneration>(this, 2, 0.5, x, z);
+    if (map.empty()) {
+        for (int x = 0; x < sqrNbChunk; x++) {
+            for (int z = 0; z < sqrNbChunk; z++) {
+                printf("new chunk \n");
+                Chunk = make_shared<ChunkGeneration>(this, 2, 0.5, x, z);
 
-            Chunk->generateWorld();
-            map.push_back(Chunk);
+                Chunk->generateWorld();
+                map.push_back(Chunk);
 
-            printf("chunk %d %d\n", x, z);
+                printf("chunk %d %d\n", x, z);
+            }
+        }
+    } else if (map.size() > nbChunk){
+        map.clear();
+        for(int x = 0; x < sqrNbChunk; x++){
+            for(int z = 0; z < sqrNbChunk; z++){
+                map.push_back(mapReload[z*sqrNbChunk + x]);
+            }
+        }
+    } else {
+        for (int z = mapReload.size()/2; z < sqrNbChunk; ++z) {
+            for (int x = 0; x < sqrNbChunk; x++) {
+                printf("new chunk \n");
+                Chunk = make_shared<ChunkGeneration>(this, 2, 0.5, x, z);
+
+                Chunk->generateWorld();
+                map.push_back(Chunk);
+
+                printf("chunk %d %d\n", x, 0);
+            }
+        }
+        for (int x = mapReload.size()/2; x < sqrNbChunk; ++x) {
+            for (int z = 0; z < sqrNbChunk; z++) {
+                printf("new chunk \n");
+                Chunk = make_shared<ChunkGeneration>(this, 2, 0.5, x, z);
+
+                Chunk->generateWorld();
+                map.push_back(Chunk);
+
+                printf("chunk %d %d\n", 0, z);
+            }
         }
     }
+
+
 }
 
 shared_ptr<ChunkGeneration> App::getChunk(int prmX, int prmY){
@@ -738,4 +774,8 @@ shared_ptr<ChunkGeneration> App::getChunk(int prmX, int prmY){
         return map[prmY * trunc(sqrt(nbChunk))];
     }
     return nullptr;
+}
+
+RenderingContext::TerrainRenderMode App::getRenderMode() {
+    return renderMode;
 }

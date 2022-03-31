@@ -7,14 +7,17 @@
 
 #include <vector>
 #include <memory>
-#include "Cube.h"
-#include "Quad.h"
+#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
+#include "../ScriptablePipeline/EngineObjects/RenderingContext.h"
 
 using namespace std;
+using namespace glm;
 
 class GameObject;
 class App;
 class Cube;
+class Quad;
 
 typedef vector<int> VectorIntObject1D;
 typedef vector<shared_ptr<Cube>> VectorCubeObject1D;
@@ -37,6 +40,7 @@ public:
     VectorQuadObject1D quads;
     vector<pair<vec3, vec2>> quadsToRender;
 
+
     void generateWorld();
     void generateCubes();
     void generateCubesSemiOpti();
@@ -55,7 +59,6 @@ public:
     int getBlockIndex(int x, int y, int z);
 
     bool shouldFilledCubeBeDrawnSemiOpti(int x, int y, int z);
-
 };
 
 
