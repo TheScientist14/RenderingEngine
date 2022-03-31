@@ -245,23 +245,37 @@ void App::handle_events() {
                     if (isMouseCaptured) {
                         HitInfo hitInfo = raycastFromCamera();
                         if (hitInfo.hasHit) {
-                            vec3 chunkCoords = vec3((int) hitInfo.blockHitPos.x / ChunkGeneration::size,
-                                                    (int) hitInfo.blockHitPos.y / ChunkGeneration::size,
-                                                    (int) hitInfo.blockHitPos.z / ChunkGeneration::size);
-                            vec3 blockChunkCoords = map[0*trunc(sqrt(nbChunk) + 0)]->worldToChunkCoords(hitInfo.blockHitPos);
+                            vec3 chunkCoords;
+                            vec3 blockChunkCoords;
                             switch (curEvent.button.button) {
                                 case SDL_BUTTON_LEFT:
+                                    chunkCoords = vec3((int) hitInfo.blockHitPos.x / ChunkGeneration::size,
+                                                       (int) hitInfo.blockHitPos.y / ChunkGeneration::size,
+                                                       (int) hitInfo.blockHitPos.z / ChunkGeneration::size);
+                                    chunkCoords -= hitInfo.faceHit * 0.5f;
+                                    blockChunkCoords = map[0 * trunc(sqrt(nbChunk) + 0)]->worldToChunkCoords(
+                                            hitInfo.blockHitPos - hitInfo.faceHit * 0.5f);
                                     if (blockChunkCoords != vec3(-1)) {
                                         /*printf("deleted %d %d %d\n", (int) blockChunkCoords.x, (int) blockChunkCoords.y,
                                                (int) blockChunkCoords.z);*/
-                                        map[0*trunc(sqrt(nbChunk) + 0)]->setCube(0, blockChunkCoords.x, blockChunkCoords.y, blockChunkCoords.z);
+                                        map[0 * trunc(sqrt(nbChunk) + 0)]->setCube(0, blockChunkCoords.x,
+                                                                                   blockChunkCoords.y,
+                                                                                   blockChunkCoords.z);
                                     }
                                     break;
                                 case SDL_BUTTON_RIGHT:
+                                    chunkCoords = vec3((int) hitInfo.blockHitPos.x / ChunkGeneration::size,
+                                                       (int) hitInfo.blockHitPos.y / ChunkGeneration::size,
+                                                       (int) hitInfo.blockHitPos.z / ChunkGeneration::size);
+                                    chunkCoords += hitInfo.faceHit * 0.5f;
+                                    blockChunkCoords = map[0 * trunc(sqrt(nbChunk) + 0)]->worldToChunkCoords(
+                                            hitInfo.blockHitPos + hitInfo.faceHit * 0.5f);
                                     if (blockChunkCoords != vec3(-1)) {
                                         /*printf("placed %d %d %d\n", (int) blockChunkCoords.x, (int) blockChunkCoords.y,
                                                (int) blockChunkCoords.z);*/
-                                        map[0*trunc(sqrt(nbChunk) + 0)]->setCube(1, blockChunkCoords.x, blockChunkCoords.y, blockChunkCoords.z);
+                                        map[0 * trunc(sqrt(nbChunk) + 0)]->setCube(1, blockChunkCoords.x,
+                                                                                   blockChunkCoords.y,
+                                                                                   blockChunkCoords.z);
                                     }
                                     break;
                             }
@@ -582,7 +596,8 @@ void App::drawImGUI() {
 
         vec3 cameraEulerAngles = mainCamera->transform->getEulerAngles();
         ImGui::Text("Camera euler angles : %f %f %f", cameraEulerAngles.x, cameraEulerAngles.y, cameraEulerAngles.z);
-        vec3 cameraChunkPos = map[0*trunc(sqrt(nbChunk) + 0)]->worldToChunkCoords(mainCamera->transform->getPosition());
+        vec3 cameraChunkPos = map[0 * trunc(sqrt(nbChunk) + 0)]->worldToChunkCoords(
+                mainCamera->transform->getPosition());
         ImGui::Text("Camera chunk position : %f %f %f", cameraChunkPos.x, cameraChunkPos.y, cameraChunkPos.z);
 
         ImGui::End();
@@ -649,39 +664,47 @@ App::HitInfo App::raycastFromCamera() {
         if (closestIntersection == nullptr) {
             closestDistance = -1;
         } else {
-            if (true /*test if block*/) {
-                hitInfo.hasHit = true;
-                hitInfo.blockHitPos = *closestIntersection;
-                switch (closestIntersectionIndex) {
-                    case 0:
-                        hitInfo.faceHit = vec3(-xDirection, 0, 0);
-                        break;
-                    case 1:
-                        hitInfo.faceHit = vec3(0, -yDirection, 0);
-                        break;
-                    case 2:
-                        hitInfo.faceHit = vec3(0, 0, -zDirection);
-                        break;
-                    default:
-                        printf("shouldn't happen, the heck ?\n");
-                        break;
-                }
-            } else {
-                switch (closestIntersectionIndex) {
-                    case 0:
-                        *closestIntersection += rayDirection * (xDirection / rayDirection.x);
-                        break;
-                    case 1:
-                        *closestIntersection += rayDirection * (yDirection / rayDirection.y);
-                        break;
-                    case 2:
-                        *closestIntersection += rayDirection * (zDirection / rayDirection.z);
-                        break;
-                    default:
-                        printf("shouldn't happen, the heck ?\n");
-                        break;
+            if ((*closestIntersection).x < ChunkGeneration::size - 0.5f && (*closestIntersection).x >= -0.5 &&
+                (*closestIntersection).y < ChunkGeneration::size - 0.5f && (*closestIntersection).y >= -0.5 &&
+                (*closestIntersection).z < ChunkGeneration::size - 0.5f && (*closestIntersection).z >= -0.5) {
+                vec3 chunkCoords = vec3((int) ((*closestIntersection).x + 0.5f) / ChunkGeneration::size,
+                                        (int) ((*closestIntersection).y + 0.5f) / ChunkGeneration::size,
+                                        (int) ((*closestIntersection).z + 0.5f) / ChunkGeneration::size);
+                shared_ptr<ChunkGeneration> chunk = map[chunkCoords.z * trunc(sqrt(nbChunk) + chunkCoords.x)];
+                vec3 intersectionChunkCoords = chunk->worldToChunkCoords(*closestIntersection + vec3(0.5f));
+                if (chunk->getCubesInt()[chunk->getBlockIndex(intersectionChunkCoords.x, intersectionChunkCoords.y,
+                                                              intersectionChunkCoords.z)] != 0) {
+                    hitInfo.hasHit = true;
+                    hitInfo.blockHitPos = *closestIntersection + vec3(0.5f);
+                    switch (closestIntersectionIndex) {
+                        case 0:
+                            hitInfo.faceHit = vec3(-xDirection, 0, 0);
+                            break;
+                        case 1:
+                            hitInfo.faceHit = vec3(0, -yDirection, 0);
+                            break;
+                        case 2:
+                            hitInfo.faceHit = vec3(0, 0, -zDirection);
+                            break;
+                        default:
+                            printf("shouldn't happen, the heck ?\n");
+                            break;
+                    }
                 }
             }
+        }
+        switch (closestIntersectionIndex) {
+            case 0:
+                *closestIntersection += rayDirection * (xDirection / rayDirection.x);
+                break;
+            case 1:
+                *closestIntersection += rayDirection * (yDirection / rayDirection.y);
+                break;
+            case 2:
+                *closestIntersection += rayDirection * (zDirection / rayDirection.z);
+                break;
+            default:
+                break;
         }
     } while (!hitInfo.hasHit && closestDistance <= maxDistance && closestDistance >= 0);
     return hitInfo;
