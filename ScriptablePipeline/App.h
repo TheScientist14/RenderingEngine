@@ -35,11 +35,12 @@ typedef shared_ptr<EngineObject> Sp_EngineObject;
 typedef shared_ptr<RenderedObject> Sp_RenderedObject;
 typedef shared_ptr<Quad> Sp_QuadObject;
 typedef shared_ptr<GameObject> Sp_GameObject;
-typedef vector<shared_ptr<ChunkGeneration>> Terrain;
 
 class App : public BaseApp {
 
 public:
+    typedef vector<shared_ptr<ChunkGeneration>> Terrain;
+
     void main_loop() override;
     void gl_init() override;
     void clean() override;
@@ -120,7 +121,7 @@ protected:
     float directionalLightPower = 1;
     vec3 directionalLightColor = vec3(0.953125f, 0.91015625f, 0.60546875f);
     vec3 directionalLightDirection = vec3(0, -1, 0.1f);
-    RenderingContext::TerrainRenderMode renderMode = RenderingContext::Opti;
+    /*extern*/ RenderingContext::TerrainRenderMode renderMode = RenderingContext::Opti;
 };
 
 

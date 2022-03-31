@@ -601,6 +601,7 @@ App::HitInfo App::raycastFromCamera() {
 }
 
 void App::loadChunk() {
+    map.clear();
     shared_ptr<ChunkGeneration> Chunk;
     for (int x = 0; x < trunc(sqrt(nbChunk)); x++) {
         for (int z = 0; z < trunc(sqrt(nbChunk)); z++) {
@@ -608,6 +609,7 @@ void App::loadChunk() {
 
             Chunk->generateWorld();
             map.push_back(Chunk);
+            printf("chunk %d %d\n", x, z);
         }
     }
 }

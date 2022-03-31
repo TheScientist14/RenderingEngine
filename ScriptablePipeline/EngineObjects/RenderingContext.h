@@ -7,14 +7,16 @@
 #include <memory>
 #include <vector>
 #include <map>
-#include "../App.h"
+
+using namespace std;
 
 class Geometry;
 class GameObject;
-class App;
 class ModelShaderData;
+class App;
+class ChunkGeneration;
 
-using namespace std;
+typedef vector<shared_ptr<ChunkGeneration>> Terrain;
 
 class RenderingContext {
 
@@ -28,6 +30,7 @@ public:
     virtual ~RenderingContext();
 
     void renderEntities();
+
 
     enum TerrainRenderMode {
         Opti, SemiOpti, Brut
