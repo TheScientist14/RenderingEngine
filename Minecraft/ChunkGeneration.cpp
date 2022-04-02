@@ -33,8 +33,8 @@ void ChunkGeneration::generateWorld() {
         }
     }
     generateNoise();
-    generateCubes();
-    generateCubesSemiOpti();
+//    generateCubes();
+//    generateCubesSemiOpti();
     combineVerticesByAxis();
 }
 

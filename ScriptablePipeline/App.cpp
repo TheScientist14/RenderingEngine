@@ -602,8 +602,26 @@ void App::loadChunk() {
         map.resize(nbChunk);
     } else {
 
+        auto prevsize = trunc(sqrt(map.size()));
 
-        for (int z = mapReload.size()/2; z < sqrNbChunk; ++z) {
+        for (int i = 0; i < sqrNbChunk; ++i) {
+
+            for (int j = 0; j < sqrNbChunk; ++j) {
+
+                if(i >= prevsize){
+                    Chunk = make_shared<ChunkGeneration>(this, 2, 0.5, i, j);
+                    Chunk->generateWorld();
+                    map.push_back(Chunk);
+                    if(i!=j){
+                        Chunk = make_shared<ChunkGeneration>(this, 2, 0.5, j, i);
+                        Chunk->generateWorld();
+                        map.push_back(Chunk);
+                    }
+                }
+            }
+        }
+
+        /*for (int z = mapReload.size()/2; z < sqrNbChunk; ++z) {
             for (int x = 0; x < sqrNbChunk; x++) {
                 Chunk = make_shared<ChunkGeneration>(this, 2, 0.5, x, z);
 
@@ -618,7 +636,7 @@ void App::loadChunk() {
                 Chunk->generateWorld();
                 map.push_back(Chunk);
             }
-        }
+        }*/
     }
 
 
