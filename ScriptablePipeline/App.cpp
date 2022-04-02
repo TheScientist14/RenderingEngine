@@ -587,7 +587,8 @@ App::HitInfo App::raycastFromCamera() {
 
 void App::loadChunk() {
     mapReload = map;
-    int sqrNbChunk = trunc(sqrt(nbChunk));
+    int sqrNbChunk = nbChunk ;
+    int squaredNbChunk = nbChunk*nbChunk;
     shared_ptr<ChunkGeneration> Chunk;
     if (map.empty()) {
         for (int x = 0; x < sqrNbChunk; x++) {
@@ -598,8 +599,8 @@ void App::loadChunk() {
                 map.push_back(Chunk);
             }
         }
-    } else if (map.size() > nbChunk){
-        map.resize(nbChunk);
+    } else if (map.size() > squaredNbChunk){
+        map.resize(squaredNbChunk);
     } else {
 
         auto prevsize = trunc(sqrt(map.size()));

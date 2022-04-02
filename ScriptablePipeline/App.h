@@ -84,7 +84,7 @@ protected:
     Terrain map;
     Terrain mapReload;
     bool isDragging;
-    int nbChunk = 4;
+    int nbChunk = 2;
 
     void drawImGUI();
     HitInfo raycastFromCamera();
